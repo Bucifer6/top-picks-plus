@@ -71,3 +71,4 @@ links: [spec.md, decisions.md]
 | C62 | F4 | (First .nfo chunk, on the server, D50) One test copy dated in summer time and one in winter time: after a metadata refresh, Emby shows the same date added as the plugin set. |
 | C63 | F9 | (Automatic) With the old plugin loaded (after the takeover chunk), no plays are logged and no watched state is copied (D51). |
 | C64 | Boundary | (Automatic) Logic may use names that only start like a forbidden one (e.g. `System.IObservable<T>`): the boundary check doesn't fail on them. |
+| C65 | F3 | Before the first artwork chunk is kept, look at three sample pictures (with a logo, without a logo, rank 10): they look like today's row in docs/reference/artwork/ (D62). |

@@ -8,3 +8,5 @@
 **Must not use:** Emby SDK, Storage, EmbyLink, Settings, project root.
 **Versions (D34):** SkiaSharp 2.88.3 exactly (matches Emby 4.10.2); font Oswald Bold (SIL OFL 1.1) with its licence file in this folder.
 **If drawing fails:** return "failed" so EmbyLink uses the plain backdrop and the report says so (D15). Never throw out of a run.
+
+**Layout:** D62 (measured from docs/reference/artwork/). **Font:** Anton (SIL OFL 1.1), embedded with its licence file here; D62 replaces D34's Oswald Bold.

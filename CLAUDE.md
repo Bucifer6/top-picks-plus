@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 5 readiness in progress – first review scored 72; readiness fixes D43–D60 and checks C51–C64 on branch spec/readiness-fixes. Next: owner questions, then re-score.
+**Stage:** 5 readiness in progress – first review scored 72; readiness fixes D43–D62 and checks C51–C65 on branch spec/readiness-fixes. Next: owner questions, then re-score.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -13,8 +13,8 @@ Follows the build-software-safely method: talk and docs first, no code before th
 
 ## Docs
 - docs/spec.md – what it does (F1–F10, v4)
-- docs/checks.md – how the owner tests it (C1–C64)
-- docs/decisions.md – what's decided (D1–D60) and what's still open
+- docs/checks.md – how the owner tests it (C1–C65)
+- docs/decisions.md – what's decided (D1–D62) and what's still open
 - docs/data.md – settings, managed list, play log, run record
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
 
