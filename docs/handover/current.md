@@ -11,9 +11,9 @@ Spec v6 written (D39 applied: the plugin never changes watched state; v5 Blocker
 - How v5 findings were handled: docs/reviews/2026-11-08-spec-v5-handling.md.
 
 ## What is still owed (smallest first)
-1. **Owner proof test (v6 Blocker 1, card 0008).** See "Waiting on the owner". Its answer decides whether D39 stands as written, or deleting copies needs a different design.
+1. ~~Owner proof test~~ done (D43).
 2. Spec v7, in this order:
-   a. Fix Blocker 2 (give-up count off by one: F5, D36, data.md `resumeCount`, C55 must agree) and Blocker 3 (rule for a skipped delete or update's managed entry so the order guard can't set stale dates). Apply the owner's proof-test answer to Blocker 1.
+   a. Fix Blocker 2 (give-up count off by one: F5, D36, data.md `resumeCount`, C55 must agree) and Blocker 3 (rule for a skipped delete or update's managed entry so the order guard can't set stale dates). Blocker 1 is settled by D43: record it as handled.
    b. Then Should-fix, then Nits, from the v6 review. Write `docs/reviews/2026-11-08-spec-v6-handling.md`.
    c. Apply R1 to every new or changed rule, **and** re-read every old rule that mentions anything a change touched (card 0005: removing F7 changed what F6 "finished" means; v6 Comp 6).
 3. Re-run the three goldfish on spec v7. If none finds a Blocker, merge pull request 1 (D27, after build and tests pass). Stage 4 then passes.
@@ -31,14 +31,11 @@ Spec v6 written (D39 applied: the plugin never changes watched state; v5 Blocker
 - device_bash on the owner's PC is broken; listing and staging files works. Emby's HTTP port is 48096 locally, 8096 publicly behind Caddy.
 
 ## Waiting on the owner
-**Proof test on today's old plugin (it still runs), before spec v7.** First, as a safety copy: stop Emby, copy every `.db` file in `programdata\data` to the Desktop, start Emby.
-- **A (copy → real):** in the Latest Top Picks row, pick a film you have *not* watched. Mark it watched from the row. Does the real film in Movies now show watched? Then mark it unwatched again from the row.
-- **B (deleting a copy):** pick a film in the row that is watched in the real library, and one half-watched (offers to resume). Move both copy folders out of `top-picks` to the Desktop, then scan the Top Picks library. Are the real films still watched, and still offering to resume at the same point? Then move the folders back and scan again.
-- **C (episodes):** pick a series in the row. Does an episode you've watched in the real library show watched in the copy? Mark an unwatched episode watched from the row: does the real one turn watched? Undo it afterwards.
-Tell Claude the answer to each (yes / no).
+- **Answered 2026-11-08 10:52 (D43):** the proof test passed on all three: copy → real works, removing copies keeps real watch history, episodes share both ways. **v6 Blocker 1 is settled; D39 and D42 stand.** Nothing more needed from the owner for it. In spec v7, record it in the handling file and note C14 stays the release check.
+- Still to ask when spec v7 reaches it: whether to add "back up Emby's own .db files before install and each release" to releases.md (v6 Sec 2). The owner already did this once for the proof test.
 
 ## Next job
-Spec v7: apply the owner's proof-test answers, fix v6 Blockers 2 and 3, then Should-fix and Nits, then the goldfish re-review. Read first: CLAUDE.md (R1), docs/reviews/2026-11-08-spec-v6-review.md, docs/decisions.md (D36, D39–D42), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
+Spec v7: record D43 (Blocker 1 settled), fix v6 Blockers 2 and 3, then Should-fix and Nits, then the goldfish re-review. Read first: CLAUDE.md (R1), docs/reviews/2026-11-08-spec-v6-review.md, docs/decisions.md (D36, D39–D42), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
 
 ## Cards that applied
 0001 (order through Emby), 0002 (ban fixtures), 0005 (R1; now seen 3, new evidence), 0006 (handover on the unmerged branch), 0008 (real-server proof; now seen 2). No new card this job.

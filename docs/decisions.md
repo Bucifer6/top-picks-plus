@@ -56,6 +56,7 @@ links: [spec.md]
 | D40 | 2026-11-08 | The order guard holds the run lock while it works (taking it only if free); a run start that finds only the order guard holding it waits up to 2 minutes instead of being turned down | The guard read managed.json and set dates while a run could be changing both (v5 review Comp 15). Decided by Claude |
 | D41 | 2026-11-08 | run.previous.json always holds the last successful run before the current one (copied at step 1 only if the run before was successful) | Two failed runs in a row hid the last good report (v5 review Comp 17). Decided by Claude |
 | D42 | 2026-11-08 | Episode .nfo files carry the source episode's provider IDs (`uniqueid`) too, like movies and series, so episodes share watched state the way D39 relies on. Owner check C14 confirms it on the real server | D39's sharing works through provider IDs; v5's episode .nfo had none. Decided by Claude, following D39 |
+| D43 | 2026-11-08 | **Proof test passed (v6 review Blocker 1):** on Emby 4.10.2 with the old plugin, (A) marking a copy watched marks the real film watched; (B) moving copy folders out of top-picks and scanning leaves the real films watched and still resumable at the same point; (C) episodes share watched state both ways. D39 and D42 stand as written; deleting copies (F4 step 7) is safe for real watch history | Owner ran the test after taking a safety copy of Emby's .db files |
 
 ## Still to decide before building
 (none)
