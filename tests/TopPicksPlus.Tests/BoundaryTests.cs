@@ -16,7 +16,8 @@ namespace TopPicksPlus.Tests;
 public class BoundaryTests
 {
     private const string Root = "TopPicksPlus";
-    private const string Emby = "MediaBrowser"; // every Emby SDK namespace starts with this
+    private const string Emby = "MediaBrowser"; // the Emby SDK's main namespaces start with this
+    private const string EmbyToo = "Emby";      // and some start with this (Emby.*); banned wherever Emby is
 
     private static readonly string[] Parts = { "Logic", "Store", "Artwork", "EmbyBridge", "Run", "Settings" };
 
@@ -31,16 +32,19 @@ public class BoundaryTests
         ["Settings"] = new[] { "Logic", Emby },
     };
 
-    /// <summary>Extra bans beyond "other parts" (docs/modules.md "Banned for every part", D28).
-    /// No part may use the network; Logic and Artwork never touch files; only Artwork may use SkiaSharp.</summary>
+    private static readonly string[] NoFiles =
+        { "System.IO.File", "System.IO.Directory", "System.IO.FileStream", "System.IO.FileInfo", "System.IO.DirectoryInfo" };
+
+    /// <summary>Extra bans beyond "other parts" (docs/modules.md "Banned for every part").
+    /// No part may use the network or start programs; Logic and Artwork never touch files; only Artwork may use SkiaSharp.</summary>
     private static readonly Dictionary<string, string[]> AlsoBanned = new()
     {
-        ["Logic"] = new[] { "System.IO.File", "System.IO.Directory", "System.Net", "System.Threading.Tasks", "SkiaSharp" },
-        ["Store"] = new[] { "System.Net", "SkiaSharp" },
-        ["Artwork"] = new[] { "System.IO.File", "System.IO.Directory", "System.Net" },
-        ["EmbyBridge"] = new[] { "System.Net", "SkiaSharp" },
-        ["Run"] = new[] { "System.Net", "SkiaSharp" },
-        ["Settings"] = new[] { "System.Net", "SkiaSharp" },
+        ["Logic"] = NoFiles.Concat(new[] { "System.Net", "System.Diagnostics.Process", "System.Threading.Tasks", "SkiaSharp" }).ToArray(),
+        ["Store"] = new[] { "System.Net", "System.Diagnostics.Process", "SkiaSharp" },
+        ["Artwork"] = NoFiles.Concat(new[] { "System.Net", "System.Diagnostics.Process" }).ToArray(),
+        ["EmbyBridge"] = new[] { "System.Net", "System.Diagnostics.Process", "SkiaSharp" },
+        ["Run"] = new[] { "System.Net", "System.Diagnostics.Process", "SkiaSharp" },
+        ["Settings"] = new[] { "System.Net", "System.Diagnostics.Process", "SkiaSharp" },
     };
 
     private static Assembly Plugin => Assembly.Load(Root);
@@ -68,13 +72,22 @@ public class BoundaryTests
         Assert.Empty(Violations(tests, "Fixture", "Run", Array.Empty<string>()));
         // The network ban bites too (Fixture.Settings opens a socket type).
         Assert.NotEmpty(Violations(tests, "Fixture", "Settings", Array.Empty<string>()));
+        // Each extra ban bites on its own (v4 review Build 24): Task in Logic, file types in Artwork,
+        // starting a program in Store, and a root type used by a part.
+        Assert.Contains("Fixture.Logic.UsesTask", Violations(tests, "Fixture", "Logic", Array.Empty<string>()));
+        Assert.Contains("Fixture.Artwork.UsesFileInfo", Violations(tests, "Fixture", "Artwork", Array.Empty<string>()));
+        Assert.Contains("Fixture.Store.UsesProcess", Violations(tests, "Fixture", "Store", Array.Empty<string>()));
+        var fixtureRoot = tests.GetTypes().Where(t => t.Namespace == "Fixture").Select(t => t.FullName!).ToArray();
+        Assert.NotEmpty(fixtureRoot);
+        Assert.Contains("Fixture.EmbyBridge.UsesRoot", Violations(tests, "Fixture", "EmbyBridge", fixtureRoot));
+        Assert.Empty(Violations(tests, "Fixture", "EmbyBridge", Array.Empty<string>()));
     }
 
     internal static string[] Violations(Assembly assembly, string root, string part, string[] alsoBanned)
     {
         var allowed = MayUse[part];
         var banned = Parts.Where(p => p != part && !allowed.Contains(p)).Select(p => $"{root}.{p}").ToList();
-        if (!allowed.Contains(Emby)) banned.Add(Emby);
+        if (!allowed.Contains(Emby)) { banned.Add(Emby); banned.Add(EmbyToo); }
         if (AlsoBanned.TryGetValue(part, out var extra)) banned.AddRange(extra);
         banned.AddRange(alsoBanned);
 
@@ -119,6 +132,21 @@ public class BoundaryTests
             .Distinct()
             .ToArray();
         Assert.Empty(stray);
+    }
+
+    [Fact]
+    public void Every_plugin_type_is_in_the_root_or_a_part_namespace()
+    {
+        // A type outside TopPicksPlus.* (e.g. namespace Helpers) would escape every wall (v4 review Build 7).
+        // Types the compiler adds by itself (nullable attributes, <Module>, lambdas' hidden classes) are allowed.
+        var outside = Plugin.GetTypes()
+            .Where(t => !t.Name.StartsWith("<", StringComparison.Ordinal))
+            .Where(t => t.GetCustomAttributes(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false).Length == 0)
+            .Where(t => t.Namespace is not ("Microsoft.CodeAnalysis" or "System.Runtime.CompilerServices"))
+            .Where(t => t.Namespace == null || !(t.Namespace == Root || t.Namespace.StartsWith(Root + ".", StringComparison.Ordinal)))
+            .Select(t => t.FullName)
+            .ToArray();
+        Assert.Empty(outside);
     }
 
     private static string SourceDir()

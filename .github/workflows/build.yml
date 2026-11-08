@@ -17,8 +17,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: build-${{ github.ref }}
-  cancel-in-progress: true
+  group: build-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}   # never cancel a build of main
 
 jobs:
   secrets:
@@ -70,31 +70,13 @@ jobs:
           fi
           echo "v=$v" >> "$GITHUB_OUTPUT"
 
-      - name: Restore (locked when lock files are committed)
+      - name: Restore (locked; missing lock files fail the build, D31)
         run: |
-          locked=""
-          if [ -f src/TopPicksPlus/packages.lock.json ] && [ -f tests/TopPicksPlus.Tests/packages.lock.json ]; then
-            locked="--locked-mode"
-          else
-            echo "::warning::Lock files not committed yet; restoring unlocked. Commit the lock-files artifact."
-          fi
-          dotnet restore src/TopPicksPlus/TopPicksPlus.csproj $locked
-          dotnet restore tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj $locked
-          if [ -z "$locked" ]; then
-            # Printed so they can be copied from the log and committed (artifact downloads are blocked from Claude's workspace).
-            for f in src/TopPicksPlus/packages.lock.json tests/TopPicksPlus.Tests/packages.lock.json; do
-              echo "=====LOCKFILE-BEGIN $f"; base64 -w0 "$f"; echo; echo "=====LOCKFILE-END $f"
-            done
-          fi
-
-      - name: Keep the lock files
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: lock-files
-          path: |
-            src/TopPicksPlus/packages.lock.json
-            tests/TopPicksPlus.Tests/packages.lock.json
-          retention-days: 3
+          for f in src/TopPicksPlus/packages.lock.json tests/TopPicksPlus.Tests/packages.lock.json; do
+            [ -f "$f" ] || { echo "::error::$f is missing. Restores must be locked (D31)."; exit 1; }
+          done
+          dotnet restore src/TopPicksPlus/TopPicksPlus.csproj --locked-mode
+          dotnet restore tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj --locked-mode
 
       - name: Build plugin
         env:
