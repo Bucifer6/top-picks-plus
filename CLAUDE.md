@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 4 – Scaffold, not yet passed. Branch `scaffold`, pull request 1 unmerged. Spec v9 written (v8 review handled in docs/reviews/2026-11-08-spec-v8-handling.md); its re-review decides whether Stage 4 passes. Claude merges PRs once build, tests and review pass (D27).
+**Stage:** 4 – Scaffold, not yet passed. Branch `scaffold`, pull request 1 unmerged. Spec v9 re-review found 2 narrow Blockers (docs/reviews/2026-11-08-spec-v9-review.md); spec v10 next. Claude merges PRs once build, tests and review pass (D27).
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
