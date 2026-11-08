@@ -14,4 +14,4 @@ links: [spec.md, decisions.md]
 | Safe error messages | Run report says what failed in plain words, never a stack trace to non-admins; settings page is admin-only (F8) |
 | Bad input refused, never a crash | Damaged or missing data files start empty (Store README); bad pins show "missing" (F2) |
 | Deletes only what it made | F9: only managed folders, only inside the Top Picks folder; a check (C18) proves it |
-| Personal data | Play log stays on the server, admin-only, 90 days (F6, F9) |
+| Personal data | None kept (D21): only daily viewer counts per title, 90 days; user IDs exist only for the current day's not-yet-counted plays. Stays on the server |

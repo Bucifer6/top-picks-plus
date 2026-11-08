@@ -30,6 +30,8 @@ links: [spec.md]
 | D18 | 2026-11-08 | Tests: automatic unit tests (xUnit) for choosing, counting, naming, takeover and ordering logic, with mutation testing (Stryker.NET) on that logic in CI; Emby-side behaviour proved by the owner's checks in checks.md | Logic can be tested without Emby; Emby behaviour needs the real server. Decided by Claude |
 | D19 | 2026-11-08 | Code changes go on branches with pull requests; Claude merges only when the build, tests and the fresh-reviewer review pass. Nothing is pushed straight to main from here on | Keeps main always installable. Decided by Claude |
 | D20 | 2026-11-08 | Code layout: one plugin DLL split into six parts (Logic, Store, Artwork, EmbyBridge, Run, Settings) with walls in each README, enforced by an automatic boundary check (NetArchTest) on every build | Keeps the rules testable without Emby and stops parts reaching into each other. Approved by owner |
+| D21 | 2026-11-08 | No viewing history is kept. During the current UK day the plugin holds who watched what only to count each person once; when the day ends it keeps just "title, day, number of viewers" and the user IDs are thrown away. Kept 90 days | Owner: the plugin only needs how popular titles are, not who watched what. Makes the play log non-personal |
+| D22 | 2026-11-08 | The weekly row check looks at the row as any non-administrator user who can see the Top Picks library; if there is none, it checks as an administrator and the report says so | Decided by Claude after the owner asked what it meant; no stored passwords or keys |
 
 ## Still to decide before building
 (none)

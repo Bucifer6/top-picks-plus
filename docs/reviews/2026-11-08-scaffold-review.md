@@ -68,9 +68,9 @@ Three fresh reviewers, run at the same time: **Comp** (comprehension, 41 finding
 - Native image decode guard (Sec 17).
 - Accepting a known vulnerable transitive package from the Emby SDK, if it ever happens (Build 19).
 
-## Ask the owner (next job)
-- Should the household be told that viewing is logged? (Sec 18)
-- Which non-admin user should the row check use? (Build 12)
+## Asked the owner (answered 2026-11-08)
+- Sec 18 (users not told viewing is logged): owner wants no viewing history at all. D21: user IDs are dropped at the end of each day; only viewer counts are kept.
+- Build 12 / Comp 17 / Sec 12 (which user for the row check): D22. Remaining row-check details (query, matching, pass rule) stay in spec v3.
 
 ## Skipped (Nits, recorded)
 - Comp 31 (data.md intro wording) – fold into spec v3 edit. Comp 32, 35, 36, 37, 41 – fold into spec v3 edit.

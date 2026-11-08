@@ -20,9 +20,11 @@ All plugin data lives in `programdata\plugins\TopPicksPlus\` on the server (JSON
 One entry per copy: `sourceId` (Emby ID of the source title), `kind` (Movie / Series), `folder` (folder name inside the Top Picks folder), `rank` (1–10, or none if adopted and not yet removed), `rankDateUtc`, `adopted` (true if taken over from the old plugin).
 Rule: a folder is only ever deleted if it is in this list.
 
-## plays.json – the play log
-One entry per playback stopped: `userId`, `sourceId` (movie or series, never the copy), `episodeId` (if any), `dayUk` (YYYY-MM-DD), `minutes`, `markedPlayed` (true/false), `runtimeMinutes` (or null).
-Entries older than 90 days are removed on each run. A viewer-day (F2) is computed from these entries, not stored.
+## plays.json – the popularity log (D21: no viewing history)
+Two sections:
+- `today`: plays from the current UK day only, one entry per playback stopped: `userId`, `sourceId` (movie or series, never the copy), `episodeId` (if any), `dayUk` (YYYY-MM-DD), `minutes`, `markedPlayed` (true/false), `runtimeMinutes` (or null). Needed only to count each person once a day.
+- `daily`: one entry per title per finished day: `sourceId`, `dayUk`, `viewers` (how many people counted as watching it that day, F6). No user IDs.
+When a UK day has ended, its `today` entries are turned into `daily` counts and deleted. `daily` entries older than 90 days are removed on each run. Viewer-days (F2) are the sum of `viewers` over the last 7 days.
 
 ## run.json – current or last run
 `runId`, `startedUtc`, `step` (prepare / swap / rescan / dates / artwork / check / done), `status` (running / finished / incomplete / failed / refused), `picks` (rank, sourceId, reason, viewerDays, copyApplied, dateApplied), `rowCheck` (passed, what Emby returned), `pluginVersion`, `embyVersion`, `message`.

@@ -11,7 +11,7 @@ Stage 4 scaffold built and reviewed by three fresh agents ("goldfish": reviewers
 ## What is still owed (smallest first)
 1. Owner to delete the throwaway branch `probe/boundary-bites` on GitHub (Claude was not allowed to delete it). It is harmless.
 2. Spec v3: work through every "Fix in the next job" item in docs/reviews/2026-11-08-scaffold-review.md: 8 Blockers first, then the Should-fix list. Update spec.md, data.md, checks.md and the READMEs to match.
-3. Ask the owner the two questions below, one at a time, and write the answers into the docs.
+3. (done: owner questions answered, D21 and D22.)
 4. Re-run the three goldfish (comprehension, builder readiness, security) on the updated docs and scaffold. Merge pull request 1 only if they find no Blockers. Stage 4 then passes.
 5. Stage 5 readiness goldfish: score must be above 90 and the owner must agree with its restatement.
 6. Stage 6 build in chunks the owner can check, Stage 7 review, Stage 8 release (old plugin removed at the same time).
@@ -27,8 +27,7 @@ Stage 4 scaffold built and reviewed by three fresh agents ("goldfish": reviewers
 - Emby's HTTP port is 48096 locally, public 8096 behind Caddy.
 
 ## Waiting on the owner
-1. Should the people using the server be told their viewing is logged (90 days, admin-only)?
-2. Which non-administrator user should the weekly row check use?
+Nothing right now. Answered 2026-11-08: no viewing history kept (D21); row-check user (D22, Claude's call). Spec v3 must keep F6, data.md and the checks in step with D21 (e.g. C10's report shows viewer-days, never names).
 Technical choices are delegated to Claude, but anything hard to undo still goes to the owner.
 
 ## Next job

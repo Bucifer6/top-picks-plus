@@ -9,7 +9,7 @@ links: [decisions.md, checks.md, data.md]
 
 **Replaces:** the old third-party Emby.TopPicks plugin, which is abandoned and closed source. The old plugin orders the row by writing a "date added" into each title's .nfo file. Emby only reads that date the first time it sees a title, so when last week's folders are still there the order breaks.
 
-**Rigour level:** 1 – Personal: a home Emby server with a handful of users. The plugin keeps 90 days of who watched what, stored only on the server and visible only to administrators (see F9).
+**Rigour level:** 1 – Personal: a home Emby server with a handful of users. The plugin keeps no viewing history: only how many people watched each title on each day, for 90 days (D21).
 
 ## Words used here
 - **Source title:** the real movie or series in the owner's normal libraries (N:\Movies, K:\Series).
@@ -51,7 +51,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 3. **Rescan** only the Top Picks library, and wait until every copy is in the library: up to 15 minutes, or 30 minutes if a series has more than 200 episodes.
 4. **Set the order:** for each copy, set the date added directly in Emby to its rank date. For a series, the series and every one of its episodes get the rank date, so a show can never jump up the row because one episode was added later. The same date is already in the .nfo (step 1), so a later refresh that re-reads the .nfo can't undo it.
 5. **Refresh artwork** for each copy so the number on the picture matches. Then read each date added back and set it again if the refresh changed it.
-6. **Check the row** the way a user sees it: ask Emby for the Latest Top Picks row as one non-administrator user would see it, through the same request the apps use. The check passes only if the row reads 1–10 in order.
+6. **Check the row** the way a user sees it: ask Emby for the Latest Top Picks row as one non-administrator user would see it (any one who can see the Top Picks library; if there is none, an administrator, and the report says so, D22), through the same request the apps use. The check passes only if the row reads 1–10 in order.
 7. **Record** the result in the run report (F8).
 
 **If the step 3 wait runs out:** steps 4–6 still run for every copy that has appeared, the run is marked "incomplete" in the report, and the order guard (F5) finishes the job when the rest appear.
@@ -65,7 +65,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - The plugin listens for Emby's "playback stopped" event on every item. For each one it notes the user, the source title, the day (UK date), how many minutes were watched, and whether Emby marked the item as played.
 - **A play on a copy counts towards its source title.** The plugin looks the copy up in the managed list, so this week's picks get credit when people watch them from the row.
 - **What counts as watched:** a user counts for a title on a day if, that day, Emby marked something in the title as played, or their watching time on the title adds up to at least 50% of the runtime, or at least 20 minutes when the runtime isn't known. Two sittings of 30% each count.
-- Plays are kept for **90 days** in the plugin's own data file. Older ones are deleted every time it runs.
+- **No viewing history (D21):** who watched what is held only for the current UK day, so each person is counted once. When the day ends, it is boiled down to "title, day, number of viewers" and the user IDs are thrown away. Daily counts are kept for **90 days** in the plugin's own data file; older ones are deleted every time it runs.
 - **First run:** if the Playback Reporting plugin's history can be read, the last 7 days are imported from it, once only, so the first list isn't empty. If it can't be read, the plugin carries on, and the report says the first list mostly used recently added titles.
 - The plugin keeps its own record, rather than reading Playback Reporting each week, so it keeps working if that third-party plugin breaks or is removed (decision D9).
 
@@ -85,7 +85,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - **First-run takeover:** before the first run, folders already in the Top Picks folder that contain at least one .strm file and one .nfo file are taken to be the old plugin's and added to the managed list. Anything else, including loose files in the Top Picks folder, is left alone forever.
 - **Old plugin guard:** if a plugin named "Top Picks" (the old Emby.TopPicks) is loaded in Emby, every run refuses to start and the report says to uninstall it first.
 - **Missing library:** if no library uses the Top Picks folder, the run refuses to start and says so.
-- **Personal data:** the play log (user, title, day, minutes) stays in the plugin's data folder on the server, is never sent anywhere, and is shown only on the administrator settings page.
+- **Personal data:** none is kept (D21). Today's not-yet-counted plays hold user IDs until the day ends; after that only daily viewer counts per title remain. Nothing is sent anywhere.
 - **Age ratings:** each copy's .nfo carries the source title's age rating, so Emby's parental controls apply to copies just as they do to the originals.
 
 ## F10 – Staying working through Emby updates
