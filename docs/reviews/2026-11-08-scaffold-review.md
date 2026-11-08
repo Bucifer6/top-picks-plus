@@ -77,3 +77,6 @@ Three fresh reviewers, run at the same time: **Comp** (comprehension, 41 finding
 - Comp 34, Build 22 (Logic must not read the clock; not enforceable by namespace) – relies on review; NetArchTest can't see member calls.
 - Build 30 (Run using concrete EmbyBridge classes) – reviewer check in Stage 7.
 - Comp 4/5 duplicates of Build 5/11 – merged above.
+
+## Handled in spec v3 (next job, same day)
+All 8 Blockers and every Should-fix item above were worked into spec.md v3, data.md, checks.md (C26–C33 added; C11, C12, C21 reworded), modules.md, security.md and the part READMEs. Three choices were recorded as decisions by Claude: D23 (data folder moved to `programdata\data\TopPicksPlus\`, answers Build 25), D24 (Playback Reporting read through Emby's own SQLite, answers Comp 23 / Build 8), D25 (unreachable library folder refuses the run, answers Comp 11). Nits Comp 31, 32, 35, 36, 37, 41 folded into the rewrite. Result of the re-review: docs/reviews/2026-11-08-spec-v3-review.md.

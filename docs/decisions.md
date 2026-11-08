@@ -33,5 +33,9 @@ links: [spec.md]
 | D21 | 2026-11-08 | No viewing history is kept. During the current UK day the plugin holds who watched what only to count each person once; when the day ends it keeps just "title, day, number of viewers" and the user IDs are thrown away. Kept 90 days | Owner: the plugin only needs how popular titles are, not who watched what. Makes the play log non-personal |
 | D22 | 2026-11-08 | The weekly row check looks at the row as any non-administrator user who can see the Top Picks library; if there is none, it checks as an administrator and the report says so | Decided by Claude after the owner asked what it meant; no stored passwords or keys |
 
+| D23 | 2026-11-08 | The plugin's own data folder is `programdata\data\TopPicksPlus\`, not `programdata\plugins\TopPicksPlus\` | Nothing in the plugins folder can then be mistaken for a plugin by Emby's plugin scan (review Build 25). No data existed yet, so nothing moves. Decided by Claude |
+| D24 | 2026-11-08 | The one-off Playback Reporting import reads its database read-only through the SQLite library Emby already ships, compiled against but not shipped (like SkiaSharp, D15); its version is read from the server before that build chunk. Any failure just skips the import | No new package to install; the import is a one-time nicety (D9). Decided by Claude |
+| D25 | 2026-11-08 | If any folder of a chosen or pinned library can't be reached, the run is refused and nothing changes | A disconnected drive would otherwise look like every file is missing and replace good copies with filler. Decided by Claude |
+
 ## Still to decide before building
 (none)
