@@ -1,5 +1,5 @@
 ---
-summary: Stage 4 docs-and-scaffold review (comprehension + builder readiness), and how each finding was handled. Open items here must be settled before Stage 5.
+summary: Stage 4 docs-and-scaffold review (comprehension + builder readiness), and how each finding was handled. All owed items settled 2026-11-08 (D20–D36).
 links: [../spec.md, ../data.md, ../checks.md, ../decisions.md, ../../src/TopPicksPlus/README.md]
 ---
 
@@ -51,3 +51,9 @@ Behaviour questions for the owner (one at a time, with a recommendation):
 - README promised "no other packages" for Logic (3) → names the three blocked packages; the rest is review-only, said plainly.
 - Version check was a substring match (4) → whole-value match, reading the DLL's version resource.
 - Logic README must-not-use list and System.IO.Path note (7, 9) → added. Nits 5, 6, 8 → no change (correct as is, or covered by "reviewed by hand").
+
+## Settled 2026-11-08 (second job)
+- Q1–Q4 → D20–D23 (owner chose the recommendation each time).
+- Owed items 1–10 → D24–D36, written into spec v3, data.md and the folder READMEs. Facts used: Emby runs on .NET 8.0.32 and carries SkiaSharp 2.88.3 and SQLitePCL.pretty 1.2.2 (system folder); Playback Reporting's table layout (its database); the old plugin's assembly name and ID (Emby.TopPicks.dll 1.0.0.63).
+- Owed item 11 (checks) → C16, C18, C24 tightened; C26–C38 added.
+- Not proved yet, by design: reading Playback Reporting through Emby's SQLite (D25 has a fallback), and the old plugin's ID (assembly name matches too). Both are checked in their build chunks.

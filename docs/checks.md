@@ -1,6 +1,6 @@
 ---
 summary: Plain-English checks the owner can try; each maps to a feature in spec.md and gets an automatic test where possible.
-links: [spec.md]
+links: [spec.md, decisions.md]
 ---
 
 # Checks
@@ -22,13 +22,26 @@ links: [spec.md]
 | C13 | F2 | A week with only 4 watched titles: places 5–10 are the newest additions, and the run finishes normally. |
 | C14 | F7 | Finish a film from the Top Picks row. The real film in your Movies library now shows as watched for you. Stop a film half-way in the row, then open the real one: it offers to resume. |
 | C15 | F4 | A title that drops out of the 10 disappears from the row, and its folder is gone from top-picks. A title that stays keeps your watched tick on its copy. |
-| C16 | F3 | Playing a movie or an episode from the row plays the real file, with its subtitles. A series opens with its seasons and episodes. |
+| C16 | F3 | Playing a movie or an episode from the row plays the real file, with its subtitles (episodes too). A series opens with its seasons and episodes. |
 | C17 | F3 | A title with no logo gets artwork with its name in large text and the rank number. |
-| C18 | F9 | Put a test folder in top-picks with a text file in it, after the plugin is installed. After two runs, it is still there. Separately, an old-plugin folder for a title that's no longer a pick is removed on the first run. |
+| C18 | F9 | Before the first run, create a folder "Keep me" in top-picks holding only note.txt. After two runs, the folder and note.txt are still there, unchanged. Separately, an old-plugin folder for a title that's no longer a pick is removed on the first run, and one that is still a pick is replaced by a fresh copy. |
 | C19 | F9 | With the old Top Picks plugin still installed, the task refuses to run and the report says to uninstall it. |
 | C20 | F10 | After an Emby upgrade, Run now: the run finishes, the row is in order, and the report shows the new Emby version. |
 | C21 | F5 | Restart Emby in the middle of a run. Within 15 minutes of it coming back, the row is complete and in order, and the report says the run finished. |
 | C22 | F1 | Press Run now twice quickly. The second is turned down with "a run is already in progress". |
 | C23 | F8 | Settings: add, reorder and remove pins; choose libraries. The Top Picks library is not offered. The report shows rank, reason and row-check result for each title. |
-| C24 | F6 | A play from 91 days ago is no longer in the log after a run. |
+| C24 | F6 | A play from 91 days ago is no longer in the log after a run. (Also an automatic test.) |
 | C25 | F2 | Choose only your Movies library: the next run has no series. |
+| C26 | F1 | Stop Emby for over a week (or set the last successful run back 8 days on a test copy), start it: about 10 minutes later a run happens by itself. |
+| C27 | F6 | First run after install: the report says the first week came from Playback Reporting, and titles watched last week are in the list. If Playback Reporting can't be read, it says "last played" was used instead. |
+| C28 | F9 | Remove the Top Picks library (on a test server) and Run now: it refuses and says the library is missing. Nothing is deleted. |
+| C29 | F4 | A run whose rescan wait runs out is marked "incomplete"; once the rest of the copies appear, the order guard puts them in order without another run. |
+| C30 | F9 | A user whose parental control blocks a rating doesn't see a Top Picks copy of a title with that rating, just as they don't see the original. |
+| C31 | F4 | With the row-check user left empty, the report names the user it used (not an admin). With a restricted user chosen, a row missing their blocked titles still passes if the rest are in order. |
+| C32 | F2 | Choose only Movies, and pin a title from Kids: the pin is still used. |
+| C33 | F2 | (Automatic) The 7-day window for a Sunday run is the previous Sunday to Saturday; a mid-week run uses the 7 days before it. |
+| C34 | F6 | (Automatic) 30% of one episode plus 30% of another on the same day doesn't count; two 30% sittings of the same episode do. |
+| C35 | F2 | (Automatic) Titles tied on everything come out in the same order every time (lowest ID first). |
+| C36 | F5 | (Automatic, plus C21) Stopping a run at any step and resuming it ends with the same 10 copies, the same rank dates, no folder in top-picks missing from the managed list, and nothing unmanaged deleted. |
+| C37 | F9 | (Automatic) If managed.json is damaged, a run refuses with "data damaged" and deletes nothing; a damaged plays.json is renamed and a new one started. |
+| C38 | F8 | Press Run now while a run is going: the running report is not replaced; the refusal shows separately. |

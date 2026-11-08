@@ -9,7 +9,8 @@
 - listening for playback stopped and recording plays (F6), the one-off Playback Reporting import;
 - copying watched state and resume points (F7);
 - the row check as a non-administrator user (F4 step 6);
-- the safety guards: old plugin loaded, Top Picks library missing, delete only managed folders inside the Top Picks folder (F9).
+- the safety guards: old plugin loaded (exact match, D33), Top Picks library missing, delete only managed folders inside the Top Picks folder (F9);
+- linking copy files to source items by path (D28), minutes watched from start/stop positions (D29), the Playback Reporting read through Emby's own SQLite library (D25), the start-up order (D35).
 
 **Belongs here:** thin code that turns Emby objects into plain values for Logic and carries out Logic's answers.
 **Does not belong:** the rules themselves (Logic), JSON file handling (Storage), drawing (Artwork), the admin page (Settings).
