@@ -9,7 +9,7 @@
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
 
 ## Standing rules
-- **R1** (2026-11-08, card 0005, approved by owner): ALWAYS, after any spec change, check every new or changed rule against the F4 step list, run.json `step`/`status`, data.md and the part walls before asking for a review. ALWAYS also walk one concrete case of every kind of operation (delete, update, add) and each restart point through every older rule that a new pre-check, lock or wait now runs before or around (added 2026-11-08, widened the same day after the v8 review, both with owner's OK, card 0005 seen 5).
+- **R1** (2026-11-08, card 0005, approved by owner): ALWAYS, after any spec change, check every new or changed rule against the F4 step list, run.json `step`/`status`, data.md and the part walls before asking for a review. ALWAYS also walk one concrete case of every kind of operation (delete, update, add) and each restart point through every older rule that a new pre-check, lock or wait now runs before or around. ALWAYS also walk with something the plugin didn't make (a file with an odd name, a link) inside each folder, and with several starts at once where the first run ends quickly (added 2026-11-08, widened after the v8 and v9 reviews, each with owner's OK, card 0005 seen 6).
 
 ## Docs
 - docs/spec.md – what it does (F1–F10)

@@ -3,5 +3,5 @@
 2. Check 2 runs on deletes, so a file someone put in a copy folder with an odd name (`~$` lock file) skips the delete for ever: apply check 2 only to names the plugin writes. Waiting starts keep waiting after a fast run and can start a second run, and the end-of-run guard can stop for a waiter that then times out: a waiting start is turned down at once when a run takes the lock. (What is still owed 1a, 1b)
 3. Blocker 2, then Blocker 1 (and C73 wording), then Should-fix, then Nits, writing docs/reviews/2026-11-08-spec-v9-handling.md; then R1 and the re-review. (What is still owed 1)
 4. Something the plugin didn't make inside each folder, and several starts at once with a run that ends quickly, because both v9 Blockers sat outside a walk of the plugin's own files and one start at a time (card 0005 seen 6). (What is still owed 1d)
-5. Whether R1 in CLAUDE.md may be widened with those two cases. (Waiting on the owner)
+5. Nothing: the R1 widening was approved 2026-11-08 12:35 and is in CLAUDE.md. (Waiting on the owner)
 6. `C:\Users\Admin\EmbySafetyCopy\`, because `C:\EmbySafetyCopy\` is readable by every Windows account on the PC (Sec S4). (Watch out for)

@@ -28,7 +28,7 @@ Spec v9 written (v8 Blockers fixed: update link sweep before any write and repla
 - The safety copy moves to `C:\Users\Admin\EmbySafetyCopy\` in v10 (v9 review Sec S4).
 
 ## Waiting on the owner
-- **R1 widening (card 0005 seen 6):** ask the owner whether R1 in CLAUDE.md may add "also walk with something the plugin didn't make inside each folder, and several starts at once where the first run ends quickly". Until approved, apply it as card 0005's advice.
+- R1 widening (card 0005 seen 6): **approved by the owner 2026-11-08 12:35 and already in CLAUDE.md.** Nothing to ask.
 
 ## Next job
 Spec v10: fix v9 Blockers 2 then 1, then Should-fix and Nits, then the fresh re-review. Read first: CLAUDE.md (R1), card 0005, docs/reviews/2026-11-08-spec-v9-review.md, docs/reviews/2026-11-08-spec-v8-handling.md, docs/decisions.md (D51–D55), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, docs/releases.md, the part READMEs.
