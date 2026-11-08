@@ -1,42 +1,44 @@
 # Handover
 
 ## Job just finished
-Spec v5 written (D34 applied; v4 Blockers 1, 5, 6 and the Should-fix list handled, D35–D38), scaffold tightened, re-reviewed by three fresh agents: **not passed, 6 Blockers**. Owner approved standing rule R1, promoted from card 0005: after any spec change, check every new or changed rule against the F4 step list, run.json `step`/`status`, data.md and the part walls before asking for a review.
+Spec v6 written (D39 applied: the plugin never changes watched state; v5 Blockers 1, 2, 3, 6 fixed; Should-fix and Nits handled; D40–D42; checks C63–C75), then re-reviewed by three fresh agents: **not passed, 3 Blockers** (docs/reviews/2026-11-08-spec-v6-review.md).
 
 ## Where it stopped
 - Stage 4 (Scaffold), still not passed.
-- Branch `scaffold`, pull request 1 open and **not merged**. Spec v5 is commit 64a2216; scaffold fixes 96682d3; handling file 01bb2dd; this handover and the v5 review are the commit after. Build passes on Windows (run 42469177368).
+- Branch `scaffold`, pull request 1 open and **not merged** (pushed). Spec v6 is commit 04e23c4; this handover, the v6 review and card updates are the commit after.
 - main is still docs only (dbf3277). Always read this branch's handover (card 0006).
 - No plugin code exists anywhere, on purpose.
-- Review: docs/reviews/2026-11-08-spec-v5-review.md. How v4 findings were handled: docs/reviews/2026-11-08-spec-v4-handling.md.
+- How v5 findings were handled: docs/reviews/2026-11-08-spec-v5-handling.md.
 
 ## What is still owed (smallest first)
-1. CLAUDE.md, tests README and releases.md small fixes listed as Nits in the v5 review (counts already updated in CLAUDE.md).
-2. **Owner proof test (Blocker 5, card 0008):** does Emby 4.10.2 share watched state between a Top Picks copy and its real title? See "Waiting on the owner". Its answer decides how F7 and F4 step 9 are rewritten (keep `uniqueid` in copies and drop the sync, or drop `uniqueid` and keep the sync).
-3. Spec v6, in this order:
-   a. Fix Blockers 1 (row-check verdict vs C39), 2 (store the full planned entry in each run.json operation), 3 (resume keeps run.json; pending flags not re-copied), 4 (resume point only if higher, first episode only, nothing if source played), 6 (back up plays.json with `"today": []`; add a restore check). Then apply D39 (owner chose shared watched state), which settles Blockers 4 and 5.
-   b. Then Should-fix, then Nits, from the v5 review. Write a handling file `docs/reviews/2026-11-08-spec-v5-handling.md`.
-   c. Apply R1 to every new or changed rule.
-4. Re-run the three goldfish (comprehension, builder readiness, security) on spec v6. If none finds a Blocker, merge pull request 1 (D27). Stage 4 then passes.
-5. Stage 5 readiness goldfish (score above 90, owner agrees with the restatement); Stage 6 build in chunks; Stage 7 review; Stage 8 release.
+1. **Owner proof test (v6 Blocker 1, card 0008).** See "Waiting on the owner". Its answer decides whether D39 stands as written, or deleting copies needs a different design.
+2. Spec v7, in this order:
+   a. Fix Blocker 2 (give-up count off by one: F5, D36, data.md `resumeCount`, C55 must agree) and Blocker 3 (rule for a skipped delete or update's managed entry so the order guard can't set stale dates). Apply the owner's proof-test answer to Blocker 1.
+   b. Then Should-fix, then Nits, from the v6 review. Write `docs/reviews/2026-11-08-spec-v6-handling.md`.
+   c. Apply R1 to every new or changed rule, **and** re-read every old rule that mentions anything a change touched (card 0005: removing F7 changed what F6 "finished" means; v6 Comp 6).
+3. Re-run the three goldfish on spec v7. If none finds a Blocker, merge pull request 1 (D27, after build and tests pass). Stage 4 then passes.
+4. Stage 5 readiness goldfish (score above 90, owner agrees with the restatement); Stage 6 build in chunks; Stage 7 review; Stage 8 release.
 
 ## Watch out for
-- **Before every commit**, run the pattern check on staged changes: `git diff --cached -U0 | grep -E '^\+' | grep -nEi '(api[_-]?key|secret|token|passw(or)?d)\s*[:=]\s*["'"'"']?[A-Za-z0-9/+_\-]{12,}|-----BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-'`. Nothing printed (exit 1) means clean. Don't try to download gitleaks. (v5 review Sec 9: move this command into security.md.)
-- **Nothing is compiled here or on the owner's PC.** Only GitHub Actions builds (D16), on Windows (D31). There is no .NET SDK in the workspace.
-- build.yml now **fails** when a lock file is missing; the old "print lock files to the log" fallback is gone. Card 0007's method still works for any other small file.
-- The boundary check now also bans `Emby.*`, `System.Diagnostics.Process` and file types for Logic and Artwork. NetArchTest matches by name prefix, so `System.IO.File` also bans `FileNotFoundException` (v5 review Build 12): Artwork must catch `Exception`, or the ban must be made exact.
-- The workspace clone is shallow. To track `scaffold`, add it to remote.origin.fetch first.
-- Wall changes need the owner's OK, with matching edits to the READMEs, docs/modules.md and BoundaryTests.cs. v5 review Comp 9 / Build 9 (who checks the plugin data folder isn't a link) will need one.
+- **Before every commit**, run the pattern check in docs/security.md "Secret scan" on the staged changes. Nothing printed (exit 1) means clean. Don't try to download gitleaks.
+- **Nothing is compiled here or on the owner's PC.** Only GitHub Actions builds (D16), on Windows (D31). No .NET SDK in the workspace.
+- Two v6 Should-fix items touch walls or test layers: an EmbyBridge test layer (Build 1), and which part holds the link-resolving helper on netstandard2.0 (Build 4, Comp 11). A new "may use" link or test layer needs the owner's OK, with matching edits to READMEs, docs/modules.md and BoundaryTests.cs.
+- D39 knock-on still open: with shared state, "finished" in F6 must mean "became played during this playback" (Comp 6), or C12 breaks.
+- The Sec 2 suggestion (back up Emby's own database before install and each release) is new: it touches the owner's server, so ask before writing it into releases.md.
 - SkiaSharp (D15) and System.Text.Json (D30) are compiled against but not shipped; versions must be read from the server before their build chunks.
-- The old plugin (Emby.TopPicks.dll) is still installed; it is uninstalled at release (Stage 8) using the first-install steps now in docs/releases.md.
+- The old plugin (Emby.TopPicks.dll) is still installed; it is uninstalled at release (Stage 8) using docs/releases.md's steps.
+- The workspace clone is shallow. To track `scaffold`, add it to remote.origin.fetch first.
 - device_bash on the owner's PC is broken; listing and staging files works. Emby's HTTP port is 48096 locally, 8096 publicly behind Caddy.
 
 ## Waiting on the owner
-- **Answered (quick look), 2026-11-08:** films already watched show as watched in today's row, so Emby shares watched state between copy and real title (CLAUDE.md Facts). Owner then chose **D39: share it, like today**. Spec v6 removes F7 and the played-state reset in F4 step 9; Blocker 4 (resume-point rule) goes with them. Update C14, C15, C49, C59, P2, the EmbyBridge/Run/Logic READMEs and modules.md to match (R1).
-- Original question, kept for the record: Quick look first: pick a film in today's Latest Top Picks row that you have watched in your Movies library. Does its copy in the row show as watched too? Then, to be sure, on one test film: mark the copy in Top Picks unwatched and see whether the real film also turns unwatched (mark it watched again afterwards).
+**Proof test on today's old plugin (it still runs), before spec v7.** First, as a safety copy: stop Emby, copy every `.db` file in `programdata\data` to the Desktop, start Emby.
+- **A (copy → real):** in the Latest Top Picks row, pick a film you have *not* watched. Mark it watched from the row. Does the real film in Movies now show watched? Then mark it unwatched again from the row.
+- **B (deleting a copy):** pick a film in the row that is watched in the real library, and one half-watched (offers to resume). Move both copy folders out of `top-picks` to the Desktop, then scan the Top Picks library. Are the real films still watched, and still offering to resume at the same point? Then move the folders back and scan again.
+- **C (episodes):** pick a series in the row. Does an episode you've watched in the real library show watched in the copy? Mark an unwatched episode watched from the row: does the real one turn watched? Undo it afterwards.
+Tell Claude the answer to each (yes / no).
 
 ## Next job
-Spec v6: get the owner's proof-test answer, fix the v5 review Blockers, then Should-fix and Nits, then the goldfish re-review. Read first: CLAUDE.md (R1), docs/reviews/2026-11-08-spec-v5-review.md, docs/decisions.md (D26, D34–D38), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
+Spec v7: apply the owner's proof-test answers, fix v6 Blockers 2 and 3, then Should-fix and Nits, then the goldfish re-review. Read first: CLAUDE.md (R1), docs/reviews/2026-11-08-spec-v6-review.md, docs/decisions.md (D36, D39–D42), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
 
 ## Cards that applied
-0001 (order through Emby), 0002 (each ban has a self-test fixture), 0005 (now R1), 0006 (handover on the unmerged branch), 0007 (read CI logs, not artifacts). New this job: 0008.
+0001 (order through Emby), 0002 (ban fixtures), 0005 (R1; now seen 3, new evidence), 0006 (handover on the unmerged branch), 0008 (real-server proof; now seen 2). No new card this job.
