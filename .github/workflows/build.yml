@@ -57,6 +57,11 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      - name: TEMP print samples for builder review
+        shell: bash
+        run: |
+          for f in artwork-samples/*.png; do echo "BEGIN-SAMPLE $(basename "$f")"; base64 -w 0 "$f"; echo; echo "END-SAMPLE"; done
+
       - name: Check the plugin ships no SkiaSharp (D15)
         shell: bash
         run: |
