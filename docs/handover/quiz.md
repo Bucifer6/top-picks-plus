@@ -1,8 +1,8 @@
 # Handover quiz (answer from current.md alone; do not open answers.md)
-1. Which branch holds the latest work, why must you not trust main's handover, and is pull request 1 merged?
-2. What must happen, in what order, before Stage 4 passes?
-3. How was review Blocker 1 settled, and which parts of the spec and checks must change for it?
-4. What extra step does card 0005 ask for every new rule in spec v4?
-5. Which kind of fix needs the owner's OK before it is made, and which files must change with it?
-6. Which three libraries are compiled against but not shipped (or now in question), and what follows from that?
-7. What do you run before every commit, and what must you not try again?
+1. Which branch and pull request hold the latest work, is it merged, and who may merge it once it passes?
+2. Which docs still describe something the owner has removed, and what was removed?
+3. In what order must spec v5 be done, and which three v4 Blockers are still to fix by hand?
+4. What two things are waiting on the owner?
+5. Why can't you download the CI's lock-files artifact, and what do you do instead?
+6. What must happen before Stage 4 passes, and what is the next stage's pass mark?
+7. What do you run before every commit, and what result means clean?

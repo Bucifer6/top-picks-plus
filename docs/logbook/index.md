@@ -9,3 +9,4 @@ summary: Index of live logbook cards
 | 0004 | build | all parts, tests, build | Stage 4 scaffold built on branch scaffold (pull request 1), not yet merged |
 | 0005 | insight | docs, spec | Fixing review findings with new detail creates contradictions unless each rule is cross-checked |
 | 0006 | method | handover | List remote branches first; the newest handover may be on an unmerged branch |
+| 0007 | method | build | CI artifacts can't be downloaded from the workspace; read the job log instead |
