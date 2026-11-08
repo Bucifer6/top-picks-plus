@@ -16,11 +16,13 @@ links: [spec.md]
 | D7 | 2026-11-08 | The plugin is called "Top Picks Plus" in Emby | Matches the repo name; never confused with the old plugin |
 
 | D8 | 2026-11-08 | Keep the numbered copies (.strm library) rather than a playlist of the real titles; sync watched/resume back to the real title; accept duplicates in search | Owner wants the numbered artwork; weighed against a playlist section during the challenge round |
-| D9 | 2026-11-08 | (Builder default, owner may change) The plugin keeps its own play log; Playback Reporting is only used once, to seed the first week | Not dependent on a third-party plugin that could break |
-| D10 | 2026-11-08 | (Builder default, owner may change) "Most watched" = viewer-days in the last 7 days; a binge counts once per user per day | Stops one person's binge outranking what several people watched |
-| D11 | 2026-11-08 | (Builder default) The number of picks is fixed at 10 | Artwork, order and pins all assume 10; fewer moving parts |
+| D9 | 2026-11-08 | The plugin keeps its own play log; Playback Reporting is only used once, to seed the first week | Not dependent on a third-party plugin that could break. Approved by owner at spec gate |
+| D10 | 2026-11-08 | "Most watched" = viewer-days in the last 7 days; a binge counts once per user per day | Stops one person's binge outranking what several people watched. Approved by owner at spec gate |
+| D11 | 2026-11-08 | The number of picks is fixed at 10 | Artwork, order and pins all assume 10; fewer moving parts. Approved by owner at spec gate |
 
 | D12 | 2026-11-08 | Proof test passed on Emby 4.10.2: changing Date added on a movie and on a series (series only) moves it in the Latest Top Picks row, and it stays after a full scan and restart. The date-added approach (F4/F5) goes ahead | Owner ran the test in the Emby dashboard |
 
+| D13 | 2026-11-08 | Spec v2 approved by the owner; Stage 2 gate passed | Every feature has a check; challenge findings handled (docs/reviews/2026-11-08-challenge.md) |
+
 ## Still to decide before building
-(none for the spec; Stage 3 technical choices listed in the handover)
+Stage 3 technical choices, proposed in docs/handover/current.md
