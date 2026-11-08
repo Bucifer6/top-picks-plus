@@ -1,8 +1,8 @@
 # Handover quiz (answer from current.md alone; do not open answers.md)
-1. Which branch and pull request hold the latest work, is it merged, and who may merge it once it passes?
-2. Which docs still describe something the owner has removed, and what was removed?
-3. In what order must spec v5 be done, and which three v4 Blockers are still to fix by hand?
-4. What two things are waiting on the owner?
-5. Why can't you download the CI's lock-files artifact, and what do you do instead?
-6. What must happen before Stage 4 passes, and what is the next stage's pass mark?
+1. Which branch and pull request hold the latest work, is it merged, and what must happen before it may be merged?
+2. Which v5 Blocker can't be fixed from the docs alone, why, and what exactly is the owner asked to do?
+3. In what order must spec v6 be done, and what are the five Blockers that can be fixed straight away?
+4. What happens now if a lock file is missing from the repo, and what changed compared with the last job?
+5. Why might Artwork's planned SkiaSharp error handling break the boundary check, and what are the two ways out?
+6. Which standing rule now exists, where did it come from, and what does it require?
 7. What do you run before every commit, and what result means clean?

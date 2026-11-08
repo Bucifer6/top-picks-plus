@@ -1,0 +1,8 @@
+# Answer key (only the goldfish marker reads this)
+1. Branch `scaffold`, pull request 1, not merged; Claude may merge it without asking once build, tests and a fresh review with no Blockers pass (D27). (Where it stopped; What is still owed 4)
+2. spec.md, data.md and checks.md (also modules, READMEs, security.md per item 3a) still describe the automatic takeover and the Playback Reporting import, removed by D34. (Where it stopped; What is still owed 3a)
+3. Apply D34 first; then mark which v4 findings D34 removed; then fix Blockers 1, 5 and 6, then Should-fix, then Nits, using card 0005. Blocker 1 = "waiting to resume" undefined, 5 = damaged plays.json keeping user IDs, 6 = unplayed reset flowing back to real titles (from the review file). (What is still owed 3)
+4. Deleting the `probe/boundary-bites` branch (harmless) and whether card 0005 becomes a standing rule (needs explicit OK). (What is still owed 1–2; Waiting on the owner)
+5. Artifact downloads go to blob storage, which the workspace refuses; read the job log through the GitHub API and decode the printed files (card 0007). (Watch out for)
+6. Spec v5, then the three goldfish re-review with no Blockers, then merge PR 1. Stage 5 readiness score must be above 90 and the owner must agree with the restatement. (What is still owed 4–5)
+7. The staged-changes pattern check; nothing printed (exit 1) means clean. (Watch out for)
