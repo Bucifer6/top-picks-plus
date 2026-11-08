@@ -3,7 +3,8 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 5 readiness in progress – reviews scored 72, 71, then 76 (fixes D43–D75 merged to main). Fixes D76–D91 and checks C76–C93 on branch spec/readiness-fixes-2 (owner to merge). Next: a fresh re-score.
+**Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
+**Stage:** 5 readiness, final round (D92). Whole-plan reviews scored 72, 71, 76, 75; the score is no longer the gate. Blocker fixes D93–D94 and docs/backlog.md on branch spec/readiness-fixes-2. Next: fix-check, owner agrees the restatement, then build chunk 3 (Artwork).
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
