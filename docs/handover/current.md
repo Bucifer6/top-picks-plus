@@ -32,7 +32,8 @@ Spec v5 written (D34 applied; v4 Blockers 1, 5, 6 and the Should-fix list handle
 - device_bash on the owner's PC is broken; listing and staging files works. Emby's HTTP port is 48096 locally, 8096 publicly behind Caddy.
 
 ## Waiting on the owner
-- **The watched-state proof test (owed item 2).** Quick look first: pick a film in today's Latest Top Picks row that you have watched in your Movies library. Does its copy in the row show as watched too? Then, to be sure, on one test film: mark the copy in Top Picks unwatched and see whether the real film also turns unwatched (mark it watched again afterwards).
+- **Answered (quick look), 2026-11-08:** films already watched show as watched in today's row, so Emby shares watched state between copy and real title (CLAUDE.md Facts). Still to settle: which way spec v6 goes (keep shared state and drop the F7 sync and weekly reset, or remove provider IDs from copies and keep the sync).
+- Original question, kept for the record: Quick look first: pick a film in today's Latest Top Picks row that you have watched in your Movies library. Does its copy in the row show as watched too? Then, to be sure, on one test film: mark the copy in Top Picks unwatched and see whether the real film also turns unwatched (mark it watched again afterwards).
 
 ## Next job
 Spec v6: get the owner's proof-test answer, fix the v5 review Blockers, then Should-fix and Nits, then the goldfish re-review. Read first: CLAUDE.md (R1), docs/reviews/2026-11-08-spec-v5-review.md, docs/decisions.md (D26, D34–D38), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.

@@ -40,3 +40,4 @@ GitHub Actions builds the plugin DLL (decision D5). Nothing is built on the owne
 ## Facts found 2026-11-08
 - Emby Server 4.10.2.0, programdata at C:\Users\Admin\AppData\Roaming\Emby-Server\programdata; media on N:\Movies and K:\Series.
 - The old plugin orders the row by writing <dateadded> into each .nfo (rank 1 = run time, each rank 1 hour earlier). Emby ignores it for titles already in the library, so leftover folders keep their old dates and the order breaks.
+- Owner, 2026-11-08 10:06: in today's Latest Top Picks row (old plugin, copies carry provider IDs), films already watched in the real library show as watched. So Emby shares watched state between a copy and its real title (v5 review Blocker 5, card 0008).
