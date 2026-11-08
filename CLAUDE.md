@@ -28,7 +28,7 @@ Follows the build-software-safely method: talk and docs first, no code before th
 | src/TopPicksPlus/EmbyLink | Everything that talks to Emby: task, events, swap, dates, guard, row check |
 | src/TopPicksPlus/Settings | Admin settings page and run report |
 | tests/ | xUnit tests for Logic; Boundaries/ is the boundary check |
-| .github/workflows/ | build.yml: build, tests, audit, secret scan; Release on v* tag |
+| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. Stryker added by the first Logic chunk |
 
 ## Building
 Boundary check: tests/TopPicksPlus.Tests/Boundaries (runs on every change; layout approved by the owner 2026-11-08).

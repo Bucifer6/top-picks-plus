@@ -5,5 +5,5 @@
 **Belongs here:** the page's HTML and script (embedded resources) and the server endpoints it calls.
 **Does not belong:** running the refresh (it asks EmbyLink), rules (Logic), file formats (Storage).
 **May use:** Logic, Storage, EmbyLink, project root, Emby SDK.
-**Must not use:** Artwork.
+**Must not use:** Artwork, SkiaSharp.
 **Personal data:** the play counts shown here are for administrators only (F9).

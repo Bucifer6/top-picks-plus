@@ -5,5 +5,6 @@
 **Belongs here:** file shapes matching docs/data.md, safe load (a missing file means empty; a damaged file is reported, never silently replaced), atomic save.
 **Does not belong:** deciding anything (that's Logic), plugin settings (Emby keeps those in `plugins\configurations\TopPicksPlus.xml` via the project root), anything that deletes copies in the Top Picks folder (EmbyLink does that, only for folders on the managed list).
 **May use:** Logic (for its record types), .NET.
-**Must not use:** Emby SDK, SkiaSharp, Artwork, EmbyLink, Settings.
+**Must not use:** Emby SDK, SkiaSharp, Artwork, EmbyLink, Settings, project root.
+**Open (must be decided before the Storage chunk):** which JSON library to use within the one-DLL rule (D17); see docs/reviews/2026-11-08-scaffold-review.md.
 **Data:** play log holds user IDs and viewing days; it never leaves this folder (F9).
