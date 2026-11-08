@@ -54,3 +54,6 @@ links: [spec.md, decisions.md]
 | C45 | F9 | (Automatic) A managed entry whose folder is empty, ".", "..", a path, or a junction pointing elsewhere is never deleted; the report names it. |
 | C46 | F9 | (Automatic) An old-plugin series folder (tvshow.nfo at the top, .strm files only in Season folders) is adopted at takeover. |
 | C47 | F4 | (Automatic) A run after a failed run finishes the old run's "leaving" deletes and drops its stray "incoming" copies; nothing is orphaned. |
+| C48 | F9 | (Automatic) Takeover run a second time (e.g. TakeoverDone lost) adopts nothing already on the managed list; saving the settings page doesn't change TakeoverDone. |
+| C49 | F9 | (Automatic) A staging folder that is a junction is not emptied; a junction inside a dropped copy is removed as a link and its target is untouched. |
+| C50 | F9 | (Automatic) An old-plugin folder that is still a pick: the new copy takes the plain name; if the old folder can't be deleted, the new copy gets " - 2" and nothing is merged. |

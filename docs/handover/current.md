@@ -1,31 +1,30 @@
 # Handover
 
 ## Job just finished
-Stage 4 scaffold: folders with READMEs, build workflow, test project, boundary check with canaries, and three fresh reviews (docs/reviews/2026-11-08-scaffold-review.md).
+Spec gaps: owner answered Q1–Q4 (D20–D23) and the library-block question (D42); Claude settled the eleven technical gaps (D24–D41) from facts on the owner's Emby; checks now C1–C50. Two fresh reviews: the first found 2 Blockers (fixed), the re-review found none (its 8 should-fixes are fixed too).
 
 ## Where it stopped
-Stage 4 done apart from the spec gaps the review found. Branch stage4/scaffold, pull request #2: all checks green and three reviews done, but NOT merged. The safety controls here stopped Claude merging it; the owner merges it on GitHub. Still no plugin code.
+Stage 4 complete, spec v3. Branch **spec/gaps-settled**, pull request open (see GitHub), NOT merged: the owner merges it. Still no plugin code. The fixes to the re-review were not reviewed again (no Blockers were involved).
 
 ## What is still owed (smallest first)
-1. Ask the owner the four behaviour questions Q1–Q4 in the scaffold review, one at a time, each with its recommendation; record the answers as decisions.
-2. Settle the eleven technical gaps listed under "Owed: next job" in the scaffold review (two were Blockers: the JSON library within the one-DLL rule, and safe resume of an interrupted run). Record each as a decision or as spec/data wording, and add the missing checks.
-3. Stage 5 readiness: a fresh reviewer restates the plan and scores it; it must score above 90 and the owner must agree the restatement.
-4. Stage 6 build in chunks the owner can check. The first Logic chunk must add Stryker mutation testing to CI in the same pull request. Then Stage 7 review, and Stage 8 release (the old plugin is removed at the same time).
+1. Owner merges the spec/gaps-settled pull request. The old branch **spec/gaps** (one commit, d3c7418, from another session, an earlier D20–D23 wording) is superseded: don't merge it; the owner can delete it.
+2. Stage 5 readiness: a fresh reviewer with only the docs and scaffold restates the plan, lists what it would guess, and scores it out of 100. Build only above 90 and once the owner agrees the restatement. If it scores low, fix the docs, not the score.
+3. Stage 6 build in chunks. The first Logic chunk adds Stryker to CI in the same pull request (D18).
 
 ## Watch out for
-- Item 2's JSON question needs facts from the owner's PC: which JSON and SQLite DLLs Emby 4.10.2 already loads (look in Emby's system folder through the device bridge). Don't guess.
-- Old plugin (Emby.TopPicks.dll) is still installed; F9's guard should match it exactly (by assembly name or ID, not "contains Top Picks"), or it would block Top Picks Plus too.
-- device_bash on the owner's PC is broken; listing and staging files works.
+- Two things are deliberately unproved until their build chunk: whether the Emby SDK package provides SQLitePCL.pretty (D25; if not, only the "last played" fallback is used), and the old plugin's ID 672630FC-… (D33; the assembly name Emby.TopPicks also matches).
+- Deletes: every delete must pass D37's containment checks (cards 0004, 0005 explain why). Never key the managed list by sourceId: it is keyed by folder.
+- device_bash on the owner's PC fails (hypervisor off). Listing works; staging works only up to 7 folder levels below C:\ (files inside top-picks copies can't be staged).
 - NuGet is blocked in the cloud workspace, so nothing compiles here; GitHub Actions only.
-- The shallow clone only fetches main: to track a new branch, add a fetch refspec for it.
-- Any change to the walls (src/TopPicksPlus/README.md table, BoundaryTests.cs, Canary.cs) needs the owner's approval; adding a forbidden entry needs a matching canary or the build fails.
+- The shallow clone only fetches main: fetch other branches with an explicit refspec.
+- Wall changes (src/TopPicksPlus/README.md table, BoundaryTests.cs, Canary.cs) need the owner's approval.
 
 ## Waiting on the owner
-- Merge pull request #2 on GitHub (Merge button). Check it is merged before starting the next job; if not, work on the stage4/scaffold branch.
-- Q1–Q4 in docs/reviews/2026-11-08-scaffold-review.md (row-check user, the 7-day window, series 50% rule, pins outside chosen libraries).
+- Merge the spec/gaps-settled pull request; delete branch spec/gaps if wanted.
+- Then: agree (or correct) the Stage 5 restatement.
 
 ## Next job
-Spec gaps: ask Q1–Q4, settle the eleven technical gaps, add the missing checks. Read first: CLAUDE.md, docs/reviews/2026-11-08-scaffold-review.md, docs/spec.md, docs/data.md, docs/checks.md, docs/decisions.md.
+Stage 5 readiness review. Read first: CLAUDE.md, docs/spec.md, docs/data.md, docs/checks.md, docs/decisions.md, the folder READMEs.
 
 ## Cards that applied
-0001 (date set directly on the item; EmbyLink README). New this job: 0002, 0003.
+0001 (rank dates set on the item). New this job: 0004 (delete containment), 0005 (series .strm in Season folders).

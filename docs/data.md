@@ -13,11 +13,11 @@ All plugin data lives in `programdata\plugins\TopPicksPlus\` on the server (JSON
 | LibraryIds | Emby IDs of the libraries to choose from (empty = all movie and TV libraries except Top Picks) |
 | Pins | Ordered list of source title Emby IDs (need not be in LibraryIds, D23) |
 | RowCheckUserId | User the row check looks through; empty = default rule (D20) |
-| TakeoverDone | True once the first-run takeover (F9) has happened |
-| PlaybackReportingImported | True once the one-off import (F6) has happened |
+| TakeoverDone | True once the first-run takeover (F9) has happened. Set only by the plugin, after managed.json is saved; the settings page never overwrites it (D38) |
+| PlaybackReportingImported | True once the one-off import (F6) has been tried. Set only by the plugin (D38) |
 
 ## managed.json – the managed list
-One entry per copy: `sourceId` (Emby ID of the source title, empty for an adopted folder that matched nothing), `kind` (Movie / Series), `folder` (folder name inside the Top Picks folder), `state` (`incoming` / `active` / `leaving`, D26), `rank` (1–10, or none if adopted and not yet removed), `rankDateUtc`, `adopted` (true if taken over from the old plugin), `items` (each video file in the copy: path relative to the folder → source item ID, D28), `files` (every other file the plugin wrote in the folder).
+One entry per copy folder, **keyed by `folder`** (never by sourceId): `sourceId` (Emby ID of the source title, empty for an adopted folder that matched nothing), `kind` (Movie / Series), `folder` (folder name inside the Top Picks folder), `state` (`incoming` / `active` / `leaving`, D26), `rank` (1–10, or none if adopted and not yet removed), `rankDateUtc` (none when unranked; the order guard skips those), `adopted` (true if taken over from the old plugin), `items` (each video file in the copy: path relative to the folder → source item ID, D28), `files` (every other file the plugin wrote in the folder).
 Rules: a folder is only ever deleted if it is in this list; inside a staying copy, only files in `items` or `files` are ever deleted. If this file can't be read, every run refuses (D32).
 
 ## plays.json – the play log

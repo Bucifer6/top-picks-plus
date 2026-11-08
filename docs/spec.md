@@ -18,7 +18,7 @@ links: [decisions.md, checks.md, data.md]
 - **Top Picks library:** the existing Emby library whose folder is the Top Picks folder. Its "Latest" home-screen row is the "Latest Top Picks" row. The plugin finds the library by its folder path. It doesn't create or delete libraries.
 - **Date added:** Emby's own record of when an item was added (DateCreated). The Latest row shows the newest date added first.
 - **Rank time:** the time this week's run started (UTC, to the whole minute), fixed for the whole run, including after a restart (D27). Pick 1 gets the rank time as its date added, pick 2 gets one hour earlier, and so on down to pick 10 at nine hours earlier.
-- **Managed list:** the plugin's record of which copies it made, keyed by the source title's Emby ID (see data.md).
+- **Managed list:** the plugin's record of which copy folders it manages, keyed by **folder name** (an adopted folder may have no source title, and two old folders may point to the same one; see data.md).
 
 ## F1 – When it runs
 - Emby scheduled task **"Refresh Top Picks"**, every **Sunday at 05:00 on the server's clock**. The server is set to UK time, so the run follows the clocks when they change.
@@ -46,9 +46,9 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - **Artwork:** `fanart.jpg` (the source backdrop), `logo.png` (the source logo, if there is one) and the theme video (`backdrops\theme.mp4`, if the source has one). Theme videos are copied only when a copy is first created, not every week. `folder.png` and `thumb.png` are drawn by the plugin at 1000×562: the backdrop, darkened on the left, a large white rank number (1–10) on the left, and the logo over the picture. With no logo, the title is written in large white text. With no backdrop, the poster is used on a dark background.
 
 ## F4 – Each week's update, in order
-1. **Prepare** this week's copies in a staging folder outside every library: `programdata\plugins\TopPicksPlus\staging`. Emby never sees half-written files there. The 10 picks and the rank time are fixed now and saved in the run record.
+1. **Finish leftovers** from an earlier run (D39), then **prepare** this week's copies in a staging folder outside every library: `programdata\plugins\TopPicksPlus\staging`. Emby never sees half-written files there. The 10 picks and the rank time are fixed now and saved in the run record.
 2. **Swap in:**
-   First, anything an earlier run left half-done is finished (D39). Then, in this order, so a restart at any moment is safe (D26, D40):
+   (Anything an earlier run left half-done was already finished before step 1, D39.) In this order, so a restart at any moment is safe (D26, D40):
    - Copies of titles that **drop out** are deleted (marked "leaving" on the managed list first, removed from it after).
    - Copies of titles that **stay** are updated in place, one file at a time: the same folder, with the .strm and .nfo rewritten and the artwork replaced. The folder isn't deleted and recreated, so Emby keeps the same item and the user's watched state on the copy.
    - **New** titles are added to the managed list first, then their folders are moved in from staging.
@@ -62,8 +62,8 @@ The list is built automatically every week. **No manual step is ever needed.** P
 **If the step 3 wait runs out:** steps 4–6 still run for every copy that has appeared, the run is marked "incomplete" in the report, and the order guard (F5) finishes the job when the rest appear.
 
 ## F5 – Order guard (keeps the order right between runs)
-- After every library scan, and 2 minutes after Emby starts up (not while a run is in progress; the run sets the dates itself, D26), the plugin compares each current copy's date added with its rank date and resets any that differ. This covers Emby restarting mid-run, full library scans, and metadata refreshes.
-- **Unfinished run:** if Emby restarts during a run, the run carries on from where it stopped when Emby starts again, with the same picks and rank time. It doesn't roll back. Each step is safe to repeat (D26). After 3 failed resumes the run is marked failed.
+- After every library scan, and 2 minutes after Emby starts up (not while a run is in progress; the run sets the dates itself, D26), the plugin compares each ranked copy's date added with its rank date and resets any that differ. Copies with no rank (adopted or leftover ones about to drop out) are skipped. This covers Emby restarting mid-run, full library scans, and metadata refreshes.
+- **Unfinished run:** if Emby restarts during a run, the run carries on from where it stopped when Emby starts again, with the same picks and rank time. It doesn't roll back. Each step is safe to repeat (D26). At most 3 resumes are tried; after that the run is marked failed (D39).
 - What the row may show while a run is in progress: for a few minutes, a mix of last week's and this week's titles. When the run finishes, the row is complete and in order.
 
 ## F6 – Counting plays
