@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** 6 Build. Stage 5 passed 2026-11-08 (fix-check 4: no Blockers; owner agreed the restatement). Docs on branch spec/readiness-fixes-2 (owner to merge). Build order (D92): chunk 3 Artwork (built on branch build/chunk3-artwork; review: keep; C65 samples approved 2026-11-08), then 1 Logic, 2 Storage, proof plugin, 4 EmbyLink, 5 Settings.
+**Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunk 3 (Artwork) done: review keep, samples approved, pull request open (owner merges after the docs pull request #5). Next: chunk 1 (Logic). Then 2 Storage, proof plugin, 4 EmbyLink, 5 Settings (D92).
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.

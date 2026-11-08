@@ -12,3 +12,4 @@ summary: Index of live logbook cards
 | 0007 | method | docs, process | When a new decision changes an older one, mark the older row and fix every README that repeats it |
 | 0008 | method | handover, process | Every "never do X" in a handover carries its reason |
 | 0009 | insight | docs, process | A whole-plan readiness score can plateau; stop chasing the score |
+| 0010 | build | Artwork, ci, tests | Chunk 3 built the numbered artwork with layout tests proved by deliberate breaks |
