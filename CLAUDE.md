@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 4 – Scaffold (layout approved D20; scaffold on branch `scaffold`, goldfish review next).
+**Stage:** 4 – Scaffold (layout approved D20; scaffold on branch `scaffold`, pull request 1 unmerged; review found spec gaps, so spec v3 then re-review next).
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -24,7 +24,7 @@ Follows the build-software-safely method: talk and docs first, no code before th
 ## Folders
 | Folder | Purpose |
 |--------|---------|
-| docs/ | Spec, checks, decisions, handover, logbook |
+| docs/ | Spec, checks, decisions, handover, logbook, reviews |
 | src/TopPicksPlus/Logic | The rules, pure and fully tested |
 | src/TopPicksPlus/Store | The plugin's own data files |
 | src/TopPicksPlus/Artwork | Drawing the numbered pictures |

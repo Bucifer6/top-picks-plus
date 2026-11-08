@@ -1,6 +1,8 @@
 # Answer key (only the marking goldfish reads this)
-1. Stage 4 Scaffold: folders + READMEs, build workflow, test projects, then goldfish review (Next job).
-2. Claude; the owner delegated them (Job just finished; Waiting on the owner).
-3. Uninstalled when Top Picks Plus goes in, at release (Watch out for).
-4. The cloud workspace; NuGet is blocked there (Watch out for).
-5. Above 90 (What is still owed 3).
+1. Branch `scaffold`, commit 9ba0e58; not merged, because D19 needs a passing fresh review and the review found spec Blockers (Where it stopped).
+2. Spec v3 fixes, then a re-run of the three goldfish (comprehension, builder readiness, security) finding no Blockers (What is still owed 2 and 4).
+3. The staged-changes pattern check from security.md; do not try to download and run gitleaks again (Watch out for).
+4. Only GitHub Actions; not in the cloud workspace (no NuGet) and not on the owner's PC (D5) (Watch out for).
+5. Whether to tell users their viewing is logged; which non-admin user the row check uses (Waiting on the owner).
+6. docs/reviews/2026-11-08-scaffold-review.md; the 8 Blockers first, then Should fix (What is still owed 2).
+7. Read the SkiaSharp version Emby loads from the server's system folder, because D15 compiles against Emby's copy (Watch out for).
