@@ -18,3 +18,8 @@ TestResults/
 plays.json
 managed.json
 run.json
+*.damaged-*
+*.zip
+*.tmp
+staging/
+state.json

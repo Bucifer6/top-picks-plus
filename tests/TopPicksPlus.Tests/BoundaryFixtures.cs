@@ -14,3 +14,8 @@ namespace Fixture.Store
 {
     internal static class UsesRun { internal static int V = Fixture.Run.Allowed.Value; }
 }
+
+namespace Fixture.Settings
+{
+    internal static class UsesNetwork { internal static System.Type T = typeof(System.Net.Sockets.TcpClient); }
+}

@@ -31,14 +31,16 @@ public class BoundaryTests
         ["Settings"] = new[] { "Logic", Emby },
     };
 
-    /// <summary>Extra bans beyond "other parts": Logic must stay pure, so no files, clocks or network.</summary>
+    /// <summary>Extra bans beyond "other parts" (docs/modules.md "Banned for every part", D28).
+    /// No part may use the network; Logic and Artwork never touch files; only Artwork may use SkiaSharp.</summary>
     private static readonly Dictionary<string, string[]> AlsoBanned = new()
     {
         ["Logic"] = new[] { "System.IO.File", "System.IO.Directory", "System.Net", "System.Threading.Tasks", "SkiaSharp" },
-        ["Store"] = new[] { "SkiaSharp" },
-        ["EmbyBridge"] = new[] { "SkiaSharp" },
-        ["Run"] = new[] { "SkiaSharp" },
-        ["Settings"] = new[] { "SkiaSharp" },
+        ["Store"] = new[] { "System.Net", "SkiaSharp" },
+        ["Artwork"] = new[] { "System.IO.File", "System.IO.Directory", "System.Net" },
+        ["EmbyBridge"] = new[] { "System.Net", "SkiaSharp" },
+        ["Run"] = new[] { "System.Net", "SkiaSharp" },
+        ["Settings"] = new[] { "System.Net", "SkiaSharp" },
     };
 
     private static Assembly Plugin => Assembly.Load(Root);
@@ -64,6 +66,8 @@ public class BoundaryTests
         Assert.NotEmpty(Violations(tests, "Fixture", "Logic", Array.Empty<string>()));
         Assert.NotEmpty(Violations(tests, "Fixture", "Store", Array.Empty<string>()));
         Assert.Empty(Violations(tests, "Fixture", "Run", Array.Empty<string>()));
+        // The network ban bites too (Fixture.Settings opens a socket type).
+        Assert.NotEmpty(Violations(tests, "Fixture", "Settings", Array.Empty<string>()));
     }
 
     internal static string[] Violations(Assembly assembly, string root, string part, string[] alsoBanned)

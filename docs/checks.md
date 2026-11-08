@@ -1,5 +1,5 @@
 ---
-summary: Plain-English checks the owner can try; each maps to a feature in spec.md and gets an automatic test where possible (A = automatic test of the rule as well as the owner's check).
+summary: Plain-English checks the owner can try; each maps to a feature in spec.md and gets an automatic test where possible (A = automatic test of the rule as well as the owner's check; T = automatic test only). Version 4.
 links: [spec.md, data.md]
 ---
 
@@ -20,8 +20,8 @@ links: [spec.md, data.md]
 | C11 | F6 | In a quiet week, watch a title from the Top Picks row past halfway. After the next run, that title's reason in the report is "N viewer-days" (not "filler"), counted for the real title. | A |
 | C12 | F6 | Watch a film for 30%, stop, come back the same day and watch another 30%: after the next run it has a viewer-day. A film watched for 5 minutes only has none (it shows as "filler" if it is picked at all). | A |
 | C13 | F2 | A week with only 4 watched titles: places 5–10 are the newest additions, and the run finishes normally. | A |
-| C14 | F7 | Finish a film from the Top Picks row: the real film in your Movies library now shows as watched for you. Stop a film half-way in the row, then open the real one: it offers to resume. Mark an episode in the row as unwatched: the real episode is unwatched too. | A |
-| C15 | F4 | A title that drops out of the 10 disappears from the row, and its folder is gone from top-picks. A title that stays keeps your watched tick on its copy and keeps the same folder name. | A |
+| C14 | F7 | Finish a film from the Top Picks row: the real film in your Movies library now shows as watched for you, and the copy in the row still shows unwatched. Stop a film half-way in the row: the real film appears in Continue Watching and offers to resume; the copy doesn't. Mark an episode in the row as watched by hand: the real episode is watched and the copy isn't. | A |
+| C15 | F4 | A title that drops out of the 10 disappears from the row, and its folder is gone from top-picks. A title that stays keeps the same folder name. With "hide watched content from Latest" turned on for your user, after watching a pick it is still in the row. | A |
 | C16 | F3 | Playing a movie or an episode from the row plays the real file, with its subtitles. A series opens with its seasons and episodes. | |
 | C17 | F3 | A title with no logo gets artwork with its name in large text and the rank number. A title with no backdrop gets its poster on dark grey with the number. | A |
 | C18 | F9 | Put a test folder in top-picks with a text file in it, after the plugin is installed. After two runs, it is still there. Separately, an old-plugin folder for a title that's no longer a pick is removed on the first run, and `backups\takeover-….zip` exists. | A |
@@ -32,11 +32,38 @@ links: [spec.md, data.md]
 | C23 | F8 | Settings: add, reorder and remove pins; choose libraries. The Top Picks library is not offered. The report shows rank, title, reason, and the row-check result. | |
 | C24 | F6 | A daily count from 91 days ago is no longer in plays.json after a run. | A |
 | C25 | F2 | Choose only your Movies library: the next run has no series. | A |
-| C26 | F8 | Signed in as a non-administrator, open the plugin's report address (given in the release notes) in a browser: it says "Administrators only" and shows nothing else. Pressing Run now from that account is refused too. | A |
+| C26 | F8 | Signed in as a non-administrator, open the plugin's report address (given in the release notes) in a browser: it says "Administrators only" and shows nothing else. Saving settings, searching pins and Run now from that account are refused the same way. | A |
 | C27 | F9 | Inside the copy folder of a title that is about to drop out, make a junction pointing at a test folder of your own with a file in it. After the run, the copy folder is gone, and your test folder and its file are untouched. | A |
 | C28 | F3 | A title whose name is only characters Windows doesn't allow (or is called "CON") gets a folder named by its Emby ID and plays normally. A title whose name matches a folder you made yourself in top-picks gets " - 2" and your folder is untouched. | A |
 | C29 | F2 | Unplug or disconnect the drive of a chosen library and run the task: it is refused, the report names the folder, and the row is unchanged. | A |
-| C30 | F9 | Stop Emby, damage managed.json (type a few letters at the start), start Emby and run: the run is refused, nothing in top-picks changes, and the report says how to restore from backups. Restore it as described: the next run finishes. | A |
+| C30 | F9 | Stop Emby, damage managed.json (type a few letters at the start), start Emby and run: the run is refused, nothing in top-picks changes, and the report says how to restore from backups. Restore it as described: the next run finishes. The same with state.json. | A |
 | C31 | F1 | On first install (no run yet), restart Emby: about 10 minutes later a run starts by itself. | A |
 | C32 | F5 | Start a full library scan while a run is in its rescan step: the run still finishes and the row is 1–10. | A |
 | C33 | F6 | Another user watches an episode of a series on the run's own day (Sunday morning, before 05:00): it counts in next week's run, not this one. | A |
+| C34 | F4 | (First build chunk) Set a copy's date added with the plugin, then run a full library scan and restart Emby: the date is unchanged. | |
+| C35 | F3 | Open a copy's .nfo files: title, year, age rating, genres, plot and date added are there; a title with `&` or `<` in it shows correctly in Emby; the .strm holds only the real file's path; subtitles sit next to the .strm with their language part. | A |
+| C36 | F3 | A title or episode name long enough to break the 240-character limit is shortened (or that episode left out and reported), and the run still finishes. | T |
+| C37 | F9 | After 9 runs, `backups\` holds exactly 8 dated folders, and none of the plays.json copies contains user IDs. | A |
+| C38 | F4 | Make a step fail on purpose (for example lock the Top Picks folder with a file open in another program) and run: the status is "failed", the report names the step, and the next run finishes. | T |
+| C39 | F4 | A pick that a non-admin check user isn't allowed to see (parental controls): the row check leaves it out and says so, and still passes. If copies hadn't all appeared in time, the check says "partial". | T |
+| C40 | F1 | With the last successful run 8 days ago, restart Emby: about 10 minutes later a run starts by itself. With it 6 days ago, nothing starts. | T |
+| C41 | F5 | Change a copy's date added by hand in the dashboard, then restart Emby: within 3 minutes it is back to its rank date. | A |
+| C42 | F2 | Two titles with the same viewer-days are ordered by newest content, then premiere date, then title, then ID, the same way every run. | T |
+| C43 | F2/F8 | Pinning the same title twice keeps one pin. With 12 pins of which 1 is missing, the row is the first 10 usable pins in order. | A |
+| C44 | F2 | A file under the Top Picks folder is never a candidate, even if the Top Picks library is chosen by mistake. | T |
+| C45 | F6 | On first install with Playback Reporting present, the first run's report shows viewer-days from the last week. Without it, the run still finishes and says it mostly used recently added titles. | A |
+| C46 | F6 | A title with no known runtime counts after 20 minutes in a day, not after 19. | T |
+| C47 | F6 | A film stopped at 00:10 counts for the day it was stopped. On the autumn and spring clock-change days, days and the 7-day window still come out right. | T |
+| C48 | F6 | After a day of watching, Emby's log at the normal level mentions no plays, and the plugin's Debug lines name no user. | |
+| C49 | F7 | When the plugin resets a copy to unwatched, the real title isn't changed back (nothing chases itself). | T |
+| C50 | F9 | Remove the Top Picks library, or add a second folder to it, and run: the run is refused and says why. | A |
+| C51 | F9 | Damage run.json or plays.json: the run carries on, the damaged file is renamed aside, and for plays.json the report says the popularity history was lost; the renamed plays file is gone after the next day. | T |
+| C52 | F9 | The write and delete checks refuse a managed name with `..`, `\` or a drive letter in it, and a file path that leaves its folder. | T |
+| C53 | F6 | Between midnight and 00:05, and with nobody watching for a week, no user IDs are left in plays.json from before today after 00:05. | T |
+| C54 | F8 | A pin search result or title containing `<b>` shows the text `<b>` on the settings page, not bold. Saving an unknown ID, the Top Picks library or 21 pins is refused with a message. | A |
+
+## How the automatic tests work (D18, D31)
+- **Logic** (choosing, counting, naming, takeover, order comparison): xUnit tests feed plain records in and check the answer, with Stryker mutation testing in CI.
+- **Store, Run and the write/delete checks**: tests use real files in a temporary folder on Windows (junctions and reserved names are real there), with fake EmbyBridge adapters (in-memory lists of items, users, libraries and dates) and a fake clock and time zone. Run's lock (C22) is tested by starting 10 runs at once and checking exactly one goes ahead.
+- **EmbyBridge and the settings page** need the real server, so their behaviour is proved by the owner's checks; the tests only check the plain-record conversions.
+- Each check marked A or T names its test by check ID, so results are reported per check.
