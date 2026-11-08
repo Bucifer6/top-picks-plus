@@ -26,7 +26,7 @@ public class BoundaryTests
         ["Logic"] = Array.Empty<string>(),
         ["Store"] = new[] { "Logic" },
         ["Artwork"] = new[] { "Logic" },
-        ["EmbyBridge"] = new[] { "Logic", Emby },
+        ["EmbyBridge"] = new[] { "Logic", "Settings", Emby },
         ["Run"] = new[] { "Logic", "Store", "Artwork", "EmbyBridge" },
         ["Settings"] = new[] { "Logic", Emby },
     };
@@ -49,19 +49,36 @@ public class BoundaryTests
     [MemberData(nameof(AllParts))]
     public void Part_only_uses_what_its_README_allows(string part)
     {
+        // Parts must not reach each other through the root class either, so root types are banned too.
+        var rootTypes = Plugin.GetTypes().Where(t => t.Namespace == Root).Select(t => t.FullName!).ToArray();
+        var failing = Violations(Plugin, Root, part, rootTypes);
+        Assert.True(failing.Length == 0, $"{part} crosses a wall. Types: {string.Join(", ", failing)}");
+    }
+
+    [Fact]
+    public void The_check_catches_a_real_wall_break()
+    {
+        // Self-test: Fixture.Logic uses Emby and Fixture.Store uses Fixture.Run, so both must be caught.
+        // Without this the wall tests above could pass only because the plugin has no code yet.
+        var tests = typeof(BoundaryTests).Assembly;
+        Assert.NotEmpty(Violations(tests, "Fixture", "Logic", Array.Empty<string>()));
+        Assert.NotEmpty(Violations(tests, "Fixture", "Store", Array.Empty<string>()));
+        Assert.Empty(Violations(tests, "Fixture", "Run", Array.Empty<string>()));
+    }
+
+    internal static string[] Violations(Assembly assembly, string root, string part, string[] alsoBanned)
+    {
         var allowed = MayUse[part];
-        var banned = Parts.Where(p => p != part && !allowed.Contains(p)).Select(p => $"{Root}.{p}").ToList();
+        var banned = Parts.Where(p => p != part && !allowed.Contains(p)).Select(p => $"{root}.{p}").ToList();
         if (!allowed.Contains(Emby)) banned.Add(Emby);
         if (AlsoBanned.TryGetValue(part, out var extra)) banned.AddRange(extra);
+        banned.AddRange(alsoBanned);
 
-        var result = Types.InAssembly(Plugin)
-            .That().ResideInNamespace($"{Root}.{part}")
+        var result = Types.InAssembly(assembly)
+            .That().ResideInNamespace($"{root}.{part}")
             .ShouldNot().HaveDependencyOnAny(banned.ToArray())
             .GetResult();
-
-        Assert.True(result.IsSuccessful,
-            $"{part} crosses a wall. Types: {string.Join(", ", result.FailingTypeNames ?? Array.Empty<string>())}. " +
-            $"Banned for {part}: {string.Join(", ", banned)}");
+        return (result.FailingTypeNames ?? Enumerable.Empty<string>()).ToArray();
     }
 
     [Fact]
@@ -70,7 +87,7 @@ public class BoundaryTests
         // Stops a new folder sneaking in without walls (core rule 8: new folders need the owner's approval).
         var folders = Directory.GetDirectories(SourceDir())
             .Select(Path.GetFileName)
-            .Where(n => n is not ("bin" or "obj" or "Properties"))
+            .Where(n => n is not ("bin" or "obj" or "Properties") && !n!.StartsWith(".", StringComparison.Ordinal))
             .OrderBy(n => n)
             .ToArray();
         Assert.Equal(Parts.OrderBy(p => p).ToArray(), folders);

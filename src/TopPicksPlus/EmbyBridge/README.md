@@ -12,7 +12,7 @@ Thin adapters: turn Emby objects into Logic's plain records, and Run's requests 
 Rules (Logic), the order of the weekly steps (Run), file formats of the plugin's own data (Store), drawing (Artwork).
 
 ## May use
-Logic, the Emby SDK (`MediaBrowser.*`, pinned at 4.9.1.90, D14).
+Logic, Settings (its configuration class only: EmbyBridge reads and saves the settings and hands Run a plain settings record from Logic), the Emby SDK (`MediaBrowser.*`, pinned at 4.9.1.90, D14).
 
 ## Must not use
-Store, Artwork, Run, Settings, SkiaSharp.
+Store, Artwork, Run, SkiaSharp.

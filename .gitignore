@@ -10,3 +10,11 @@ obj/
 backups/
 StrykerOutput/
 TestResults/
+.env.*
+*.pem
+*.p12
+*.snk
+*.log
+plays.json
+managed.json
+run.json
