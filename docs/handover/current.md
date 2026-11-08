@@ -6,7 +6,7 @@ Spec v7 written (v6 Blockers 2 and 3 fixed, D43 recorded, Should-fix and Nits ha
 ## Where it stopped
 - Stage 4 (Scaffold), still not passed.
 - Branch `scaffold`, pull request 1 open and **not merged**. Spec v7 is commit 20588d0; this handover, the v7 review and card updates are the commit after.
-- main is still docs only. Always read this branch's handover (card 0006).
+- main now holds pull request 2, an older parallel scaffold (spec v2, D1–D19, five parts: Storage, EmbyLink) merged by the owner at 11:33 on 2026-11-08 from another session. **Owner's choice 2026-11-08: pull request 1 is the real line.** main was merged into this branch keeping this branch's files entirely (its handover is in docs/handover/archive/2026-11-08-pr2-parallel-scaffold-current.md), so pull request 1 merges cleanly and replaces it. Never work from stage4/scaffold. Always read this branch's handover (card 0006).
 - No plugin code exists anywhere, on purpose.
 - How v6 findings were handled: docs/reviews/2026-11-08-spec-v6-handling.md.
 
