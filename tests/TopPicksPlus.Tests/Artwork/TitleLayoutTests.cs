@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using TopPicksPlus.Artwork;
 using Xunit;
@@ -58,6 +59,21 @@ public class TitleLayoutTests
         Assert.Single(fit.Lines);
         Assert.EndsWith("…", fit.Lines[0]);
         Assert.True(Measure(40f, fit.Lines[0]) <= BoxW);
+    }
+
+    [Fact]
+    public void Title_over_200_characters_is_cut_before_fitting()
+    {
+        var seen = 0;
+        float CountingMeasure(float size, string text)
+        {
+            seen = Math.Max(seen, text.Length);
+            return Measure(size, text);
+        }
+
+        var fit = TitleLayout.Fit(new string('W', 100_000), CountingMeasure, BoxW, BoxH);
+        Assert.True(seen <= 201, $"measured a {seen}-character string; the title was not cut to 200 first");
+        Assert.EndsWith("…", fit.Lines[0]);
     }
 
     [Theory]

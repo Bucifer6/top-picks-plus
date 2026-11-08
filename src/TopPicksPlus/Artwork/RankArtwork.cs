@@ -176,7 +176,7 @@ public static class RankArtwork
         canvas.DrawBitmap(logo, dest, paint);
     }
 
-    // White Anton title, up to 2 lines, bottom-left in the logo box (D62, D74).
+    // White Anton title in capitals, up to 2 lines, bottom-left in the logo box (D62, D74, D100).
     private static void DrawTitle(SKCanvas canvas, SKTypeface typeface, string? title)
     {
         if (string.IsNullOrWhiteSpace(title))
@@ -185,7 +185,8 @@ public static class RankArtwork
         using var paint = new SKPaint { Typeface = typeface, IsAntialias = true, Color = SKColors.White };
         var boxW = Layout.BoxRight - Layout.BoxLeft;
         var boxH = Layout.BoxBottom - Layout.BoxTop;
-        var fit = TitleLayout.Fit(title!, (size, text) =>
+        // D100: written in capitals, like the title logos in today's row.
+        var fit = TitleLayout.Fit(title!.ToUpperInvariant(), (size, text) =>
         {
             paint.TextSize = size;
             return paint.MeasureText(text);

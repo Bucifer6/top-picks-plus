@@ -28,7 +28,17 @@ internal static class TitleLayout
 
     public static Result Fit(string title, Func<float, string, float> measure, float boxWidth, float boxHeight)
     {
-        var words = (title ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        var text = title ?? "";
+        if (text.Length > Layout.TitleMaxChars)
+        {
+            // Cut very long titles first (review Low 1), keeping "…" so the cut still shows.
+            var keep = Layout.TitleMaxChars;
+            if (char.IsHighSurrogate(text[keep - 1]))
+                keep--;
+            text = text.Substring(0, keep).TrimEnd() + Ellipsis;
+        }
+
+        var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
         if (words.Length == 0)
             return new Result(Layout.TitleMaxSize, Array.Empty<string>());
 

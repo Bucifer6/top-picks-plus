@@ -29,6 +29,7 @@ internal static class Layout
     public const float PosterLeft = 0.40f * Width;
 
     // Title text (D74: shrinks to fit 2 lines, no smaller than 40 px, then ends in "…"). D97 caps the size.
+    public const int TitleMaxChars = 200;        // longer titles are cut first, so fitting stays quick (D97 a)
     public const float TitleMaxSize = 160f;
     public const float TitleMinSize = 40f;
     public const float TitleSizeStep = 2f;

@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** 6 Build. Stage 5 passed 2026-11-08 (fix-check 4: no Blockers; owner agreed the restatement). Docs on branch spec/readiness-fixes-2 (owner to merge). Build order (D92): chunk 3 Artwork (built on branch build/chunk3-artwork; owner to approve the C65 samples), then 1 Logic, 2 Storage, proof plugin, 4 EmbyLink, 5 Settings.
+**Stage:** 6 Build. Stage 5 passed 2026-11-08 (fix-check 4: no Blockers; owner agreed the restatement). Docs on branch spec/readiness-fixes-2 (owner to merge). Build order (D92): chunk 3 Artwork (built on branch build/chunk3-artwork; review: keep; C65 samples approved 2026-11-08), then 1 Logic, 2 Storage, proof plugin, 4 EmbyLink, 5 Settings.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -14,8 +14,8 @@ Follows the build-software-safely method: talk and docs first, no code before th
 
 ## Docs
 - docs/spec.md – what it does (F1–F10, v7)
-- docs/checks.md – how the owner tests it (C1–C97)
-- docs/decisions.md – what's decided (D1–D99) and what's still open
+- docs/checks.md – how the owner tests it (C1–C100)
+- docs/decisions.md – what's decided (D1–D100) and what's still open
 - docs/data.md – settings, plugin flags (state.json), managed list, play log, run record
 - docs/backlog.md – findings set aside for the chunk that deals with them; each chunk's builder fixes or decides its items
 - docs/reviews/ – challenge round and scaffold review, with what's still owed

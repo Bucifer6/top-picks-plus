@@ -92,6 +92,16 @@ public class LayoutTests
     }
 
     [Fact]
+    public void Title_is_written_in_capitals()
+    {
+        // D100: "beast" and "BEAST" must give the very same picture.
+        var lower = TopPicksPlus.Artwork.RankArtwork.Draw(Solid(1280, 720, Grey), null, null, 2, "beast");
+        var upper = TopPicksPlus.Artwork.RankArtwork.Draw(Solid(1280, 720, Grey), null, null, 2, "BEAST");
+        Assert.False(lower.Failed || upper.Failed);
+        Assert.True(lower.Bytes!.SequenceEqual(upper.Bytes!), "the title was not drawn in capitals");
+    }
+
+    [Fact]
     public void Short_title_is_one_big_line()
     {
         using var picture = DrawOk(Solid(1280, 720, Grey), null, null, 2, "Beast");

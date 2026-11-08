@@ -62,6 +62,33 @@ public class LayoutCheckCanaries
     }
 
     [Theory]
+    [InlineData(1, 1.0, 0)]    // "1" stretched to fill the whole band (review finding 8)
+    [InlineData(4, 0.5, 0)]    // "4" squeezed to half the band
+    [InlineData(10, 0.8, 0)]   // "10" not reaching the 22% edge
+    [InlineData(1, 0, 1.25)]   // "1" a quarter wider than Anton's shape, still inside the band
+    public void Number_check_catches_a_stretched_or_squeezed_number(int number, double bandShare, double widthFactor)
+    {
+        // Anton's own outline at the D62 height and place; only the width-to-height ratio is wrong.
+        using var picture = new SKBitmap(W, H);
+        picture.Erase(SKColors.Black);
+        using (var canvas = new SKCanvas(picture))
+        using (var paint = new SKPaint { Typeface = Anton, TextSize = 1000, IsAntialias = true, Color = SKColors.White })
+        using (var path = paint.GetTextPath(number.ToString(System.Globalization.CultureInfo.InvariantCulture), 0, 0))
+        {
+            var b = path.TightBounds;
+            const float top = 67.44f, height = 438.36f, band = 185f;
+            var natural = b.Width * height / b.Height;
+            var width = bandShare > 0 ? (float)(band * bandShare) : (float)Math.Min(band, natural * widthFactor);
+            canvas.Translate(35, top);
+            canvas.Scale(width / b.Width, height / b.Height);
+            canvas.Translate(-b.Left, -b.Top);
+            canvas.DrawPath(path, paint);
+        }
+
+        Assert.NotNull(LayoutChecks.NumberProblem(picture, number, Anton));
+    }
+
+    [Theory]
     [InlineData(0.00, 0.00)] // no shade at all
     [InlineData(0.22, 0.22)] // hard edge, no fade
     [InlineData(0.30, 0.50)] // fade in the wrong place

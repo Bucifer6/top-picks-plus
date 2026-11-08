@@ -29,7 +29,7 @@ public class SampleWriter
             Backdrop(new SKColor(70, 95, 55), new SKColor(35, 40, 30), 1),
             TextLogo(Anton, "ADULTHOOD", new SKColor(245, 215, 40)), null, "Adulthood");
 
-        // Rank 2 without a logo, like "Beast": the title is written in white Anton.
+        // Rank 2 without a logo, like "Beast": the title is written in white Anton capitals (D100).
         Write(folder, "rank02-no-logo-Beast.png", 2,
             Backdrop(new SKColor(60, 55, 50), new SKColor(20, 18, 16), 2), null, null, "Beast");
 

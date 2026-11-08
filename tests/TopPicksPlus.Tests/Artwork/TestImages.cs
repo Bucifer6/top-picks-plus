@@ -117,6 +117,17 @@ internal static class TestImages
     }
 
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, bool[,]> Templates = new();
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, double> Ratios = new();
+
+    /// <summary>Width over height of a number's outline in Anton, measured by the test itself.</summary>
+    public static double NumberRatio(SKTypeface anton, int number) =>
+        Ratios.GetOrAdd(number, n =>
+        {
+            using var paint = new SKPaint { Typeface = anton, TextSize = 1000, IsAntialias = true };
+            using var path = paint.GetTextPath(n.ToString(System.Globalization.CultureInfo.InvariantCulture), 0, 0);
+            var b = path.TightBounds;
+            return b.Width / b.Height;
+        });
 
     /// <summary>The grid of a number written in Anton by the test itself, independently of the plugin.</summary>
     public static bool[,] NumberTemplate(SKTypeface anton, int number) =>

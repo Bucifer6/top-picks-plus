@@ -72,7 +72,18 @@ public class FailureTests
     }
 
     [Fact]
-    public void Very_long_title_is_cut_with_an_ellipsis_and_still_draws()
+    public void Enormous_title_draws_quickly()
+    {
+        // Review Low 1: a 100,000-character "word" must not hang the run.
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var result = RankArtwork.Draw(Good, null, null, 7, new string('W', 100_000));
+        watch.Stop();
+        Assert.False(result.Failed, result.FailureReason);
+        Assert.True(watch.Elapsed < TimeSpan.FromSeconds(5), $"took {watch.Elapsed.TotalSeconds:F1} s");
+    }
+
+    [Fact]
+    public void Very_long_title_still_draws()
     {
         var title = string.Join(" ", Enumerable.Repeat("Supercalifragilistic Extraordinarily Lengthy", 20));
         var result = RankArtwork.Draw(Good, null, null, 7, title);
@@ -92,6 +103,71 @@ public class FailureTests
         var one = Solid(1, 1, SKColors.Red);
         Assert.False(RankArtwork.Draw(one, one, null, 1, null).Failed);
         Assert.False(RankArtwork.Draw(null, null, one, 10, null).Failed);
+    }
+
+    // Review finding 9: a real, fully readable PNG just over the 50-million-pixel cap must fail, and one just
+    // under it must draw, so the cap (not the decoder) is what refuses it. 7072 x 7072 = 50,013,184 pixels.
+    [Fact]
+    public void Real_picture_just_over_the_pixel_cap_returns_failed()
+    {
+        var result = RankArtwork.Draw(GreyPng(7072, 7072), null, null, 1, "Title");
+        Assert.True(result.Failed, "a 50.01-million-pixel backdrop was drawn; the D97 cap did not bite");
+    }
+
+    [Fact]
+    public void Real_picture_just_under_the_pixel_cap_draws()
+    {
+        var result = RankArtwork.Draw(GreyPng(7000, 7000), null, null, 1, "Title");
+        Assert.False(result.Failed, result.FailureReason);
+    }
+
+    // A valid grey PNG of any size, compressed to a few tens of KB (every pixel the same).
+    private static byte[] GreyPng(int width, int height)
+    {
+        using var output = new System.IO.MemoryStream();
+        output.Write(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });
+        var header = new byte[13];
+        BigEndian(header, 0, (uint)width);
+        BigEndian(header, 4, (uint)height);
+        header[8] = 8; // bit depth
+        header[9] = 0; // greyscale
+        Chunk(output, "IHDR", header);
+
+        using var packed = new System.IO.MemoryStream();
+        using (var zlib = new System.IO.Compression.ZLibStream(packed, System.IO.Compression.CompressionLevel.Optimal, leaveOpen: true))
+        {
+            var row = new byte[width + 1]; // filter byte 0, then the pixels
+            for (var i = 1; i < row.Length; i++)
+                row[i] = 128;
+            for (var y = 0; y < height; y++)
+                zlib.Write(row, 0, row.Length);
+        }
+
+        Chunk(output, "IDAT", packed.ToArray());
+        Chunk(output, "IEND", Array.Empty<byte>());
+        return output.ToArray();
+    }
+
+    private static void Chunk(System.IO.Stream output, string type, byte[] data)
+    {
+        var body = new byte[4 + data.Length];
+        System.Text.Encoding.ASCII.GetBytes(type, 0, 4, body, 0);
+        Buffer.BlockCopy(data, 0, body, 4, data.Length);
+        var length = new byte[4];
+        BigEndian(length, 0, (uint)data.Length);
+        var crc = new byte[4];
+        BigEndian(crc, 0, Crc32(body, 0, body.Length));
+        output.Write(length);
+        output.Write(body);
+        output.Write(crc);
+    }
+
+    private static void BigEndian(byte[] target, int offset, uint value)
+    {
+        target[offset] = (byte)(value >> 24);
+        target[offset + 1] = (byte)(value >> 16);
+        target[offset + 2] = (byte)(value >> 8);
+        target[offset + 3] = (byte)value;
     }
 
     // A valid PNG signature and IHDR chunk that claims a picture far too big to decode.

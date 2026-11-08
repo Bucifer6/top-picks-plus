@@ -30,6 +30,15 @@ internal static class LayoutChecks
         if (b.Right > (0.22 * W) + 2)
             problems.Add($"right edge {b.Right} is past 22% ({0.22 * W})");
 
+        // Shape kept (D97 b): the number keeps Anton's width-to-height ratio, and is squeezed sideways
+        // only when that would make it wider than the 3.5%-22% band; then it fills the band exactly.
+        var height = b.Bottom - b.Top + 1;
+        var width = b.Right - b.Left + 1;
+        var natural = NumberRatio(anton, rank) * height;
+        var expectedWidth = Math.Min(natural, (0.22 - 0.035) * W);
+        if (Math.Abs(width - expectedWidth) > Math.Max(Tolerance, 0.03 * expectedWidth))
+            problems.Add($"width {width} should be {expectedWidth:F0} (Anton's shape kept, squeezed only to fit the band)");
+
         var drawn = Grid((x, y) => IsWhite(picture.GetPixel(x, y)), b);
         var best = 0;
         var bestScore = -1.0;

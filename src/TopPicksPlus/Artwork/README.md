@@ -1,6 +1,6 @@
 # Artwork – the numbered pictures
 
-**Responsible for:** drawing `folder.png` and `thumb.png` at 1000×562 (spec F3, D6): backdrop darkened on the left, big white rank number, logo over the picture; title text when there's no logo; poster on dark when there's no backdrop. Layout exactly as D62 and D74; numbers in the embedded Anton font.
+**Responsible for:** drawing `folder.png` and `thumb.png` at 1000×562 (spec F3, D6): backdrop darkened on the left, big white rank number, logo over the picture; title text in capitals when there's no logo (D100); poster on dark when there's no backdrop. Layout exactly as D62 and D74; numbers in the embedded Anton font.
 
 **Belongs here:** `RankArtwork.Draw(backdrop, logo, poster, rank, title)`, which takes image bytes in and gives an `ArtworkResult` out (PNG bytes, or failed with a reason, D97), its layout constants (`Layout`), the title fitting (`TitleLayout`), plus the embedded font `Anton-Regular.ttf` and its licence `OFL.txt`.
 **Does not belong:** finding the backdrop or logo in Emby, saving files into copy folders (EmbyLink finds them; Storage saves the files, D43), deciding the rank.

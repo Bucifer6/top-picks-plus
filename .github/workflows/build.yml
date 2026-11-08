@@ -83,12 +83,14 @@ jobs:
           dotnet list tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj package --vulnerable --include-transitive | tee -a audit.txt
           # D65 exception (added by chunk 3, D87 c, D97): SkiaSharp 2.88.3 and SkiaSharp.NativeAssets.* 2.88.3 only.
           # The plugin draws with the copy Emby already loads and ships none of it (D15). Any other flagged
-          # package, or any other SkiaSharp version, still fails.
-          allowed='^[[:space:]]*>[[:space:]]+SkiaSharp(\.NativeAssets\.[A-Za-z0-9.]+)?[[:space:]]+(\[2\.88\.3\][[:space:]]+)?2\.88\.3[[:space:]]'
+          # package, any other SkiaSharp version, or any other advisory against 2.88.3, still fails.
+          allowed='^[[:space:]]*>[[:space:]]+SkiaSharp(\.NativeAssets\.[A-Za-z0-9.]+)?[[:space:]]+(\[2\.88\.3\][[:space:]]+)?2\.88\.3[[:space:]].*https://github\.com/advisories/GHSA-j7hp-h8jx-5ppr[[:space:]]*$'
           flagged() { grep -E '^[[:space:]]*>' "$1" | grep -vE "$allowed" || true; }
-          # Prove the filter bites (card 0003): another package, and SkiaSharp at another version, must stay flagged.
-          printf '   > Some.Package   1.0.0   High   https://x\n   > SkiaSharp   [2.88.4]   2.88.4   High   https://x\n   > SkiaSharp.NativeAssets.Linux   2.88.3   High   https://x\n' > audit-canary.txt
-          [ "$(flagged audit-canary.txt | wc -l)" -eq 2 ] || { echo "Audit exception filter is wrong"; exit 1; }
+          # Prove the filter bites (card 0003): another package, SkiaSharp at another version, and another
+          # advisory against 2.88.3 must stay flagged; only the named advisory at 2.88.3 is let through.
+          adv='https://github.com/advisories'
+          printf '   > Some.Package   1.0.0   High   %s/GHSA-j7hp-h8jx-5ppr\n   > SkiaSharp   [2.88.4]   2.88.4   High   %s/GHSA-j7hp-h8jx-5ppr\n   > SkiaSharp   [2.88.3]   2.88.3   High   %s/GHSA-aaaa-bbbb-cccc\n   > SkiaSharp.NativeAssets.Linux   2.88.3   High   %s/GHSA-j7hp-h8jx-5ppr\n   > SkiaSharp   [2.88.3]   2.88.3   High   %s/GHSA-j7hp-h8jx-5ppr\n' "$adv" "$adv" "$adv" "$adv" "$adv" > audit-canary.txt
+          [ "$(flagged audit-canary.txt | wc -l)" -eq 3 ] || { echo "Audit exception filter is wrong:"; flagged audit-canary.txt; exit 1; }
           if [ -n "$(flagged audit.txt)" ]; then echo "Vulnerable packages found:"; flagged audit.txt; exit 1; fi
 
       - name: Keep the DLL for 3 days
