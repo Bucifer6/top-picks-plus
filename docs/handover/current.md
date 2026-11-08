@@ -1,41 +1,40 @@
 # Handover
 
 ## Job just finished
-Spec v7 written (v6 Blockers 2 and 3 fixed, D43 recorded, Should-fix and Nits handled, D44–D48), then re-reviewed by three fresh agents: **not passed, 2 Blockers** (docs/reviews/2026-11-08-spec-v7-review.md).
+Spec v8 written (v7 Blockers fixed mostly by removing rules: D51 guard one entry at a time, D52 no link resolving, D53 stale date; owner proofs D49, D50; D54), then re-reviewed by three fresh agents: **not passed, 2 narrow Blockers** (docs/reviews/2026-11-08-spec-v8-review.md).
 
 ## Where it stopped
 - Stage 4 (Scaffold), still not passed.
-- Branch `scaffold`, pull request 1 open and **not merged**. Spec v7 is commit 20588d0; this handover, the v7 review and card updates are the commit after.
-- main now holds pull request 2, an older parallel scaffold (spec v2, D1–D19, five parts: Storage, EmbyLink) merged by the owner at 11:33 on 2026-11-08 from another session. **Owner's choice 2026-11-08: pull request 1 is the real line.** main was merged into this branch keeping this branch's files entirely (its handover is in docs/handover/archive/2026-11-08-pr2-parallel-scaffold-current.md), so pull request 1 merges cleanly and replaces it. Never work from stage4/scaffold. Always read this branch's handover (card 0006).
+- Branch `scaffold`, pull request 1 open and **not merged**. Spec v8 is commit c1fab5f; this handover and the v8 review are the commit after.
+- main holds pull request 2, an older parallel scaffold (spec v2, D1–D19, five parts: Storage, EmbyLink) the owner merged at 11:33 on 2026-11-08 from another session. **Owner's choice 2026-11-08: pull request 1 is the real line.** main was merged into this branch keeping this branch's files (its handover is in archive/2026-11-08-pr2-parallel-scaffold-current.md), so pull request 1 merges cleanly and replaces it. Never work from `stage4/scaffold`. Always read this branch's handover (card 0006).
 - No plugin code exists anywhere, on purpose.
-- How v6 findings were handled: docs/reviews/2026-11-08-spec-v6-handling.md.
+- How v7 findings were handled: docs/reviews/2026-11-08-spec-v7-handling.md.
 
 ## What is still owed (smallest first)
-1. Spec v8, in this order:
-   a. Fix Blocker 1 (a link *inside* an operation's folder passes the pre-check and is unlinked, never entered; only a link *on the way to* it fails; C27 must still pass) and Blocker 2 (a half-updated series must not sort into the row: e.g. the order guard sets every item of a stale copy to one fixed old date).
-   b. Then Should-fix, then Nits, from the v7 review. Write `docs/reviews/2026-11-08-spec-v7-handling.md`.
-   c. Apply R1, plus card 0005's new step: walk one concrete case (a delete of a folder with a junction inside, a brand-new add) through every older rule a new pre-check, lock or wait now runs around.
-2. Re-run the three goldfish on spec v8. If none finds a Blocker, merge pull request 1 (D27, after build and tests pass). Stage 4 then passes.
+1. Spec v9, in this order:
+   a. **Blocker 2 (C39):** C39 calls a missing pick both `partial` and `failed`. Fix: remove "missing an expected pick" and "an extra item" from its `failed` list, matching spec F4 step 11.
+   b. **Blocker 1 (update and links):** today an update writes before removing links inside, so a junction named like a new folder skips the update, and a file symlink with a new file's name could be written through. Fix: an update first sweeps its folder removing every link as a link, before any write; every replace target is checked not to be a link just before it is replaced.
+   c. Then Should-fix, then Nits, from the v8 review. Write `docs/reviews/2026-11-08-spec-v8-handling.md`. Keep preferring removal: for the lock hand-off, one "start waiting" flag plus a 30-second wait limit is the simple form.
+   d. Apply R1, walking **every** operation kind (delete, update, add) and each resume point, not one example (card 0005, seen 5).
+2. Re-run the three goldfish on spec v9. If none finds a Blocker, merge pull request 1 (D27, after build and tests pass). Stage 4 then passes.
 3. Stage 5 readiness goldfish; Stage 6 build in chunks; Stage 7 review; Stage 8 release.
 
 ## Watch out for
 - **Before every commit**, run the pattern check in docs/security.md "Secret scan" on the staged changes. Nothing printed (exit 1) means clean.
 - **Nothing is compiled here or on the owner's PC.** Only GitHub Actions builds (D16), on Windows (D31).
-- **The spec is growing faster than it settles.** Each review's fixes add rules that clash with older ones (card 0005, seen 4). In v8 prefer removing a rule to adding one, and where a simpler design exists (for a stale copy: just set its dates to one fixed old value), take it.
-- Owed to build chunks, not v8: NSubstitute and Mono.Cecil in the test csproj with locked versions (D47; say in v8 which chunk adds them), the ban fixtures and the two empty-passing wall tests (v6 Build 11, card 0002), the meta-test and built-features.txt, SkiaSharp and System.Text.Json versions read from the server.
-- D47 (EmbyBridge test layer B) and D48 (Emby database safety copy) are **owner decisions**; v7 review Sec 11–12 only refine how D48 is done (copy `*.db*`, restore tried before the first install), which is in the spirit of D48, but tell the owner.
-- D40 says "up to 2 minutes": mark it replaced by D45 in v8.
+- **Sec found the delete design sound** (no route to real media). Don't re-add link resolving (D52) to answer the Nits about UNC or subst paths: say they are accepted, since deletes stay inside managed folders.
+- The Cecil ban list in modules.md names Emby SDK members from memory; the first EmbyBridge chunk confirms each (the scan fails on a missing name by design).
+- Owed to build chunks, not v9: the ban fixtures and empty-passing wall tests (card 0002, plus v8 Build 16: SkiaSharp and Settings bans), the meta-test and built-features.txt, SkiaSharp and System.Text.Json versions read from the server. NSubstitute and Mono.Cecil come with the first EmbyBridge chunk (modules.md).
 - The old plugin (Emby.TopPicks.dll) is still installed; it is uninstalled at release using docs/releases.md.
-- The workspace clone is shallow: run `git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'` before tracking `scaffold`.
+- Shallow clone: run `git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'` before tracking `scaffold`.
 - device_bash on the owner's PC is broken; listing and staging files works.
 
 ## Waiting on the owner
-- **A second short proof test (v7 Comp 10, card 0008):** D43 proved deleting *film* copies keeps watch history, not *episode* copies. On the old plugin: take the Emby safety copy (D48), note an episode watched and one half-watched in a series in the row, move that series' copy folder out of top-picks, scan, check the real episodes are still watched and resumable, then put it back and scan. Ask this when v8 reaches F7.
-- **Two Emby settings on the Top Picks library (v7 Sec 9):** ask the owner to check that "save metadata as .nfo" (and "save user watch data") and "save artwork into media folders" are off for the Top Picks library, and record the answer.
-- **Proposed change to R1** (card 0005, seen 4): add "and walk one concrete case through every older rule that a new pre-check, lock or wait runs around". Needs the owner's OK before it goes into CLAUDE.md.
+- R1 widened to every operation kind and restart point: **approved by the owner 2026-11-08 and already in CLAUDE.md.** Nothing to ask.
+- Tell the owner (no decision needed): D54 refines how the Emby safety copy is taken; v9 will add written restore steps and how many copies are kept.
 
 ## Next job
-Spec v8: fix v7 Blockers 1 and 2, then Should-fix and Nits, then the goldfish re-review. Read first: CLAUDE.md (R1), docs/reviews/2026-11-08-spec-v7-review.md, docs/decisions.md (D36, D40, D44–D48), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
+Spec v9: fix v8 Blockers 2 then 1, then Should-fix and Nits, then the goldfish re-review. Read first: CLAUDE.md (R1), docs/reviews/2026-11-08-spec-v8-review.md, docs/decisions.md (D44, D49–D54), docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, docs/releases.md, the part READMEs.
 
 ## Cards that applied
-0001 (order through Emby), 0002 (ban fixtures), 0005 (R1; now seen 4), 0006 (handover on the unmerged branch), 0008 (real-server proof; now seen 3). No new card this job.
+0001 (order through Emby), 0005 (R1; now seen 5), 0006 (handover on the unmerged branch), 0008 (real-server proof; D49 and D50 settled its v7 items). No new card this job.

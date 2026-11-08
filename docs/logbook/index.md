@@ -7,7 +7,7 @@ summary: Index of live logbook cards
 | 0002 | insight | tests, boundary | A namespace wall test passes on an empty project, so it proves nothing until a fixture shows it can fail |
 | 0003 | insight | build | dotnet test rebuilds referenced projects without your -p:Version, overwriting the versioned DLL |
 | 0004 | build | all parts, tests, build | Stage 4 scaffold built on branch scaffold (pull request 1), not yet merged |
-| 0005 | insight | docs, spec | Fixing review findings with new detail creates contradictions unless each rule is cross-checked (promoted to R1) |
+| 0005 | insight | docs, spec | Fixing review findings with new detail creates contradictions unless each rule is cross-checked, walking every operation kind (promoted to R1) |
 | 0006 | method | handover | List remote branches first; the newest handover may be on an unmerged branch |
 | 0007 | method | build | CI artifacts can't be downloaded from the workspace; read the job log instead |
 | 0008 | insight | EmbyBridge, Run, tests | A rule that depends on how Emby stores data can't be proved with fake adapters; prove it on the real server first |
