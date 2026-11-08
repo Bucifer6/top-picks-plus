@@ -21,4 +21,5 @@ links: [spec.md]
 | C12 | F8 | With the old Emby.TopPicks plugin still installed, the task refuses to run and the report says why. |
 | C13 | F8 | If the task is stopped part-way (e.g. Emby restarted mid-run), the row still shows last week's complete list. |
 | C14 | F7 | The last run report lists the 10 titles, the reason for each, and "order check passed". |
+| C16 | F2 | With no pins at all, a weekly run fills all 10 places by itself from what was watched, with nothing done by hand. |
 | C15 | F2 | Fewer than 10 watched titles in the week: the gaps are filled with the newest additions, and the run doesn't fail. |

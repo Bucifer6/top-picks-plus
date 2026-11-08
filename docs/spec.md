@@ -16,7 +16,8 @@ links: [decisions.md, checks.md, data.md]
 - The same task can be run any time with Emby's "Run now" button, or from the plugin's settings page.
 
 ## F2 – How the 10 titles are chosen
-1. **Pinned titles first**, in the order the owner set. Pins always make the list (if there are more than 10 pins, only the first 10 are used).
+0. **Fully automatic by default.** The plugin builds the list itself each week from what your users watched. No manual step is needed. Pins are optional; with no pins, all 10 places are automatic.
+1. **Pinned titles (optional) first**, in the order the owner set. Pins always make the list (if there are more than 10 pins, only the first 10 are used).
 2. **The remaining places are filled automatically**, by the ranking below. Candidates are movies and series from the chosen libraries (default: all movie and TV libraries, never the Top Picks library itself).
 3. **Ranking = most watched** – plays across all users in the **last 7 days**, most plays first. For a series, every episode play counts towards the series. One person watching the same thing several times in a day counts once.
    - **Ties** go to the more recently added title, then the newer release.
