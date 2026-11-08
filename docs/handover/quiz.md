@@ -1,8 +1,8 @@
 # Handover quiz (answer from current.md alone; do not open answers.md)
-1. Which branch holds this job's work, what state is its pull request in, and what should happen to the other branch with a similar name?
-2. What exactly does Stage 5 need before any build can start (score, who agrees, what to do if it scores low)?
-3. Which two facts were deliberately left unproved, and what happens in each case if they turn out wrong?
-4. What is the managed list keyed by, and why does that matter?
-5. Which limits apply when reaching files on the owner's PC this time?
-6. What must the first Logic build chunk add, and in which pull request?
-7. How many fresh reviews ran this job and what did each find?
+1. What were the two readiness scores this job, and what must be true before building starts?
+2. Which branch holds the work, and what state is its pull request in?
+3. Why is there no early release of part of the plugin, and which decisions did that replace or withdraw?
+4. Which part of the plugin makes every file change, and why?
+5. How do you recognise an older decision that a newer one has changed, and why does it matter?
+6. What is the managed list keyed by, and why?
+7. Which three things stay unproved until their build chunk?

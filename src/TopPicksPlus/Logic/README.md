@@ -2,6 +2,9 @@
 
 **Responsible for:** the decisions the plugin makes, as plain C# that never touches Emby, files or pictures, so all of it can be tested automatically (D18):
 - choosing the 10: pins, viewer-day scores, tie-breaks, filler, candidate rules (spec F2);
+- planning the swap, resume and leftovers as an ordered list of file steps for Storage to carry out (D26, D39, D40, D43);
+- refusals (including `librarySetup`, D53), the missed-run rule (D41), the retry limit (D44) and the row-check retry (D45);
+- episode and file naming (D49) and the `<dateadded>` text from a UTC date plus a given offset (D50);
 - deciding whether a user counts for a title on a day (50% / 20 minutes / marked played, F6) and the 90-day trim;
 - folder names: illegal characters, trailing dots and spaces, missing year, ` - 2` clashes (F3);
 - rank times: pick 1 = run time, each pick one hour earlier (F4, card 0001);
@@ -15,4 +18,4 @@
 **Must not use:** Emby SDK, SkiaSharp, System.IO (including `Path`), System.Net, TimeZoneInfo, Newtonsoft, Microsoft.Extensions, SQLitePCL, any other part of the plugin.
 **Note for folder-name rules (F3):** write the list of characters Windows forbids into Logic yourself; don't use `Path.GetInvalidFileNameChars()`, which is blocked here and returns almost nothing on the Linux build machine.
 **Records:** the plain record types the rules work on (pick, play, managed entry) live here; Storage saves and loads them.
-**Tests:** `tests/TopPicksPlus.Tests/Logic`. Mutation testing (Stryker.NET) on this folder is not in CI yet: the first Logic build chunk must add it in the same pull request, pinned in a dotnet tool manifest, limited to this folder, with a break-at threshold so it can fail the build (D18).
+**Tests:** `tests/TopPicksPlus.Tests/Logic`. Mutation testing (Stryker.NET) is not in CI yet: chunk 1 adds it, pinned in a dotnet tool manifest, on Logic and Storage, in the Windows job, failing below 80% (D66).
