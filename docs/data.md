@@ -11,7 +11,7 @@ All plugin data lives in `programdata\plugins\TopPicksPlus\` on the server (JSON
 | Field | Meaning |
 |-------|---------|
 | LibraryIds | Emby IDs of the libraries to choose from (empty = all movie and TV libraries except Top Picks) |
-| Pins | Ordered list of source title Emby IDs (need not be in LibraryIds, D23) |
+| Pins | Ordered list of up to 10 movie or series Emby IDs (need not be in LibraryIds, D23, D61) |
 | RowCheckUserId | User the row check looks through; empty = default rule (D20) |
 | TakeoverDone | True once the first-run takeover (F9) has happened. Set only by the plugin, after managed.json is saved; the settings page never overwrites it (D38) |
 | PlaybackReportingImported | True once the one-off import (F6) has been tried. Set only by the plugin (D38) |
