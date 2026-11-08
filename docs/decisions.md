@@ -20,5 +20,7 @@ links: [spec.md]
 | D10 | 2026-11-08 | (Builder default, owner may change) "Most watched" = viewer-days in the last 7 days; a binge counts once per user per day | Stops one person's binge outranking what several people watched |
 | D11 | 2026-11-08 | (Builder default) The number of picks is fixed at 10 | Artwork, order and pins all assume 10; fewer moving parts |
 
+| D12 | 2026-11-08 | Proof test passed on Emby 4.10.2: changing Date added on a movie and on a series (series only) moves it in the Latest Top Picks row, and it stays after a full scan and restart. The date-added approach (F4/F5) goes ahead | Owner ran the test in the Emby dashboard |
+
 ## Still to decide before building
-- Proof test result: does setting date added in Emby 4.10.2 order the Latest Top Picks row, survive a rescan and restart, and work for series? (see docs/handover/current.md)
+(none for the spec; Stage 3 technical choices listed in the handover)
