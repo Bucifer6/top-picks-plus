@@ -32,10 +32,10 @@ links: [spec.md, decisions.md]
 | C23 | F8 | Settings: add, reorder and remove pins; choose libraries and the row-check user. The Top Picks library is not offered. The report shows rank, reason and row-check result for each title. |
 | C24 | F6 | A play from 91 days ago is no longer in the log after a run. (Also an automatic test.) |
 | C25 | F2 | Choose only your Movies library: the next run has no series. |
-| C26 | F1 | Stop Emby for over a week (or set the last successful run back 8 days on a test copy), start it: about 10 minutes later a run happens by itself. |
+| C26 | F1 | (Automatic, D54) With the last successful run more than 7 days ago, start-up starts a run 10 minutes later; with a resumed run, it doesn't. |
 | C27 | F6 | First run after install: the report says the first week came from Playback Reporting, and titles watched last week are in the list. If Playback Reporting can't be read, it says "last played" was used instead. |
-| C28 | F9 | Remove the Top Picks library (on a test server) and Run now: it refuses and says the library is missing. Nothing is deleted. |
-| C29 | F4 | A run whose rescan wait runs out is marked "incomplete"; once the rest of the copies appear, the order guard puts them in order without another run. |
+| C28 | F9 | (Automatic, D54) With no library using the Top Picks folder, a run refuses with "library missing" and deletes nothing. |
+| C29 | F4 | (Automatic, D54) A run whose rescan wait runs out is marked "incomplete", still counts as successful, and the order guard later sets the dates of copies that appear. |
 | C30 | F9 | A user whose parental control blocks a rating doesn't see a Top Picks copy of a title with that rating, just as they don't see the original. |
 | C31 | F4 | With the row-check user left empty, the report names the user it used (not an admin). With a restricted user chosen, a row missing their blocked titles still passes if the rest are in order. |
 | C32 | F2 | Choose only Movies, and pin a title from Kids: the pin is still used. |
@@ -57,3 +57,17 @@ links: [spec.md, decisions.md]
 | C48 | F9 | (Automatic) Takeover run a second time (e.g. TakeoverDone lost) adopts nothing already on the managed list; saving the settings page doesn't change TakeoverDone. |
 | C49 | F9 | (Automatic) A staging folder that is a junction is not emptied; a junction inside a dropped copy is removed as a link and its target is untouched. |
 | C50 | F9 | (Automatic) An old-plugin folder that is still a pick: the new copy takes the plain name; if the old folder can't be deleted, the new copy gets " - 2" and nothing is merged. |
+| C51 | F3 | (Automatic) Folder and file names: forbidden characters and trailing dots or spaces removed; no year gives `Title`; clashes (ignoring case) get ` - 2`, ` - 3`; reserved names get `_`; specials go in `Specials` as `S00Eyy`; a double episode is `SxxEyy-Ezz`; an episode with no number is left out and counted; no path over 240 characters (D49). |
+| C52 | F3 | (Automatic) Each .nfo holds the fields in D30, including the age rating, with `&` and `<` in a title written safely. |
+| C53 | F4 | (Automatic) Rank dates: pick n is the rank time minus (n−1) hours, the rank time cut to the whole minute, and a resume keeps them. |
+| C54 | F6 | (Automatic) Minutes watched never go below 0 or above the runtime; a play whose start wasn't seen counts 0 minutes; with no runtime, 20 minutes counts; "marked played" counts on its own (D29). |
+| C55 | F1 | (Automatic) Right after first install, with no last run, start-up doesn't start a run (D41). |
+| C56 | F5 | (Automatic) The order guard skips unranked copies, and resets a ranked series' episodes as well as the series (D52). |
+| C57 | F4 | (Automatic) With no unrestricted user, the row check uses the first administrator and the report says so (D20). |
+| C58 | F6 | (Automatic) Plays already in the log are not imported again from Playback Reporting or the "last played" fallback; each fallback title counts as one viewer-day (D46, D47). |
+| C59 | F1/F5 | (Automatic) An error mid-run is retried 5 minutes later, at most 3 times, then the run is failed; the order guard runs while no run is working, even if run.json says "running" (D44). |
+| C60 | F4 | (Automatic) A row check that fails is retried once after the dates are set again; if it still fails, the run is finished and the report shows the failed check (D45). |
+| C61 | F9 | Turn off the .nfo reader on the Top Picks library and Run now: it refuses and the report says to turn it back on. Turn it on again: the next run works (D53). |
+| C62 | F4 | (First .nfo chunk, on the server, D50) One test copy dated in summer time and one in winter time: after a metadata refresh, Emby shows the same date added as the plugin set. |
+| C63 | F9 | (Automatic) With the old plugin loaded (after the takeover chunk), no plays are logged and no watched state is copied (D51). |
+| C64 | Boundary | (Automatic) Logic may use names that only start like a forbidden one (e.g. `System.IObservable<T>`): the boundary check doesn't fail on them. |
