@@ -44,3 +44,10 @@ Behaviour questions for the owner (one at a time, with a recommendation):
 - Q2. "Last 7 days" at a Sunday 05:00 run (C11, B6). Recommend: the 7 full UK days before the run day (Sunday to Saturday); plays are kept for 90 full days.
 - Q3. For a series, is the 50% rule per episode? (C12, B6). Recommend: per episode; two sittings of the same episode add up, different episodes don't.
 - Q4. Must a pin be in the chosen libraries? (C30, B6). Recommend: no, a pin always counts if its file exists.
+
+## Fix review (third reviewer, on commit 51bce01): safe to merge; three should-fixes done before merging
+- Canary for "uses another part" didn't use the real rule (1) → a canary for every forbidden entry of every part, checked against the real lists, and a test that fails if lists and canaries drift apart.
+- Types outside any namespace or extra types in Polyfills.cs escaped every wall (2) → one test: every plugin type must be in a part, or be Plugin, PluginConfiguration or IsExternalInit.
+- README promised "no other packages" for Logic (3) → names the three blocked packages; the rest is review-only, said plainly.
+- Version check was a substring match (4) → whole-value match, reading the DLL's version resource.
+- Logic README must-not-use list and System.IO.Path note (7, 9) → added. Nits 5, 6, 8 → no change (correct as is, or covered by "reviewed by hand").

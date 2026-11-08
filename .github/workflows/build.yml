@@ -48,7 +48,11 @@ jobs:
       - name: Check the DLL carries the version
         shell: bash
         run: |
-          strings -a src/TopPicksPlus/bin/Release/netstandard2.0/TopPicksPlus.dll | grep -qF "${{ steps.ver.outputs.version }}" \
+          v='${{ steps.ver.outputs.version }}'
+          # Whole-value match: the version, then end or "+commit", not part of a longer number.
+          dll=src/TopPicksPlus/bin/Release/netstandard2.0/TopPicksPlus.dll
+          # The UTF-16 version resource (ProductVersion) holds the clean value; the UTF-8 copy has a length byte in front.
+          { strings -a -el "$dll"; strings -a "$dll"; } | grep -qE "(^|[^0-9.])${v//./\\.}(\\+|$)" \
             || { echo "TopPicksPlus.dll does not carry version ${{ steps.ver.outputs.version }}"; exit 1; }
 
       - name: Dependency vulnerability audit

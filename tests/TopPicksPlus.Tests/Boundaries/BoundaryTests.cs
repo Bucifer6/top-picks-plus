@@ -43,7 +43,7 @@ public class BoundaryTests
         _ => throw new ArgumentException(part),
     };
 
-    internal static TestResult Check(Assembly assembly, string ns, string[] forbidden) =>
+    private static TestResult Check(Assembly assembly, string ns, string[] forbidden) =>
         Types.InAssembly(assembly)
             .That().ResideInNamespace(ns)
             .ShouldNot().HaveDependencyOnAny(forbidden)
@@ -62,34 +62,60 @@ public class BoundaryTests
         Assert.True(result.IsSuccessful, $"{part} crosses a wall. Offending types: {string.Join(", ", offenders)}");
     }
 
+    // Every type in the plugin must sit somewhere a wall applies. This also catches classes
+    // left outside any namespace and extra classes hidden in Polyfills.cs.
     [Fact]
-    public void Project_root_holds_only_Plugin_and_PluginConfiguration()
+    public void Every_plugin_type_lives_inside_a_walled_part_or_is_allowed_in_the_root()
     {
-        var extra = Plugin.GetTypes()
-            .Where(t => t.Namespace == Root && !t.Name.StartsWith("<", StringComparison.Ordinal))
+        var stray = Plugin.GetTypes()
             .Where(t => t.DeclaringType == null)
-            .Select(t => t.Name)
-            .Where(n => !RootTypeNames.Contains(n))
+            .Where(t => !t.Name.StartsWith("<", StringComparison.Ordinal))
+            .Where(t => !IsCompilerMade(t))
+            .Where(t => !(t.Namespace == Root && RootTypeNames.Contains(t.Name)))
+            .Where(t => !Parts.Any(p => t.Namespace == Ns(p) || (t.Namespace ?? "").StartsWith(Ns(p) + ".", StringComparison.Ordinal)))
+            .Where(t => t.FullName != $"{PolyfillNamespace}.IsExternalInit")
+            .Select(t => t.FullName ?? t.Name)
             .ToArray();
-        Assert.True(extra.Length == 0,
-            $"Only Plugin and PluginConfiguration may live in the project root. Found: {string.Join(", ", extra)}");
+        Assert.True(stray.Length == 0,
+            "Types outside the walled parts (only Plugin, PluginConfiguration and IsExternalInit may be): " + string.Join(", ", stray));
     }
 
-    // Proves the rules bite: the Canary types below deliberately break Logic's walls.
-    [Fact]
-    public void Canary_a_Logic_type_using_files_is_caught()
-    {
-        var result = Check(typeof(Canary.Logic.ReadsAFile).Assembly, "TopPicksPlus.Tests.Boundaries.Canary.Logic", Forbidden("Logic"));
-        Assert.False(result.IsSuccessful);
-        Assert.Contains(typeof(Canary.Logic.ReadsAFile).FullName, result.FailingTypeNames ?? Array.Empty<string>());
-    }
+    private static bool IsCompilerMade(Type t) =>
+        t.GetCustomAttributes(false).Any(a => a.GetType().FullName is
+            "System.Runtime.CompilerServices.CompilerGeneratedAttribute" or "Microsoft.CodeAnalysis.EmbeddedAttribute");
 
-    [Fact]
-    public void Canary_a_Logic_type_using_another_part_is_caught()
+    // Proves the rules bite: for every part, every forbidden entry has a canary type (Canary.cs)
+    // that breaks exactly that wall, and the real rule catches it. Removing an entry from a
+    // list, or a canary, fails here.
+    [Theory]
+    [InlineData("Logic")]
+    [InlineData("Storage")]
+    [InlineData("Artwork")]
+    [InlineData("EmbyLink")]
+    [InlineData("Settings")]
+    public void Canaries_prove_every_wall_bites(string part)
     {
-        var result = Check(typeof(Canary.Logic.UsesEmbyLink).Assembly, "TopPicksPlus.Tests.Boundaries.Canary.Logic",
-            new[] { "TopPicksPlus.Tests.Boundaries.Canary.EmbyLink" });
-        Assert.False(result.IsSuccessful);
+        var test = typeof(BoundaryTests).Assembly;
+        var canaryNs = $"{Ns(part)}.BoundaryCanaries";
+        var canaries = test.GetTypes()
+            .Where(t => t.Namespace == canaryNs)
+            .Select(t => (Type: t, Entry: ((BreaksAttribute?)Attribute.GetCustomAttribute(t, typeof(BreaksAttribute)))?.Entry))
+            .Where(c => c.Entry != null)
+            .ToArray();
+        var forbidden = Forbidden(part);
+
+        var uncovered = forbidden.Where(e => canaries.All(c => c.Entry != e)).ToArray();
+        Assert.True(uncovered.Length == 0, $"{part}: no canary for {string.Join(", ", uncovered)}");
+
+        foreach (var (type, entry) in canaries)
+        {
+            Assert.True(forbidden.Contains(entry!), $"{part}: canary {type.Name} breaks '{entry}', which is no longer forbidden");
+            var result = Types.InAssembly(test)
+                .That().ResideInNamespace(canaryNs).And().HaveName(type.Name)
+                .ShouldNot().HaveDependencyOnAny(forbidden)
+                .GetResult();
+            Assert.False(result.IsSuccessful, $"{part}: canary {type.Name} breaking '{entry}' was not caught");
+        }
     }
 
     // The checks above go by namespace, so a file put in the wrong folder (or a

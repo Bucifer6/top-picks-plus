@@ -7,10 +7,10 @@ The project root (namespace `TopPicksPlus`) holds only `Plugin` (the entry class
 | Part | Namespace | May use | Must not use |
 |------|-----------|---------|--------------|
 | project root | TopPicksPlus | everything below, Emby SDK | SkiaSharp |
-| Logic/ | TopPicksPlus.Logic | nothing else in the plugin; .NET only | Emby SDK, SkiaSharp, System.IO, System.Net, TimeZoneInfo, other packages, Storage, Artwork, EmbyLink, Settings, project root |
+| Logic/ | TopPicksPlus.Logic | nothing else in the plugin; .NET only | Emby SDK, SkiaSharp, System.IO, System.Net, TimeZoneInfo, Newtonsoft, Microsoft.Extensions, SQLitePCL, Storage, Artwork, EmbyLink, Settings, project root |
 | Storage/ | TopPicksPlus.Storage | Logic | Emby SDK, SkiaSharp, Artwork, EmbyLink, Settings, project root |
 | Artwork/ | TopPicksPlus.Artwork | Logic, SkiaSharp | Emby SDK, Storage, EmbyLink, Settings, project root |
 | EmbyLink/ | TopPicksPlus.EmbyLink | Logic, Storage, Artwork, project root, Emby SDK | Settings, SkiaSharp |
 | Settings/ | TopPicksPlus.Settings | Logic, Storage, EmbyLink, project root, Emby SDK | Artwork, SkiaSharp |
 
-The boundary check (`tests/TopPicksPlus.Tests/Boundaries`) fails the build if any of these walls is crossed, if anything else appears in the project root, or if a file's namespace doesn't match its folder. Canary tests prove the rules can fail. Not checked automatically: the project root's own row (reviewed by hand), and Logic reading the clock (`DateTime.Now`), which reviewers check. A new part, or a new arrow in this table, needs the owner's approval.
+The boundary check (`tests/TopPicksPlus.Tests/Boundaries`) fails the build if any of these walls is crossed, if any type sits outside the five parts (apart from Plugin, PluginConfiguration and IsExternalInit), or if a file's namespace doesn't match its folder. A canary for every forbidden entry proves each wall can fail. Not checked automatically, so reviewers check them: the project root's own row; Logic reading the clock or machine (`DateTime.Now`, `DateTimeOffset.Now`, `ToLocalTime`, `Environment`, `Random`, `Guid.NewGuid`); Logic using packages other than the three named. A new part, or a new arrow in this table, needs the owner's approval.
