@@ -3,7 +3,7 @@
 **Responsible for:** the decisions the plugin makes, as plain C# that never touches Emby, files or pictures, so all of it can be tested automatically (D18):
 - choosing the 10: pins, viewer-day scores, tie-breaks, filler, candidate rules (spec F2);
 - planning the swap, resume and leftovers as an ordered list of file steps for Storage to carry out (D26, D39, D40, D43);
-- refusals (including `librarySetup`, D53), the missed-run rule (D41), the retry limit (D44) and the row-check retry (D45);
+- refusals (including `librarySetup`, D53, and `stateDamaged`, D93) and the one refusal rule: guards at the start of every run and resume, a refusal leaves the waiting run unchanged and never uses a resume, a problem found mid-step is an error that is retried (D94); the missed-run rule (D41), the retry limit (D44) and the row-check retry (D45);
 - episode and file naming (D49) and the `<dateadded>` text from a UTC date plus a given offset (D50);
 - deciding whether a user counts for a title on a day (50% / 20 minutes / marked played, F6) and the 90-day trim;
 - folder names: illegal characters, trailing dots and spaces, missing year, ` - 2` clashes (F3);

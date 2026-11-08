@@ -9,7 +9,7 @@
 - listening for playback stopped and recording plays (F6), the one-off Playback Reporting import;
 - copying watched state and resume points (F7);
 - the row check as a non-administrator user (F4 step 6), comparing ranked copies only (D83);
-- running a run's steps in the D80 order (guards, import, takeover, leftovers, prepare …);
+- running a run's steps in the D80 order (guards, import, takeover, leftovers, prepare …); guards again at every resume, before `resumeCount` goes up; a refusal leaves the waiting run alone and the next trigger after it clears resumes it; a problem found mid-step goes through the retry path (D94); reading and saving the plugin's flags through Storage's state.json (D93), never through PluginConfiguration;
 - the safety guards: old plugin loaded (exact match, D33), Top Picks library missing, delete only managed folders inside the Top Picks folder (F9);
 - linking copy files to source items by path (D28), minutes watched from start/stop positions (D29), the Playback Reporting read through Emby's own SQLite library (D25), the start-up order (D35), takeover (D38), and the in-memory run lock and retry rule (D44). The delete-containment checks (D37), leftovers (D39) and file-level order (D40) are carried out by Storage (D43).
 

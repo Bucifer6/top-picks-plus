@@ -1,9 +1,9 @@
 ---
-summary: What Top Picks Plus does, in plain English. Every feature has a check in checks.md. Version 6: readiness fixes (D43–D91).
+summary: What Top Picks Plus does, in plain English. Every feature has a check in checks.md. Version 7: readiness fixes (D43–D94).
 links: [decisions.md, checks.md, data.md]
 ---
 
-# Top Picks Plus – spec (v6, 2026-11-08)
+# Top Picks Plus – spec (v7, 2026-11-08)
 
 **Purpose:** Every week, fill the "Latest Top Picks" row on the Emby home screen with the 10 titles people are watching most, numbered 1–10 in the right order every time, with no manual step. The owner can pin titles if they want to.
 
@@ -24,8 +24,9 @@ links: [decisions.md, checks.md, data.md]
 - Emby scheduled task **"Refresh Top Picks"**, every **Sunday at 05:00 on the server's clock**. The server is set to UK time, so the run follows the clocks when they change.
 - Can also be run with "Run now", in Emby's Scheduled Tasks or on the plugin's settings page.
 - **Only one run at a time.** If a run is asked for while one is going, the request is turned down and the settings page says a run is already in progress. If a run hits an error while Emby keeps going, it is resumed 5 minutes later: the first attempt plus up to 3 resumes, then it is marked failed. The resume counter goes up once each time a resume starts, never on the error itself (D44, D68, D78). A scheduled or Run now request while an unfinished run is waiting resumes that run instead (D68).
+- **Refusals (D94):** the safety checks ("guards", F9) run at the start of every run and every resume. A refusal leaves a waiting run exactly as it was (same step, same resume count) and only records the refusal; it never fails the run or uses up a resume. Once the cause is fixed, the next trigger resumes the run. A problem that first appears in the middle of a step is treated as an error and retried like any other.
 - **Missed run:** if Emby starts up and the last successful run (finished or incomplete, D31) was more than 7 days ago, the plugin runs once, 10 minutes after start-up, unless an unfinished run was resumed. Right after first install there is no last run, so it waits for Sunday or Run now (D41). If the run record was damaged but the plugin has run before, it counts as a missed run (D90).
-- **Start-up order (D35):** old-plugin guard first (if the old plugin is loaded, nothing else happens: no runs, no play logging, no watched sync, D51); then resume an unfinished run at 2 minutes (D90); otherwise the order guard at 2 minutes; then the missed-run rule at 10 minutes.
+- **Start-up order (D35):** old-plugin guard first (if the old plugin is loaded, nothing else happens: no runs, no play logging, no watched sync, D51; an unfinished run just waits, unchanged, until the old plugin is gone, D94); then resume an unfinished run at 2 minutes (D90); otherwise the order guard at 2 minutes; then the missed-run rule at 10 minutes.
 
 ## F2 – Choosing the 10 (fully automatic)
 The list is built automatically every week. **No manual step is ever needed.** Pins are optional.
@@ -48,7 +49,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - **Artwork:** `fanart.jpg` (the source backdrop), `logo.png` (the source logo, if there is one) and the theme video (`backdrops\theme.<ext>`, keeping the source's file type, if the source has one, D90). Theme videos are copied only when a copy is first created, not every week. `folder.png` and `thumb.png` are drawn by the plugin at 1000×562: the backdrop, darkened on the left, a large white rank number (1–10) on the left, and the logo over the picture. Exact layout and font: D62, with today's pictures in docs/reference/artwork/. With no logo, the title is written in large white text. With no backdrop, the poster is used on a dark background.
 
 ## F4 – Each week's update, in order
-0. **Before anything else (D80):** the guards (a refusal stops here and is recorded), then the one-off Playback Reporting import (first run only), then the takeover of old-plugin folders (first run only). Each of these is a saved step, so a restart part-way repeats it safely.
+0. **Before anything else (D80):** the guards (a refusal stops here, is recorded and leaves any waiting run unchanged, D94), then the one-off Playback Reporting import (first run only), then the takeover of old-plugin folders (first run only). Each of these is a saved step, so a restart part-way repeats it safely.
 1. **Finish leftovers** from an earlier run (D39), then **prepare** this week's copies in a staging folder outside every library: `programdata\plugins\TopPicksPlus\staging`. Emby never sees half-written files there. The 10 picks and the rank time are fixed now and saved in the run record.
 2. **Swap in:**
    (Anything an earlier run left half-done was already finished before step 1, D39.) In this order, so a restart at any moment is safe (D26, D40):
@@ -93,8 +94,9 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - **Deletes only what it manages:** it deletes only folders on the managed list (the whole folder, including anything inside), only direct children of the Top Picks folder after the safety checks in D37, and inside a staying copy only the files it wrote, after checking each file's stored path stays inside that copy (D82). Nothing in the Top Picks folder that isn't on the managed list is ever touched; staging is the plugin's own scratch folder (D60).
 - **First-run takeover:** before the first run, folders already in the Top Picks folder that contain, counting their subfolders, at least one .strm file and one .nfo file (D38) are taken to be the old plugin's and added to the managed list, linked to their source title through the path in their .strm file (D28). Anything else, including loose files in the Top Picks folder, is left alone forever.
 - **Old plugin guard:** if the old plugin is loaded in Emby (exactly: assembly `Emby.TopPicks` or plugin ID `672630FC-6FB8-4207-9C7B-AB414CD85B53`, D33), every run refuses to start and the report says to uninstall it first.
-- **Newer data:** if a data file was written by a newer version, runs refuse and the plugin stops logging plays, syncing watched state and guarding the order, and writes none of its data files, so an older version can't spoil newer data (D72, D85).
+- **Newer data:** if a data file (including state.json) was written by a newer version, runs refuse and the plugin stops logging plays, syncing watched state and guarding the order, and writes none of its data files, not even the refusal, so an older version can't spoil newer data (D72, D85, D93, D94).
 - **Damaged data:** if the managed list can't be read, every run refuses and nothing is deleted. A damaged play log or run record is set aside (renamed) and a fresh one started; the report says so (D32).
+- **The plugin's own flags** (takeover done, import done, listening since) are kept in the plugin's own file state.json, not in the settings, so saving the settings page can never reset them (D93). If state.json can't be read, every run refuses (`stateDamaged`), nothing is renamed or recreated, and the report says to restore it from a backup; deleting it would make the plugin redo the takeover and the import.
 - **Missing library:** if no library uses the Top Picks folder, the run refuses to start and says so.
 - **Library setup (D53):** the Top Picks library must have its .nfo metadata reader on and no .nfo metadata saver on. Otherwise the run refuses (`librarySetup`) and the report says which setting to change.
 - **Personal data:** the play log (user, title, day, minutes) stays in the plugin's data folder on the server, is never sent anywhere, and is shown only on the administrator settings page.

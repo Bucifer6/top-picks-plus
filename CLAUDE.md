@@ -13,10 +13,11 @@ Follows the build-software-safely method: talk and docs first, no code before th
 (none yet)
 
 ## Docs
-- docs/spec.md – what it does (F1–F10, v6)
-- docs/checks.md – how the owner tests it (C1–C93)
-- docs/decisions.md – what's decided (D1–D91) and what's still open
-- docs/data.md – settings, managed list, play log, run record
+- docs/spec.md – what it does (F1–F10, v7)
+- docs/checks.md – how the owner tests it (C1–C97)
+- docs/decisions.md – what's decided (D1–D94) and what's still open
+- docs/data.md – settings, plugin flags (state.json), managed list, play log, run record
+- docs/backlog.md – findings set aside for the chunk that deals with them; each chunk's builder fixes or decides its items
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
 
 ## Folders
@@ -25,7 +26,7 @@ Follows the build-software-safely method: talk and docs first, no code before th
 | docs/ | Spec, checks, decisions, handover, logbook |
 | src/TopPicksPlus/ | The plugin (one DLL). Parts and their walls: src/TopPicksPlus/README.md |
 | src/TopPicksPlus/Logic | Pure rules (choosing, counting, naming, rank times, takeover); no Emby |
-| src/TopPicksPlus/Storage | managed.json, plays.json, run.json, staging, and every file change in top-picks (D43); atomic writes |
+| src/TopPicksPlus/Storage | managed.json, plays.json, run.json, state.json (the plugin's own flags, D93), staging, and every file change in top-picks (D43); atomic writes |
 | src/TopPicksPlus/Artwork | Numbered 1000x562 pictures (SkiaSharp, not shipped) |
 | src/TopPicksPlus/EmbyLink | Everything that talks to Emby: task, events, swap, dates, guard, row check |
 | src/TopPicksPlus/Settings | Admin settings page and run report |
