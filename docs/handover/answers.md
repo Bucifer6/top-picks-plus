@@ -1,8 +1,8 @@
 # Answer key (only the marking goldfish reads this)
-1. Branch `scaffold`, commit 9ba0e58; not merged, because D19 needs a passing fresh review and the review found spec Blockers (Where it stopped).
-2. Spec v3 fixes, then a re-run of the three goldfish (comprehension, builder readiness, security) finding no Blockers (What is still owed 2 and 4).
-3. The staged-changes pattern check from security.md; do not try to download and run gitleaks again (Watch out for).
-4. Only GitHub Actions; not in the cloud workspace (no NuGet) and not on the owner's PC (D5) (Watch out for).
-5. None any more: both were answered as D21 (no viewing history) and D22 (row-check user) (Waiting on the owner).
-6. docs/reviews/2026-11-08-scaffold-review.md; the 8 Blockers first, then Should fix (What is still owed 2).
-7. Read the SkiaSharp version Emby loads from the server's system folder, because D15 compiles against Emby's copy (Watch out for).
+1. Branch `scaffold`. main's handover is two jobs old because work stays off main until reviewed (card 0006). PR 1 is not merged. (Where it stopped)
+2. Owner answers the watched-titles question; spec v4 fixes the review file (8 Blockers first, then Should-fix, then Nits); the three goldfish re-run and find no Blocker; then merge PR 1. (What is still owed 2–5)
+3. Blocker 1, watched titles hidden from Latest. Options: (a) keep copies looking unwatched, real titles still ticked (recommended); (b) keep ticks on copies and accept shorter rows; (c) owner turns the setting off for every user. (Waiting on the owner)
+4. Check each new rule against the F4 step list, run.json `step`, data.md and the part's walls, in the same edit. (What is still owed 3)
+5. A change to a wall (a part's may use / must not use). READMEs, docs/modules.md and tests/TopPicksPlus.Tests/BoundaryTests.cs. (What is still owed 4)
+6. SkiaSharp (D15) and Emby's SQLite (D24); System.Text.Json is now in question. Their versions must be read from the server before their build chunks. (Watch out for)
+7. The staged-changes secret pattern check from security.md. Don't try to download gitleaks. (Watch out for)

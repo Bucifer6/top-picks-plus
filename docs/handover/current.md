@@ -1,37 +1,39 @@
 # Handover
 
 ## Job just finished
-Stage 4 scaffold built and reviewed by three fresh agents ("goldfish": reviewers given only the files, no chat history). Scaffold fixes done; spec fixes are the next job.
+Spec v3 written from the scaffold review, then re-reviewed by three fresh agents ("goldfish": reviewers given only the files). Not passed: 8 Blockers.
 
 ## Where it stopped
-- Stage 4 (Scaffold), not yet passed: the review found spec gaps, so the re-review is still owed.
-- Branch `scaffold`, last commit 9ba0e58, build green (15 tests). Pull request 1 is open and **not merged** (D19: merge only after a passing fresh review).
-- main is still docs only (commit dbf3277). No plugin code exists anywhere, on purpose.
+- Stage 4 (Scaffold), still not passed.
+- Branch `scaffold`, pull request 1 open and **not merged** (D19: merge only after a fresh review with no Blockers). Spec v3 is commit 1f81762; this handover is the commit after it.
+- main is still docs only (commit dbf3277) and its handover is two jobs old. Always read this branch's handover, not main's (card 0006).
+- No plugin code exists anywhere, on purpose.
 
 ## What is still owed (smallest first)
-1. Owner to delete the throwaway branch `probe/boundary-bites` on GitHub (Claude was not allowed to delete it). It is harmless.
-2. Spec v3: work through every "Fix in the next job" item in docs/reviews/2026-11-08-scaffold-review.md: 8 Blockers first, then the Should-fix list. Update spec.md, data.md, checks.md and the READMEs to match.
-3. (done: owner questions answered, D21 and D22.)
-4. Re-run the three goldfish (comprehension, builder readiness, security) on the updated docs and scaffold. Merge pull request 1 only if they find no Blockers. Stage 4 then passes.
-5. Stage 5 readiness goldfish: score must be above 90 and the owner must agree with its restatement.
-6. Stage 6 build in chunks the owner can check, Stage 7 review, Stage 8 release (old plugin removed at the same time).
+1. Owner: delete the throwaway branch `probe/boundary-bites` on GitHub (Claude can't). Harmless.
+2. Owner: answer the "watched titles hidden from Latest" question (below). Blocker 1 can't be fixed without it.
+3. Spec v4: fix everything in docs/reviews/2026-11-08-spec-v3-review.md. The 8 Blockers come first (Blocker 1 needs the owner's answer), then the Should-fix list, then the Nits. Follow card 0005 for every new rule: check it against the F4 step list, run.json `step`, data.md and the part's walls in the same edit.
+4. Any fix that changes a wall (a part's "may use" / "must not use", e.g. Blocker 2) needs the owner's OK first, with matching edits to the READMEs, docs/modules.md and tests/TopPicksPlus.Tests/BoundaryTests.cs.
+5. Re-run the three goldfish (comprehension, builder readiness, security) on spec v4. Merge pull request 1 only if none finds a Blocker. Stage 4 then passes.
+6. Stage 5 readiness goldfish: the score must be above 90 and the owner must agree with its restatement.
+7. Stage 6 build in chunks, Stage 7 review, Stage 8 release (the old plugin is removed at the same time).
 
 ## Watch out for
-- **Before every commit**, run the pattern check on staged changes (security.md): `git diff --cached -U0 | grep -E '^\+' | grep -nEi '(api[_-]?key|secret|token|passw(or)?d)\s*[:=]\s*["'"'"']?[A-Za-z0-9/+_\-]{12,}|-----BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-'`. Nothing printed means clean. Downloading and running gitleaks here was refused; don't try again.
-- **Nothing is compiled here or on the owner's PC.** The cloud workspace can't reach NuGet, and D5 says the PC never builds. Only GitHub Actions builds (D16: every branch and pull request; a v1.2.3 tag on main makes a Release with the DLL and checksum).
-- Tests are xUnit plus Stryker mutation testing on Logic (D18). Stryker is skipped until Logic has code.
-- Walls between parts are enforced by tests/TopPicksPlus.Tests/BoundaryTests.cs. Changing a wall needs the owner's OK and matching edits to the READMEs, docs/modules.md and that file.
-- The workspace clone is shallow; to track a branch, add it to remote.origin.fetch first.
-- Old plugin (Emby.TopPicks.dll) is still installed. It is uninstalled at release (Stage 8), at the same moment Top Picks Plus goes in (F9 guard). Its DLL and settings are backed up on the Desktop (D17).
-- device_bash on the owner's PC is broken; listing and staging files works. The SkiaSharp version Emby loads has to be read from the server's system folder before the Artwork chunk.
-- Emby's HTTP port is 48096 locally, public 8096 behind Caddy.
+- **Before every commit**, run the pattern check on staged changes (security.md): `git diff --cached -U0 | grep -E '^\+' | grep -nEi '(api[_-]?key|secret|token|passw(or)?d)\s*[:=]\s*["'"'"']?[A-Za-z0-9/+_\-]{12,}|-----BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-'`. Nothing printed means clean. Don't try to download gitleaks here; it was refused.
+- **Nothing is compiled here or on the owner's PC.** The cloud workspace can't reach NuGet, and D5 says the PC never builds. Only GitHub Actions builds (D16).
+- The workspace clone is shallow. To track this branch, add it to remote.origin.fetch first.
+- Spec v3 added decisions D23 (data folder `programdata\data\TopPicksPlus\`), D24 (Playback Reporting read through Emby's own SQLite, compiled against, not shipped) and D25 (an unreachable library folder refuses the run). All three were Claude's calls under the owner's delegation.
+- SkiaSharp (D15) and Emby's SQLite library (D24) are compiled against but **not shipped**: the plugin uses Emby's own copies. So both versions must be read from the server before their build chunks. The same question is now open for System.Text.Json (review: Build 8).
+- The old plugin (Emby.TopPicks.dll) is still installed. It is uninstalled at release (Stage 8), at the same moment Top Picks Plus goes in. Its DLL and settings are backed up on the Desktop (D17).
+- device_bash on the owner's PC is broken; listing and staging files works.
+- Emby's HTTP port is 48096 locally, 8096 publicly behind Caddy.
 
 ## Waiting on the owner
-Nothing right now. Answered 2026-11-08: no viewing history kept (D21); row-check user (D22, Claude's call). Spec v3 must keep F6, data.md and the checks in step with D21 (e.g. C10's report shows viewer-days, never names).
-Technical choices are delegated to Claude, but anything hard to undo still goes to the owner.
+- **Watched titles and the Latest row (review Blocker 1):** Emby may hide titles a user has already watched from "Latest" rows. Options put to the owner on 2026-11-08: (a) the plugin keeps the copies looking unwatched, so the row always shows all 10 for everyone, while the real titles still get the watched tick; (b) keep the watched ticks on copies and accept shorter rows for people who've seen a pick; (c) the owner turns that setting off for every user. Claude recommended (a). Record the answer as a decision.
+- Possibly: whether card 0006 should become a standing rule (needs the owner's OK).
 
 ## Next job
-Spec v3 from the review file, the two owner questions, then the goldfish re-review. Read first: CLAUDE.md, docs/reviews/2026-11-08-scaffold-review.md, docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md.
+Spec v4: get the owner's answer on watched titles, then fix the spec v3 review file item by item, then the goldfish re-review. Read first: CLAUDE.md, docs/reviews/2026-11-08-spec-v3-review.md, docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
 
 ## Cards that applied
-0001 (ordering via Emby, not the .nfo). New this job: 0002, 0003, 0004.
+0001 (order through Emby, not the .nfo), 0002 (wall test must prove it can fail), 0004 (scaffold record). New this job: 0005, 0006.
