@@ -11,3 +11,4 @@ summary: Index of live logbook cards
 | 0006 | method | handover | List remote branches first; the newest handover may be on an unmerged branch |
 | 0007 | method | build | CI artifacts can't be downloaded from the workspace; read the job log instead |
 | 0008 | insight | EmbyBridge, Run, tests | A rule that depends on how Emby stores data can't be proved with fake adapters; prove it on the real server first |
+| 0009 | insight | docs, spec, Run, Store | When review rounds keep finding new Blockers in one area, simplify the design there instead of adding rules |

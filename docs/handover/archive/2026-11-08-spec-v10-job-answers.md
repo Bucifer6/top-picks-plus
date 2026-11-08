@@ -1,0 +1,8 @@
+# Answer key (only the marking reviewer reads this)
+1. Not passed, 3 Blockers (all about found entries). Spec v11, then three fresh reviewers find no Blocker, and build and tests pass (D27). (Job just finished; What is still owed 2)
+2. Blocker 1: only the delete uses the `\\?\` path, so a junction named `Season 1 ` to `N:\Movies` reads as not there, passes check 4, and the delete lists through it and deletes real media; fix: every action on a found entry and below it uses the same `\\?\` path, link-or-not from that path or the listing. Blocker 2: a wrong-kind entry on a planned path (file `Season 1`, folder `Heat (1995).nfo` or `x.tpp-tmp`) or a read-only one makes the update fail weekly, copy `stale` for ever; fix: remove wrong-kind entries on planned paths by exact name before the first write, clear ReadOnly before deleting or replacing. (What is still owed 1a, 1b)
+3. Blocker 1, then Blocker 2, then Should-fix, then Nits, writing docs/reviews/2026-11-08-spec-v10-handling.md and adding the missing checks; then the R1 walk; then the re-review. (What is still owed 1–2)
+4. Walk every action on a thing whose access a rule changes (list, attributes, link test, write, delete), plus a wrong-kind and a read-only entry (card 0005, seen 7). (What is still owed 1d)
+5. R1's wording; the seen count lives on the card, not in R1. (Watch out for)
+6. A turned-down waiter leaves the waiting count (flag false) before asking for the guard pass. (Watch out for)
+7. Nothing blocking; only the note that if v11 doesn't pass, ask whether a simpler copy-handling design is wanted. (Waiting on the owner)
