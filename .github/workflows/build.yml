@@ -80,6 +80,12 @@ jobs:
           fi
           dotnet restore src/TopPicksPlus/TopPicksPlus.csproj $locked
           dotnet restore tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj $locked
+          if [ -z "$locked" ]; then
+            # Printed so they can be copied from the log and committed (artifact downloads are blocked from Claude's workspace).
+            for f in src/TopPicksPlus/packages.lock.json tests/TopPicksPlus.Tests/packages.lock.json; do
+              echo "=====LOCKFILE-BEGIN $f"; base64 -w0 "$f"; echo; echo "=====LOCKFILE-END $f"
+            done
+          fi
 
       - name: Keep the lock files
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
