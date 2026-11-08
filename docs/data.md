@@ -27,7 +27,7 @@ Owned by Storage; written atomically; never written by the settings page. Missin
 | playbackReportingImported | True once the one-off import (F6) has been tried. Saved only after plays.json holds the import's rows and marker (D80, D93) |
 | listeningSinceUtc | When the plugin first started listening for plays (the first start with the old plugin not loaded); the import cut-off (D46, D91). Set once |
 
-If state.json can't be read, every run refuses (`stateDamaged`); the file is not renamed, recreated or rewritten, and the report says to restore it from a backup (deleting it would make the plugin redo the takeover and the import) (D93).
+If state.json can't be read, every run refuses (`stateDamaged`); it is renamed and rebuilt from plays.json, managed.json and run.json, with a notice on the report; only if one of those is also unreadable does the run refuse (D93, D95).
 
 ## managed.json – the managed list
 One entry per copy folder, **keyed by `folder`** (never by sourceId): `sourceId` (Emby ID of the source title, empty for an adopted folder that matched nothing), `kind` (Movie / Series), `folder` (folder name inside the Top Picks folder), `state` (`incoming` / `active` / `leaving`, D26), `rank` (1–10, or none for any unranked copy, D74), `rankDateUtc` (none when unranked; the order guard skips those), `adopted` (true if taken over from the old plugin), `items` (each video file in the copy: path relative to the folder → source item ID, D28), `files` (every other file the plugin wrote in the folder). For adopted folders, `kind`, `items` and `files` are filled as D90 says.
@@ -35,7 +35,7 @@ Rules: a folder is only ever deleted if it is in this list; inside a staying cop
 
 ## plays.json – the play log
 One entry per playback stopped: `userId`, `sourceId` (movie or series, never the copy), `episodeId` (if any), `dayUk` (YYYY-MM-DD), `minutes` (stop − start position, D29), `markedPlayed` (true/false), `runtimeMinutes` (of the movie or episode, or null), `origin` (`live` / `playbackReporting` / `lastPlayed`; imported rows are written in one save, D80).
-Also, once the import has run: `importMarker` (`runId` of the run that imported, `source`: playbackReporting / lastPlayed / none), saved in the same save as the imported rows, even when there were no rows; it is not removed by the 90-day trim. A resume at the import step that finds a marker for its own run skips the import and only sets `playbackReportingImported` in state.json (D93).
+Also, once the import has run: `importMarker` (`runId` of the run that imported, `source`: playbackReporting / lastPlayed / none), saved in the same save as the imported rows, even when there were no rows; it is not removed by the 90-day trim. Any run that finds an import marker (from any run) skips the import (D96); a resume at the import step that finds one and only sets `playbackReportingImported` in state.json (D93).
 Entries older than the 90 full UK days before the run day are removed (plays from the run day itself are kept) on each run (D21). If unreadable, it is renamed `plays.damaged-YYYY-MM-DD.json` and a new log started (D32). A viewer-day (F2) is computed from these entries, not stored.
 
 ## run.json – current or last run

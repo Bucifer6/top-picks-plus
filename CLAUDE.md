@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** 5 readiness, final round (D92). Whole-plan reviews scored 72, 71, 76, 75; the score is no longer the gate. Blocker fixes D93–D94 and docs/backlog.md on branch spec/readiness-fixes-2. Next: fix-check, owner agrees the restatement, then build chunk 3 (Artwork).
+**Stage:** 6 Build. Stage 5 passed 2026-11-08 (fix-check 4: no Blockers; owner agreed the restatement). Docs on branch spec/readiness-fixes-2 (owner to merge). Build order (D92): chunk 3 Artwork, then 1 Logic, 2 Storage, proof plugin, 4 EmbyLink, 5 Settings.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
