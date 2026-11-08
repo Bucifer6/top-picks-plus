@@ -1,5 +1,5 @@
 ---
-summary: What the plugin stores, where, and the exact shape of each field. Kept minimal on purpose; no viewing history (D21, D33). Version 7 (stale copies, starting values, state lock).
+summary: What the plugin stores, where, and the exact shape of each field. Kept minimal on purpose; no viewing history (D21, D33). Version 8 (stale date, pending flags cleared only at step 12, row-check reasons, single-name rule).
 links: [spec.md, decisions.md]
 ---
 
@@ -11,10 +11,10 @@ Everything lives on the server; nothing is sent anywhere.
 - **Settings:** Emby's own plugin configuration file, `<programdata>\plugins\configurations\TopPicksPlus.xml`. Only what the owner chooses (D29). Store copies it into backups as a file and never reads it.
 
 **Common rules for the JSON files**
-- Read and written with System.Text.Json (D30). UTF-8, written atomically: write `<name>.tmp`, then replace the old file with it in one step. Leftover `*.tmp` files in the plugin data folder are removed at start-up.
+- Read and written with System.Text.Json (D30). UTF-8, written atomically: write `<name>.tmp`, then replace the old file with it in one step. If the write fails, Store deletes its `<name>.tmp` at once (so a failed plays.json write never leaves user IDs behind). Leftover `*.tmp` files in the plugin data folder are also removed at start-up.
 - Each file starts with `"schemaVersion": 1`. A different number, or any field that breaks the rules below, means **damaged** (spec F9).
 - **IDs** are Emby IDs (spec "Words used here") as strings, exactly as Emby gives them, compared ordinal. **UTC times** are ISO 8601 with a `Z` and whole seconds, e.g. `2026-11-15T05:00:00Z`. **UK days** are `YYYY-MM-DD` in Europe/London. Names of dated files and folders use UTC: `YYYY-MM-DD-HHMMZ` (folders) and `YYYYMMDD-HHMMZ` (damaged files).
-- Paths are stored relative to the Top Picks folder, with `\` between parts, e.g. `Heat (1995)\Heat (1995).strm`. Every part is a single name (no `..`, `/`, drive letter or empty part).
+- Paths are stored relative to the Top Picks folder, with `\` between parts, e.g. `Heat (1995)\Heat (1995).strm`. Every part is a single name (spec "Words used here": SafeName's cleaning leaves it unchanged, so no `..`, `/`, `:`, drive letter, trailing dot or space, `~`, reserved name or empty part).
 - All fields listed are required (a field allowed to be null must be present as null).
 - **A missing file is not damaged.** Missing state.json = never run (`lastSuccessfulRunUtc` null, `pinTitles` empty, both pending flags false). Missing managed.json = no copies (but see the copy-looking-folder rule, spec F9). Missing plays.json = no plays yet. Missing run.json = no run yet, nothing to resume. Missing run.previous.json = no earlier successful run to show. Each is written when first needed.
 - A file that exists but can't be opened or read (locked, disk error) is not damaged either: it is left alone and the action fails as an error (spec F9).
@@ -28,10 +28,10 @@ Everything lives on the server; nothing is sent anywhere.
 ## state.json – run state (D29, D37)
 | Field | Type | Meaning |
 |-------|------|---------|
-| lastSuccessfulRunUtc | UTC time or null | End of the last `finished` or `incomplete` run (F1). Null = never |
+| lastSuccessfulRunUtc | UTC time or null | The last `finished` or `incomplete` run's `finishedUtc` (F1). Null = never |
 | pinTitles | list of `{ sourceId, title }` | Last-known title of each pin, updated at each run's step 12, so a missing pin can still be named |
-| historyLostPending | true/false | Set by Store when it deletes a damaged plays.json. Carried into run.json `historyLost` at steps 1 and 12 (spec "Pending flags"), then cleared |
-| stateResetPending | true/false | True in the empty state.json Store writes after renaming a damaged one. Carried into run.json `stateReset` at steps 1 and 12, then cleared |
+| historyLostPending | true/false | Set by Store when it deletes a damaged plays.json. Carried into run.json `historyLost` at steps 1 and 12 (spec "Pending flags"); cleared only at step 12 |
+| stateResetPending | true/false | True in the empty state.json Store writes after renaming a damaged one. Carried into run.json `stateReset` at steps 1 and 12; cleared only at step 12 |
 
 Store holds one lock around every read-change-write of state.json, so a pending flag set by a play event can't be lost under a run's write. A damaged state.json is renamed `state.json.damaged-YYYYMMDD-HHMMZ` (the 3 newest kept) and replaced by an empty one (spec F9). It is not backed up.
 
@@ -45,11 +45,11 @@ One entry per copy:
 | folder | text, a single name | Folder name directly inside the Top Picks folder (unique, ignoring case) |
 | sourceId | ID | The source movie or series |
 | kind | `Movie` / `Series` | |
-| state | `incoming` / `active` / `stale` | `incoming` = entry written, folder not yet moved in (F4 step 7); `active` = in place; `stale` = its delete or update was skipped, so it is left for the next run (spec "Stale copy") |
+| state | `incoming` / `active` / `stale` | `incoming` = entry written, folder not yet moved in (F4 step 7); `active` = in place; `stale` = its delete or update was skipped, so it is left for the next run and its items get the stale date `2000-01-01T00:00:00Z` (spec "Stale copy", D53) |
 | rank | 1–10, or null only when `stale` | This week's rank |
-| rankDateUtc | UTC time, or null only when `stale` | Date added this copy should have (F5) |
+| rankDateUtc | UTC time, or null only when `stale` | Date added this copy should have (F5); a `stale` copy's target is the stale date instead |
 | itemId | ID or null | The copy item: the copy movie or copy series (F4 step 8). Null until found |
-| files | list | Every .strm the plugin wrote in this copy: `{ "path": relative path, "sourceItemIds": [IDs of the source movie or episodes it holds, at least one], "itemId": ID of the copy movie or copy episode, or null until found }`. Used to match plays (F6), the rescan wait, dates and the order guard |
+| files | list | Every .strm the plugin wrote in this copy: `{ "path": relative path, "sourceItemIds": [IDs of the source movie or episodes it holds, at least one], "itemId": ID of the copy movie or copy episode, or null until found }`. Used to match plays (F6), the rescan wait, dates and the order guard. For a `stale` entry from a skipped update: every .strm in the old entry or the planned one (spec F4 step 7) |
 
 Rule: a folder is only ever deleted if it is in this list, and then only through the checks in spec F9. Only Run writes this file, through `IStore`, which holds one lock around each read-change-write. A damaged managed.json (or a missing one while the Top Picks folder holds a copy-looking folder) refuses every run until fixed as spec F9 says. It is not backed up.
 
@@ -88,7 +88,7 @@ Rule: a folder is only ever deleted if it is in this list, and then only through
 | ignoredLibraries | list of IDs | Chosen libraries that no longer exist or aren't movie or TV libraries (F2 step 5) |
 | operations | list | The plan (F4 step 5), in swap order: `kind` (`delete` / `update` / `add`), `folder`, `sourceId`, `entry` (for `update` and `add`: the full planned managed.json entry, same fields and rules as a managed.json entry, with `state` `active` and the `itemId` fields null; for `delete`: null), `done` (true/false), `note` (text or null: why skipped, if it was) |
 | skipped | list | `{ what, why }`, both text: items left out and why (no copy possible, copy not updated, name too long, line break in path, drawing failed, check failed …) |
-| rowCheck | object | `result` (`passed` / `partial` / `failed` / `not run`; `not run` until step 11), `userKind` (`non-admin` / `admin` / null before step 11), `expected` (list of sourceIds), `leftOut` (list of `{ sourceId, why }`: `no copy`, `not appeared`, `parental controls`), `returned` (list of `{id, name}` exactly as Emby gave them), `unmatched` (names of returned items that match no copy), `stale` (names of returned items that match a `stale` copy). Verdict rules: spec F4 step 11 |
+| rowCheck | object | `result` (`passed` / `partial` / `failed` / `not run`; `not run` until step 11), `userKind` (`non-admin` / `admin` / null before step 11), `expected` (list of sourceIds), `leftOut` (list of `{ sourceId, why }`: `parental controls`, `no copy`, `not in row`), `returned` (list of `{id, name}` exactly as Emby gave them), `unmatched` (names of returned items that match no copy), `stale` (names of returned items that match a `stale` copy). Verdict rules: spec F4 step 11 |
 | viewerDaysTotal | whole number | Sum of viewer-days in this run's 7-day window |
 | historyLost | true/false | plays.json was found damaged and deleted since the last run's step 12 (from the pending flag, spec "Pending flags"); once true it stays true, even on resume |
 | stateReset | true/false | state.json was found damaged and reset since the last run's step 12 (same rule) |

@@ -9,12 +9,12 @@
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
 
 ## Standing rules
-- **R1** (2026-11-08, card 0005, approved by owner): ALWAYS, after any spec change, check every new or changed rule against the F4 step list, run.json `step`/`status`, data.md and the part walls before asking for a review.
+- **R1** (2026-11-08, card 0005, approved by owner): ALWAYS, after any spec change, check every new or changed rule against the F4 step list, run.json `step`/`status`, data.md and the part walls before asking for a review. ALWAYS also walk one concrete case (e.g. deleting a folder with a junction inside, a brand-new add) through every older rule that a new pre-check, lock or wait now runs before or around (added 2026-11-08 with owner's OK, card 0005 seen 4).
 
 ## Docs
 - docs/spec.md – what it does (F1–F10)
-- docs/checks.md – how the owner tests it (C1–C81)
-- docs/decisions.md – what's decided (D1–D48) and what's still open
+- docs/checks.md – how the owner tests it (C1–C82)
+- docs/decisions.md – what's decided (D1–D54) and what's still open
 - docs/data.md – settings, run state, managed list, play log, run record
 - docs/modules.md – the six parts and their walls
 - docs/security.md – level 1 security baseline
