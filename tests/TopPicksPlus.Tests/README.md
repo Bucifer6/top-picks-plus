@@ -1,7 +1,7 @@
 # tests
 
 ## Responsible for
-Automatic tests (D18): xUnit tests for Logic and for Run (with fake EmbyBridge adapters), and the boundary check (BoundaryTests.cs) that fails the build if a part crosses a wall.
+Automatic tests (D18): xUnit tests for Logic, Store (real files in a temporary folder), Run (with fake EmbyBridge adapters), EmbyBridge (against fakes of Emby's services) and Artwork, and the boundary check (BoundaryTests.cs) that fails the build if a part crosses a wall.
 
 ## Belongs here
 One test file per thing tested, named after it. Every test covering a check carries `[Trait("Check", "C10")]`; that tag is what the meta-test counts (docs/checks.md). Names may also start with the ID (e.g. `C10_binge_counts_once_per_user_per_day`). The meta-test and `built-features.txt` come with the first build chunk. Test layers L, S, R, B, W and Art are described in docs/checks.md.

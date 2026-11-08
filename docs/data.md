@@ -1,5 +1,5 @@
 ---
-summary: What the plugin stores, where, and the exact shape of each field. Kept minimal on purpose; no viewing history (D21, D33). Version 9 (Store's writes never go through a link, D55).
+summary: What the plugin stores, where, and the exact shape of each field. Kept minimal on purpose; no viewing history (D21, D33). Version 10 (every write created new, data files that are links, D56).
 links: [spec.md, decisions.md]
 ---
 
@@ -11,7 +11,7 @@ Everything lives on the server; nothing is sent anywhere.
 - **Settings:** Emby's own plugin configuration file, `<programdata>\plugins\configurations\TopPicksPlus.xml`. Only what the owner chooses (D29). Store copies it into backups as a file and never reads it.
 
 **Common rules for the JSON files**
-- Read and written with System.Text.Json (D30). UTF-8, written atomically: write `<name>.tmp`, created new (if one is already there it is deleted first, as a link if it is a link), then replace the old file with it in one step. Just before the replace, the live file is checked not to be a link; if it is, it is removed as a link and the `.tmp` renamed into its place. A file that is a link is never read: it counts as missing and is removed as a link. If the write fails, Store deletes its `<name>.tmp` at once (so a failed plays.json write never leaves user IDs behind). Leftover `*.tmp` files in the plugin data folder are also removed at start-up.
+- Read and written with System.Text.Json (D30). UTF-8, written atomically and **created new** (spec "Words used here"): write `<name>.tmp` created new (one already there is removed first, as a link if it is a link), then `File.Replace` it over the live file, or `File.Move` it into place if there is none; just before that step the live file is checked not to be a link, and if it is, it is removed as a link first. This is the only way any of these files, run.previous.json included, is ever written. A file that is a link is never read: it is removed as a link and counts as missing; a linked plays.json sets `historyLostPending` and a linked state.json sets `stateResetPending`, so the report says so (spec F9). If the write fails, Store deletes its `<name>.tmp` at once (so a failed plays.json write never leaves user IDs behind). Leftover `*.tmp` files in the plugin data folder are also removed at start-up.
 - Each file starts with `"schemaVersion": 1`. A different number, or any field that breaks the rules below, means **damaged** (spec F9).
 - **IDs** are Emby IDs (spec "Words used here") as strings, exactly as Emby gives them, compared ordinal. **UTC times** are ISO 8601 with a `Z` and whole seconds, e.g. `2026-11-15T05:00:00Z`. **UK days** are `YYYY-MM-DD` in Europe/London. Names of dated files and folders use UTC: `YYYY-MM-DD-HHMMZ` (folders) and `YYYYMMDD-HHMMZ` (damaged files).
 - Paths are stored relative to the Top Picks folder, with `\` between parts, e.g. `Heat (1995)\Heat (1995).strm`. Every part is a single name (spec "Words used here": SafeName's cleaning leaves it unchanged, so no `..`, `/`, `:`, drive letter, trailing dot or space, `~`, reserved name or empty part).
@@ -46,8 +46,8 @@ One entry per copy:
 | sourceId | ID | The source movie or series |
 | kind | `Movie` / `Series` | |
 | state | `incoming` / `active` / `stale` | `incoming` = entry written, folder not yet moved in (F4 step 7); `active` = in place; `stale` = its delete or update was skipped, so it is left for the next run and its items get the stale date `2000-01-01T00:00:00Z` (spec "Stale copy", D53) |
-| rank | 1–10, or null only when `stale` | This week's rank |
-| rankDateUtc | UTC time, or null only when `stale` | Date added this copy should have (F5); a `stale` copy's target is the stale date instead |
+| rank | 1–10; null exactly when `stale` | This week's rank |
+| rankDateUtc | UTC time; null exactly when `stale` | Date added this copy should have (F5); a `stale` copy's target is the stale date instead |
 | itemId | ID or null | The copy item: the copy movie or copy series (F4 step 8). Null until found |
 | files | list | Every .strm the plugin wrote in this copy: `{ "path": relative path, "sourceItemIds": [IDs of the source movie or episodes it holds, at least one], "itemId": ID of the copy movie or copy episode, or null until found }`. Used to match plays (F6), the rescan wait, dates and the order guard. For a `stale` entry from a skipped update: every .strm in the old entry or the planned one (spec F4 step 7) |
 
@@ -102,4 +102,4 @@ Used to resume (F5) and to show the report (F8). Holds no user IDs or names. A r
 Inside the plugin data folder. Emptied by Store at F4 step 6 (and when a resume restarts that step), never during the swap. Layout: `staging\<copy folder name>\…`, each copy exactly as it will be in the Top Picks folder (spec F4 step 6).
 
 ## backups\
-- `YYYY-MM-DD-HHMMZ\` (run start, UTC) – plays.json with `"today": []`, and TopPicksPlus.xml, copied at F4 step 3 (a file that doesn't exist yet is skipped), then an empty `complete` file written last. Only folders with `complete` count; the 8 newest are kept, and an unfinished folder older than the newest complete one is deleted. Holds no user IDs.
+- `YYYY-MM-DD-HHMMZ\` (run start, UTC) – plays.json with `"today": []`, and TopPicksPlus.xml, copied at F4 step 3 (a file that doesn't exist yet is skipped), then an empty `complete` file written last. A complete folder for the same minute is kept and the backup skipped; an unfinished one is deleted and made again (spec F4 step 3). Only folders with `complete` count; the 8 newest are kept, and an unfinished folder older than the newest complete one is deleted. Holds no user IDs.
