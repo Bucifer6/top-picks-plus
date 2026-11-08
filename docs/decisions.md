@@ -13,8 +13,12 @@ links: [spec.md]
 | D4 | 2026-11-08 | Reuse the existing top-picks folder and library, so the "Latest Top Picks" row stays put | No home-screen setup to redo for each user |
 | D5 | 2026-11-08 | Code lives in the private GitHub repo Bucifer6/top-picks-plus; GitHub Actions builds the DLL on every change; the owner downloads and installs it | Owner's choice (changed from building on the PC the same morning) |
 | D6 | 2026-11-08 | Same artwork style as today: 1000x562, big white rank number on the left, logo over the backdrop | The owner likes the current look |
-
 | D7 | 2026-11-08 | The plugin is called "Top Picks Plus" in Emby | Matches the repo name; never confused with the old plugin |
 
-## Still to decide
-(none)
+| D8 | 2026-11-08 | Keep the numbered copies (.strm library) rather than a playlist of the real titles; sync watched/resume back to the real title; accept duplicates in search | Owner wants the numbered artwork; weighed against a playlist section during the challenge round |
+| D9 | 2026-11-08 | (Builder default, owner may change) The plugin keeps its own play log; Playback Reporting is only used once, to seed the first week | Not dependent on a third-party plugin that could break |
+| D10 | 2026-11-08 | (Builder default, owner may change) "Most watched" = viewer-days in the last 7 days; a binge counts once per user per day | Stops one person's binge outranking what several people watched |
+| D11 | 2026-11-08 | (Builder default) The number of picks is fixed at 10 | Artwork, order and pins all assume 10; fewer moving parts |
+
+## Still to decide before building
+- Proof test result: does setting date added in Emby 4.10.2 order the Latest Top Picks row, survive a rescan and restart, and work for series? (see docs/handover/current.md)
