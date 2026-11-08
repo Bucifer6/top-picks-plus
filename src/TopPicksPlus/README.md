@@ -2,7 +2,7 @@
 
 Builds into the single `TopPicksPlus.dll` the owner installs (D17). Targets netstandard2.0 against Emby SDK MediaBrowser.Server.Core 4.9.1.90, pinned (D14).
 
-The project root (namespace `TopPicksPlus`) holds only `Plugin` (the entry class; its fixed ID is `744d00f2-735f-4d57-a952-47e98a5b6f0d`, D33) and `PluginConfiguration` (Emby needs both; it holds only the owner's settings LibraryIds, Pins and RowCheckUserId; the plugin's own flags live in Storage's state.json, D93), plus at most one `Polyfills.cs` that may only declare `System.Runtime.CompilerServices` (for `IsExternalInit`, so records work on netstandard2.0). Everything else lives in one of the five parts below. There is no `Properties/` folder: assembly settings such as InternalsVisibleTo go in the .csproj.
+The project root (namespace `TopPicksPlus`) holds only `Plugin` (the entry class; its fixed ID is `744d00f2-735f-4d57-a952-47e98a5b6f0d`, D33) and `PluginConfiguration` (Emby needs both; it holds only the owner's settings LibraryIds, Pins and RowCheckUserId; the plugin's own flags live in Storage's state.json, D93), plus at most one `Polyfills.cs` that may only declare `System.Runtime.CompilerServices` (for `IsExternalInit`, so records work on netstandard2.0). Everything else lives in one of the five parts below. There is no `Properties/` folder: assembly settings such as InternalsVisibleTo go in the .csproj. Code limits (warnings are errors, only `IsExternalInit` polyfilled): D97(g).
 
 | Part | Namespace | May use | Must not use |
 |------|-----------|---------|--------------|

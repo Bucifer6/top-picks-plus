@@ -19,15 +19,15 @@ Chunks are listed in build order (D92): Artwork, Logic, Storage, Proof, EmbyLink
 | B8 | Should fix | The 240-character path rule doesn't say which full path is measured (top-picks or staging) and has no rule for a very long film or series folder name. | readiness-4 item 10 | Logic | open |
 | B9 | Should fix | C68 (settings page refuses bad pins) is put in chunk 5, which has no automatic tests, so its rule must be a Logic function; and C83 is built in chunk 1 per the Logic README but listed only under chunk 2. | readiness-4 item 11 | Logic | open |
 | B10 | Should fix | The order guard is said to cover metadata refreshes, but it only starts after a library scan; which Emby events start it isn't defined. | readiness-4 item 12 | EmbyLink | open |
-| B11 | Should fix | D62's no-backdrop "right-hand part" was made exact by D74 (40–100%), but D62 isn't marked. | readiness-4 item 13 | Artwork | open |
+| B11 | Should fix | D62's no-backdrop "right-hand part" was made exact by D74 (40–100%), but D62 isn't marked. | readiness-4 item 13 | Artwork | done: D62 marked (D99) |
 | B12 | Should fix | Older rows changed by newer ones still not fully marked: D38's "at the start of the first run" (import now comes first, D80), D28's "first episode .strm" (D90: every .strm), D54's "proved by automatic tests" (narrowed by D73, D79). (D68 is now marked by D94.) | readiness-4 item 13 | Logic | open |
-| B13 | Nit | Artwork fallback: whether folder.png/thumb.png become the backdrop re-saved as PNG or are left out, what happens with no backdrop, and fixed `.jpg`/`.png` names when the source is another format. | readiness-4 item 14 | Artwork | open |
+| B13 | Nit | Artwork fallback: whether folder.png/thumb.png become the backdrop re-saved as PNG or are left out, what happens with no backdrop, and fixed `.jpg`/`.png` names when the source is another format. | readiness-4 item 14 | Artwork | settled by D98 |
 | B14 | Nit | JSON file shapes: top-level layout, date format, and whether "none" is null or left out. | readiness-4 item 15 | Storage | open |
 | B15 | Nit | `lastSuccessfulRunUtc`: start or finish time, and that a new run.json must carry it forward. | readiness-4 item 16 | Storage | open |
 | B16 | Nit | The Specials poster path `Season N\folder.jpg` doesn't fit the `Specials` folder. | readiness-4 item 17 | Logic | open |
 | B17 | Nit | C62's automatic half can't catch the real risk: the per-date offset is worked out in EmbyLink, which has no tests. | readiness-4 item 18 | EmbyLink | open |
 | B18 | Nit | "Emby's user list order" and what counts as a "movie and TV library" aren't defined. | readiness-4 item 19 | EmbyLink | open |
-| B19 | Nit | Code limits aren't stated: only `IsExternalInit` may be polyfilled and warnings are errors, so `required` members and `[NotNullWhen]` can't be used. | readiness-4 item 20 | Artwork | open |
+| B19 | Nit | Code limits aren't stated: only `IsExternalInit` may be polyfilled and warnings are errors, so `required` members and `[NotNullWhen]` can't be used. | readiness-4 item 20 | Artwork | settled by D97(g) |
 | B20 | Nit | Whether the proof project and its CI job stay after use isn't said. | readiness-4 item 21 | Proof | open |
 | B21 | Nit | The EmbyLink README still lists "delete only managed folders" among its guards, though D43 moved all deletes to Storage. | readiness-4 item 22 | EmbyLink | open |
 | B22 | Nit | A theme the source gains later is never copied, and one it loses is never removed; probably intended but not stated. | readiness-4 item 23 | Logic | open |
