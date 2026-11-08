@@ -5,7 +5,8 @@
 - deciding whether a user counts for a title on a day (50% / 20 minutes / marked played, F6) and the 90-day trim;
 - folder names: illegal characters, trailing dots and spaces, missing year, ` - 2` clashes (F3);
 - rank times: pick 1 = run time, each pick one hour earlier (F4, card 0001);
-- the first-run takeover rule: a folder counts as the old plugin's if it holds at least one .strm and one .nfo (F9);
+- the first-run takeover rule: a folder counts as the old plugin's if it, including its subfolders, holds at least one .strm and one .nfo (F9, D38); whether a folder name is safe to delete (D37);
+- the text of every .strm and .nfo (D30); the 7-day and 90-day windows (D21); the per-episode 50% rule (D22); the resume plan for an unfinished run (D26);
 - which copies drop out, stay or are new (F4 step 2); whether a copy's date needs resetting (F5); the missed-run rule (F1).
 
 **Belongs here:** functions that take plain values (IDs, dates, numbers, names) and return answers.

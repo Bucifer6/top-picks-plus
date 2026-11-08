@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 4 – Scaffold done (layout approved by the owner 2026-11-08, PR #2, to be merged by the owner). Before Stage 5: settle the spec gaps in docs/reviews/2026-11-08-scaffold-review.md.
+**Stage:** 4 complete – scaffold merged (PR #2) and spec gaps settled (spec v3, D20–D42, branch spec/gaps-settled, owner to merge). Next: Stage 5 readiness.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -12,9 +12,9 @@ Follows the build-software-safely method: talk and docs first, no code before th
 (none yet)
 
 ## Docs
-- docs/spec.md – what it does (F1–F10)
-- docs/checks.md – how the owner tests it (C1–C25)
-- docs/decisions.md – what's decided (D1–D19) and what's still open
+- docs/spec.md – what it does (F1–F10, v3)
+- docs/checks.md – how the owner tests it (C1–C50)
+- docs/decisions.md – what's decided (D1–D42) and what's still open
 - docs/data.md – settings, managed list, play log, run record
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
 
@@ -37,4 +37,5 @@ GitHub Actions builds the plugin DLL (decision D5). Nothing is built on the owne
 
 ## Facts found 2026-11-08
 - Emby Server 4.10.2.0, programdata at C:\Users\Admin\AppData\Roaming\Emby-Server\programdata; media on N:\Movies and K:\Series.
+- Emby runs on .NET 8.0.32 and ships System.Text.Json 8, SkiaSharp 2.88.3, SQLitePCL.pretty 1.2.2. Old plugin: Emby.TopPicks.dll 1.0.0.63. Playback Reporting history: data\playback_reporting.db, table PlaybackActivity.
 - The old plugin orders the row by writing <dateadded> into each .nfo (rank 1 = run time, each rank 1 hour earlier). Emby ignores it for titles already in the library, so leftover folders keep their old dates and the order breaks.
