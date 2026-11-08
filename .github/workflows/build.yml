@@ -54,13 +54,8 @@ jobs:
         with:
           name: artwork-samples-${{ steps.ver.outputs.version }}
           path: artwork-samples/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
-
-      - name: TEMP print samples for builder review
-        shell: bash
-        run: |
-          for f in artwork-samples/*.png; do echo "BEGIN-SAMPLE $(basename "$f")"; base64 -w 4000 "$f"; echo "END-SAMPLE"; done
 
       - name: Check the plugin ships no SkiaSharp (D15)
         shell: bash

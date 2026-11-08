@@ -171,7 +171,7 @@ public static class RankArtwork
         var scale = Math.Min(boxW / logo.Width, boxH / logo.Height);
         var w = logo.Width * scale;
         var h = logo.Height * scale;
-        var dest = SKRect.Create(Layout.BoxLeft, Layout.BoxTop, w, h); // DELIBERATE BREAK 3
+        var dest = SKRect.Create(Layout.BoxLeft, Layout.BoxBottom - h, w, h);
         using var paint = ImagePaint();
         canvas.DrawBitmap(logo, dest, paint);
     }
@@ -211,7 +211,7 @@ public static class RankArtwork
     private static void DrawNumber(SKCanvas canvas, SKTypeface typeface, int rank)
     {
         using var paint = new SKPaint { Typeface = typeface, IsAntialias = true, TextSize = 1000f };
-        using var glyphs = paint.GetTextPath(((rank % 10) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture), 0, 0) /* DELIBERATE BREAK 1 */;
+        using var glyphs = paint.GetTextPath(rank.ToString(System.Globalization.CultureInfo.InvariantCulture), 0, 0);
         var bounds = glyphs.TightBounds;
         if (bounds.Width <= 0 || bounds.Height <= 0)
             throw new InvalidOperationException("rank number has no outline");

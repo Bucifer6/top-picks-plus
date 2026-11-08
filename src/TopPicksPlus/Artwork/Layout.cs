@@ -10,7 +10,7 @@ internal static class Layout
     public const int Height = 562;
 
     // Left shade: solid black to 22% of the width, fading to clear by 40% (D62).
-    public const float ShadeSolidX = 0.30f * Width; // DELIBERATE BREAK 2
+    public const float ShadeSolidX = 0.22f * Width;
     public const float ShadeClearX = 0.40f * Width;
 
     // Rank number: left edge 3.5%, top 12%, bottom 90%, inside the 22% band (D62).
