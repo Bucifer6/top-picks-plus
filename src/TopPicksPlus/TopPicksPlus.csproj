@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>TopPicksPlus</AssemblyName>
+    <RootNamespace>TopPicksPlus</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>0.0.0</Version>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- D14: Emby plugin SDK, pinned exactly. Emby supplies it at runtime. -->
+    <PackageReference Include="MediaBrowser.Server.Core" Version="[4.9.1.90]" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="**/README.md" />
+  </ItemGroup>
+
+</Project>

@@ -21,8 +21,17 @@ Follows the build-software-safely method: talk and docs first, no code before th
 | Folder | Purpose |
 |--------|---------|
 | docs/ | Spec, checks, decisions, handover, logbook |
+| src/TopPicksPlus/ | The plugin (one DLL). Parts and their walls: src/TopPicksPlus/README.md |
+| src/TopPicksPlus/Logic | Pure rules (choosing, counting, naming, rank times, takeover); no Emby |
+| src/TopPicksPlus/Storage | managed.json, plays.json, run.json, staging; atomic writes |
+| src/TopPicksPlus/Artwork | Numbered 1000x562 pictures (SkiaSharp, not shipped) |
+| src/TopPicksPlus/EmbyLink | Everything that talks to Emby: task, events, swap, dates, guard, row check |
+| src/TopPicksPlus/Settings | Admin settings page and run report |
+| tests/ | xUnit tests for Logic; Boundaries/ is the boundary check |
+| .github/workflows/ | build.yml: build, tests, audit, secret scan; Release on v* tag |
 
 ## Building
+Boundary check: tests/TopPicksPlus.Tests/Boundaries (runs on every change; layout approved by the owner 2026-11-08).
 GitHub Actions builds the plugin DLL (decision D5). Nothing is built on the owner's PC.
 
 ## Facts found 2026-11-08

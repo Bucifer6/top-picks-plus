@@ -1,0 +1,81 @@
+# D16: build and test on every branch and pull request; a version tag (v1.0.0 etc.)
+# publishes a GitHub Release with TopPicksPlus.dll attached.
+name: build
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Work out version
+        id: ver
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=0.0.0-ci.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore
+        run: dotnet restore tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj
+
+      - name: Build plugin
+        run: dotnet build src/TopPicksPlus/TopPicksPlus.csproj -c Release --no-restore -p:Version=${{ steps.ver.outputs.version }}
+
+      - name: Tests and boundary check
+        run: dotnet test tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj -c Release --no-restore --logger "console;verbosity=normal"
+
+      - name: Dependency vulnerability audit
+        shell: bash
+        run: |
+          dotnet list tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj package --vulnerable --include-transitive | tee audit.txt
+          if grep -q "has the following vulnerable packages" audit.txt; then echo "Vulnerable packages found"; exit 1; fi
+
+      - name: Keep the DLL for 3 days
+        uses: actions/upload-artifact@v4
+        with:
+          name: TopPicksPlus-${{ steps.ver.outputs.version }}
+          path: src/TopPicksPlus/bin/Release/netstandard2.0/TopPicksPlus.dll
+          retention-days: 3
+
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, secrets-scan]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: TopPicksPlus-*
+          merge-multiple: true
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" TopPicksPlus.dll --repo "$GITHUB_REPOSITORY" --title "Top Picks Plus $GITHUB_REF_NAME" --generate-notes
