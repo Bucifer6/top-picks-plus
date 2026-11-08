@@ -29,6 +29,10 @@ links: [spec.md]
 | D17 | 2026-11-08 | Install = copy TopPicksPlus.dll into programdata\plugins and restart Emby. Rollback = put the previous DLL back (every Release keeps its DLL) and restart. At first install the old Top Picks plugin is uninstalled from the dashboard; its DLL and settings are already backed up on the Desktop | Simple, one-step rollback. Decided by Claude |
 | D18 | 2026-11-08 | Tests: automatic unit tests (xUnit) for choosing, counting, naming, takeover and ordering logic, with mutation testing (Stryker.NET) on that logic in CI; Emby-side behaviour proved by the owner's checks in checks.md | Logic can be tested without Emby; Emby behaviour needs the real server. Decided by Claude |
 | D19 | 2026-11-08 | Code changes go on branches with pull requests; Claude merges only when the build, tests and the fresh-reviewer review pass. Nothing is pushed straight to main from here on | Keeps main always installable. Decided by Claude |
+| D20 | 2026-11-08 | Row check (F4 step 6) looks through one user picked in settings; default = the first non-administrator user with no parental controls or other restrictions. A shorter row passes if it reads 1, 2, 3… in order with no gaps | A restricted user's row can be shorter or different without anything being wrong. Owner's choice (Q1) |
+| D21 | 2026-11-08 | "Last 7 days" = the 7 full UK-time days before the run day (for the Sunday run: Sunday 00:00 to Saturday 23:59 of the previous week), on Run now as well. Plays are kept for 90 full days | Same window every week; Sunday's early hours count in the next week. Owner's choice (Q2) |
+| D22 | 2026-11-08 | The 50% rule is per episode for a series: sittings of the same episode by the same user add up; minutes from different episodes don't | Sampling a show for a few minutes shouldn't count as watching it. Owner's choice (Q3) |
+| D23 | 2026-11-08 | A pin counts whatever library it is in, as long as its file exists; the chosen libraries limit only the most-watched and filler picks | A pin is the owner's deliberate choice. Owner's choice (Q4) |
 
 ## Still to decide before building
 (none)
