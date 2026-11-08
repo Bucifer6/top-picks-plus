@@ -1,17 +1,13 @@
 # Handover
 
 ## Job just finished
-Spec job: interview, challenge round, spec v2, proof test passed (D12), spec approved by owner (D13).
+Spec job and Stage 3: spec approved (D13); owner delegated technical decisions, recorded as D14–D19.
 
 ## Where it stopped
-Stage 3 (Decisions) not started. Branch main, docs only, no code.
+Stage 4 (Scaffold) not started. Branch main, docs only, no code.
 
 ## What is still owed (smallest first)
-1. Stage 3 technical decisions, proposed to the owner in plain English with a recommendation:
-   a. Emby plugin SDK package and version to pin (must load in Emby Server 4.10.2.0).
-   b. Image library for drawing the numbered artwork (must run inside Emby on Windows without clashing with Emby's own libraries).
-   c. GitHub Actions build: what it runs, where the DLL appears for the owner to download, how long builds are kept (keep artifacts short: the owner's GitHub storage filled up before).
-   d. How the owner installs and rolls back (copy the DLL into programdata\plugins, restart Emby; keep the previous DLL).
+1. (done: D14–D19)
 2. Stage 4 scaffold: folders with READMEs, build workflow, boundary check; goldfish review.
 3. Stage 5 readiness goldfish (score must be above 90).
 4. Stage 6 build in chunks the owner can check, Stage 7 review, Stage 8 release (old plugin removed at the same time).
@@ -23,10 +19,10 @@ Stage 3 (Decisions) not started. Branch main, docs only, no code.
 - Emby's HTTP port is 48096 locally (system.xml), public 8096 behind Caddy.
 
 ## Waiting on the owner
-Nothing right now; Stage 3 choices will be brought one at a time.
+Nothing right now; owner has delegated technical decisions to Claude; still bring anything hard to undo.
 
 ## Next job
-Stage 3 decisions, then scaffold. Read first: CLAUDE.md, docs/spec.md, docs/decisions.md, docs/data.md.
+Stage 4 scaffold: folders + READMEs, build workflow (D16), test projects (D18), then goldfish review. Read first: CLAUDE.md, docs/spec.md, docs/decisions.md, docs/data.md.
 
 ## Cards that applied
 0001

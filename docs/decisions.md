@@ -23,6 +23,12 @@ links: [spec.md]
 | D12 | 2026-11-08 | Proof test passed on Emby 4.10.2: changing Date added on a movie and on a series (series only) moves it in the Latest Top Picks row, and it stays after a full scan and restart. The date-added approach (F4/F5) goes ahead | Owner ran the test in the Emby dashboard |
 
 | D13 | 2026-11-08 | Spec v2 approved by the owner; Stage 2 gate passed | Every feature has a check; challenge findings handled (docs/reviews/2026-11-08-challenge.md) |
+| D14 | 2026-11-08 | Build against Emby's plugin SDK MediaBrowser.Server.Core **4.9.1.90** (latest stable on NuGet, .NET Standard 2.0), pinned exactly; the plugin targets netstandard2.0 | Newest stable SDK; Emby 4.10 loads 4.9-built plugins. First build chunk's check is that it loads in 4.10.2. Decided by Claude (owner delegated Stage 3) |
+| D15 | 2026-11-08 | Draw the numbered artwork with SkiaSharp, compiled against but **not shipped with** the plugin, so it uses the copy Emby already loads; numbers drawn in an embedded open-licence (SIL OFL) bold font. If drawing fails, the copy gets the plain backdrop and the report says so | No clash with Emby's own image library; no Windows-only System.Drawing. Decided by Claude |
+| D16 | 2026-11-08 | GitHub Actions builds and runs the tests on every branch and pull request (DLL kept 3 days as an artifact). A version tag (v1.0.0 etc.) publishes a GitHub Release with the DLL attached; the owner downloads from Releases | Releases don't use artifact storage, which filled up on another repo. Decided by Claude |
+| D17 | 2026-11-08 | Install = copy TopPicksPlus.dll into programdata\plugins and restart Emby. Rollback = put the previous DLL back (every Release keeps its DLL) and restart. At first install the old Top Picks plugin is uninstalled from the dashboard; its DLL and settings are already backed up on the Desktop | Simple, one-step rollback. Decided by Claude |
+| D18 | 2026-11-08 | Tests: automatic unit tests (xUnit) for choosing, counting, naming, takeover and ordering logic, with mutation testing (Stryker.NET) on that logic in CI; Emby-side behaviour proved by the owner's checks in checks.md | Logic can be tested without Emby; Emby behaviour needs the real server. Decided by Claude |
+| D19 | 2026-11-08 | Code changes go on branches with pull requests; Claude merges only when the build, tests and the fresh-reviewer review pass. Nothing is pushed straight to main from here on | Keeps main always installable. Decided by Claude |
 
 ## Still to decide before building
-Stage 3 technical choices, proposed in docs/handover/current.md
+(none)
