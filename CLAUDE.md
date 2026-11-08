@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 4 – Scaffold done (layout approved by the owner 2026-11-08, merged in PR #2). Before Stage 5: settle the spec gaps in docs/reviews/2026-11-08-scaffold-review.md.
+**Stage:** 4 – Scaffold done (layout approved by the owner 2026-11-08, PR #2, to be merged by the owner). Before Stage 5: settle the spec gaps in docs/reviews/2026-11-08-scaffold-review.md.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.

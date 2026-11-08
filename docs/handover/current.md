@@ -4,7 +4,7 @@
 Stage 4 scaffold: folders with READMEs, build workflow, test project, boundary check with canaries, and three fresh reviews (docs/reviews/2026-11-08-scaffold-review.md).
 
 ## Where it stopped
-Stage 4 done apart from the spec gaps the review found. Branch stage4/scaffold, pull request #2, merged into main by Claude after all checks passed (see the last commit on main). Still no plugin code.
+Stage 4 done apart from the spec gaps the review found. Branch stage4/scaffold, pull request #2: all checks green and three reviews done, but NOT merged. The safety controls here stopped Claude merging it; the owner merges it on GitHub. Still no plugin code.
 
 ## What is still owed (smallest first)
 1. Ask the owner the four behaviour questions Q1–Q4 in the scaffold review, one at a time, each with its recommendation; record the answers as decisions.
@@ -21,7 +21,8 @@ Stage 4 done apart from the spec gaps the review found. Branch stage4/scaffold, 
 - Any change to the walls (src/TopPicksPlus/README.md table, BoundaryTests.cs, Canary.cs) needs the owner's approval; adding a forbidden entry needs a matching canary or the build fails.
 
 ## Waiting on the owner
-Q1–Q4 in docs/reviews/2026-11-08-scaffold-review.md (row-check user, the 7-day window, series 50% rule, pins outside chosen libraries).
+- Merge pull request #2 on GitHub (Merge button). Check it is merged before starting the next job; if not, work on the stage4/scaffold branch.
+- Q1–Q4 in docs/reviews/2026-11-08-scaffold-review.md (row-check user, the 7-day window, series 50% rule, pins outside chosen libraries).
 
 ## Next job
 Spec gaps: ask Q1–Q4, settle the eleven technical gaps, add the missing checks. Read first: CLAUDE.md, docs/reviews/2026-11-08-scaffold-review.md, docs/spec.md, docs/data.md, docs/checks.md, docs/decisions.md.
