@@ -72,7 +72,9 @@ public class TitleLayoutTests
         }
 
         var fit = TitleLayout.Fit(new string('W', 100_000), CountingMeasure, BoxW, BoxH);
-        Assert.True(seen <= 201, $"measured a {seen}-character string; the title was not cut to 200 first");
+        // 200 characters + "…" from the cut, + one more "…" tried while shortening = 202 at most.
+        // Without the cut this would be 100,001.
+        Assert.True(seen <= 202, $"measured a {seen}-character string; the title was not cut to 200 first");
         Assert.EndsWith("…", fit.Lines[0]);
     }
 
