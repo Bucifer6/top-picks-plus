@@ -14,7 +14,7 @@ Spec v5 written (D34 applied; v4 Blockers 1, 5, 6 and the Should-fix list handle
 1. CLAUDE.md, tests README and releases.md small fixes listed as Nits in the v5 review (counts already updated in CLAUDE.md).
 2. **Owner proof test (Blocker 5, card 0008):** does Emby 4.10.2 share watched state between a Top Picks copy and its real title? See "Waiting on the owner". Its answer decides how F7 and F4 step 9 are rewritten (keep `uniqueid` in copies and drop the sync, or drop `uniqueid` and keep the sync).
 3. Spec v6, in this order:
-   a. Fix Blockers 1 (row-check verdict vs C39), 2 (store the full planned entry in each run.json operation), 3 (resume keeps run.json; pending flags not re-copied), 4 (resume point only if higher, first episode only, nothing if source played), 6 (back up plays.json with `"today": []`; add a restore check). Then Blocker 5 per the owner's proof-test answer.
+   a. Fix Blockers 1 (row-check verdict vs C39), 2 (store the full planned entry in each run.json operation), 3 (resume keeps run.json; pending flags not re-copied), 4 (resume point only if higher, first episode only, nothing if source played), 6 (back up plays.json with `"today": []`; add a restore check). Then apply D39 (owner chose shared watched state), which settles Blockers 4 and 5.
    b. Then Should-fix, then Nits, from the v5 review. Write a handling file `docs/reviews/2026-11-08-spec-v5-handling.md`.
    c. Apply R1 to every new or changed rule.
 4. Re-run the three goldfish (comprehension, builder readiness, security) on spec v6. If none finds a Blocker, merge pull request 1 (D27). Stage 4 then passes.
@@ -32,7 +32,7 @@ Spec v5 written (D34 applied; v4 Blockers 1, 5, 6 and the Should-fix list handle
 - device_bash on the owner's PC is broken; listing and staging files works. Emby's HTTP port is 48096 locally, 8096 publicly behind Caddy.
 
 ## Waiting on the owner
-- **Answered (quick look), 2026-11-08:** films already watched show as watched in today's row, so Emby shares watched state between copy and real title (CLAUDE.md Facts). Still to settle: which way spec v6 goes (keep shared state and drop the F7 sync and weekly reset, or remove provider IDs from copies and keep the sync).
+- **Answered (quick look), 2026-11-08:** films already watched show as watched in today's row, so Emby shares watched state between copy and real title (CLAUDE.md Facts). Owner then chose **D39: share it, like today**. Spec v6 removes F7 and the played-state reset in F4 step 9; Blocker 4 (resume-point rule) goes with them. Update C14, C15, C49, C59, P2, the EmbyBridge/Run/Logic READMEs and modules.md to match (R1).
 - Original question, kept for the record: Quick look first: pick a film in today's Latest Top Picks row that you have watched in your Movies library. Does its copy in the row show as watched too? Then, to be sure, on one test film: mark the copy in Top Picks unwatched and see whether the real film also turns unwatched (mark it watched again afterwards).
 
 ## Next job
