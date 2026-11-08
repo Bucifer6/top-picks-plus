@@ -8,7 +8,7 @@ evidence: docs/reviews/2026-11-08-spec-v3-review.md (8 Blockers on commit 1f8176
 date: 2026-11-08
 status: live
 seen: 2
-promoted:
+promoted: R1
 ---
 Spec v3 answered every v2 finding, but backups, resume, damaged files and takeover each added a rule that clashed with something else: the F4 step order, a run.json field, a part's "must not use", or D21.
 Do instead: after writing a new rule, check it against (1) the F4 step list and run.json `step`, (2) every data.md field it reads or writes, (3) the README walls of the part that does it, (4) the decisions. Fix the clash in the same edit.

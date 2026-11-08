@@ -1,7 +1,7 @@
 # Logic
 
 ## Responsible for
-The rules, as plain calculations with no side effects: choosing the 10 (F2: pins, viewer-days, ties, filler, candidates), deciding what counts as watched (F6), the 90-day cut-off, the one naming rule `SafeName` and every copy, season and episode name (F3), the order chain and filler (F2 step 3–4), the UK-day and 7-day window rules with the time zone passed in, rank dates (rank time minus 0–9 hours), which old folders to take over (F9), and the order guard's "which dates are wrong" comparison (F5), the roll-up sums (F6), the path checks used before writes and deletes (F9), and the run step to resume from (F5).
+The rules, as plain calculations with no side effects: choosing the 10 (F2: pins, viewer-days, ties, filler, candidates), deciding what counts as watched (F6), the 90-day cut-off, the one naming rule `SafeName` and every copy, season and episode name (F3), the order chain and filler (F2 step 3–4), the UK-day and 7-day window rules with the time zone passed in, rank dates (rank time minus 0–9 hours), the order guard's "which dates are wrong" comparison (F5), the roll-up sums (F6), the path checks used before writes and deletes (F9), the run step to resume from and the give-up-after-3 rule (F5, D36), the forward-only rule for watched state (F7, D38), the data.md field rules that decide when a file is damaged (F9), the swap order (deletes, updates, adds) and which files an update must remove (F4 step 7), and the row-check verdict (F4 step 11).
 
 ## Belongs here
 Small classes and records that take data in and give an answer back. Also the plain shared types other parts pass around: the paths record, the settings record and the log interface (Logic defines them but never logs). The current time is passed in, never read from the clock. Everything here gets xUnit tests and Stryker mutation testing (D18).
@@ -13,4 +13,4 @@ Reading or writing files, talking to Emby, drawing pictures, waiting, timers.
 Nothing else in the plugin. Plain .NET (collections, strings, dates).
 
 ## Must not use
-Store, Artwork, EmbyBridge, Run, Settings, any `MediaBrowser.*` (Emby) type, `System.IO.File`/`Directory`, networking, `Task`/async, SkiaSharp.
+Store, Artwork, EmbyBridge, Run, Settings, any `MediaBrowser.*` or `Emby.*` (Emby) type, any file access (`System.IO.File`, `Directory`, `FileStream`, `FileInfo`, `DirectoryInfo`), networking, `System.Diagnostics.Process`, `Task`/async, SkiaSharp.

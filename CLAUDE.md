@@ -9,7 +9,7 @@
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
 
 ## Standing rules
-(none yet)
+- **R1** (2026-11-08, card 0005, approved by owner): ALWAYS, after any spec change, check every new or changed rule against the F4 step list, run.json `step`/`status`, data.md and the part walls before asking for a review.
 
 ## Docs
 - docs/spec.md – what it does (F1–F10)

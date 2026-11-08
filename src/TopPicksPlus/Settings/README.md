@@ -13,4 +13,4 @@ Running anything, checking values on save (EmbyBridge's API does that on the ser
 Logic, the Emby SDK types needed for plugin configuration and pages.
 
 ## Must not use
-Store, Artwork, EmbyBridge, Run, SkiaSharp, `System.Net`, the root namespace.
+Store, Artwork, EmbyBridge, Run, SkiaSharp, `System.Net`, `System.Diagnostics.Process`, the root namespace.
