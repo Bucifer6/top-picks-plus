@@ -8,6 +8,6 @@ links: [checks.md, spec.md]
 | ID | Part | Who relies on it | Journey | Test |
 |----|------|------------------|---------|------|
 | P1 | Run, EmbyBridge | Every Emby user | Open the Emby home screen: the Latest Top Picks row shows 10 titles numbered 1–10 left to right, and playing one plays the real film or episode | Owner check C2 + C16 after each release (needs the real server, so no automatic browser test); the plugin's own row check (F4 step 11) runs on every weekly run and reports a failure |
-| P2 | EmbyBridge | Every Emby user | Watched ticks and resume points on the real titles are never lost or wrongly changed | Owner check C14 after each release |
+| P2 | EmbyBridge, Run | Every Emby user | Watched ticks and resume points, on the real titles and in the row, are never lost or changed by the plugin (D39) | Owner check C14 after each release; automatic test C49 on every build |
 
 A failed protected journey blocks the release. Changing one needs the owner's OK.

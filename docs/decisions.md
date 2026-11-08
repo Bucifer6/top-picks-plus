@@ -15,7 +15,7 @@ links: [spec.md]
 | D6 | 2026-11-08 | Same artwork style as today: 1000x562, big white rank number on the left, logo over the backdrop | The owner likes the current look |
 | D7 | 2026-11-08 | The plugin is called "Top Picks Plus" in Emby | Matches the repo name; never confused with the old plugin |
 
-| D8 | 2026-11-08 | Keep the numbered copies (.strm library) rather than a playlist of the real titles; sync watched/resume back to the real title; accept duplicates in search | Owner wants the numbered artwork; weighed against a playlist section during the challenge round |
+| D8 | 2026-11-08 | Keep the numbered copies (.strm library) rather than a playlist of the real titles; sync watched/resume back to the real title (the sync was replaced by D39: Emby itself shares it); accept duplicates in search | Owner wants the numbered artwork; weighed against a playlist section during the challenge round |
 | D9 | 2026-11-08 | The plugin keeps its own play log; Playback Reporting is only used once, to seed the first week (first-week seeding dropped by D34) | Not dependent on a third-party plugin that could break. Approved by owner at spec gate |
 | D10 | 2026-11-08 | "Most watched" = viewer-days in the last 7 days; a binge counts once per user per day | Stops one person's binge outranking what several people watched. Approved by owner at spec gate |
 | D11 | 2026-11-08 | The number of picks is fixed at 10 | Artwork, order and pins all assume 10; fewer moving parts. Approved by owner at spec gate |
@@ -52,6 +52,10 @@ links: [spec.md]
 | D38 | 2026-11-08 | (Replaced by D39) Watched state only ever moves the real title forward: F7 sends "played" or a resume point above 0 to the source, never "unplayed" and never a cleared or lower resume point | The weekly reset of copies to unplayed must never wipe real watch history (v4 review Blocker 6). Refines D26. Decided by Claude |
 
 | D39 | 2026-11-08 | **Copies share watched state with the real title, as today.** Copies keep their provider IDs (`uniqueid`), so Emby itself shares watched ticks and resume points between copy and real title. The plugin never changes anyone's watched state: spec F7 (the sync) and the played-state reset in F4 step 9 are removed. Replaces D26 and D38. A user with "hide watched from Latest" on may see fewer than 10 in the row; accepted | Owner's proof test: watched films already show as watched in today's row (v5 review Blocker 5, card 0008). Simpler, resume works from the row, and real watch history can't be wiped by the plugin. Owner's choice |
+
+| D40 | 2026-11-08 | The order guard holds the run lock while it works (taking it only if free); a run start that finds only the order guard holding it waits up to 2 minutes instead of being turned down | The guard read managed.json and set dates while a run could be changing both (v5 review Comp 15). Decided by Claude |
+| D41 | 2026-11-08 | run.previous.json always holds the last successful run before the current one (copied at step 1 only if the run before was successful) | Two failed runs in a row hid the last good report (v5 review Comp 17). Decided by Claude |
+| D42 | 2026-11-08 | Episode .nfo files carry the source episode's provider IDs (`uniqueid`) too, like movies and series, so episodes share watched state the way D39 relies on. Owner check C14 confirms it on the real server | D39's sharing works through provider IDs; v5's episode .nfo had none. Decided by Claude, following D39 |
 
 ## Still to decide before building
 (none)
