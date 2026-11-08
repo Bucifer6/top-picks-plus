@@ -13,8 +13,8 @@ Follows the build-software-safely method: talk and docs first, no code before th
 
 ## Docs
 - docs/spec.md – what it does (F1–F10)
-- docs/checks.md – how the owner tests it (C1–C84)
-- docs/decisions.md – what's decided (D1–D56) and what's still open
+- docs/checks.md – how the owner tests it (C1–C86)
+- docs/decisions.md – what's decided (D1–D57) and what's still open
 - docs/data.md – settings, run state, managed list, play log, run record
 - docs/modules.md – the six parts and their walls
 - docs/security.md – level 1 security baseline
