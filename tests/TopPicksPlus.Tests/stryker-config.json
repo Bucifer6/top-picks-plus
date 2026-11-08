@@ -1,0 +1,9 @@
+{
+  "stryker-config": {
+    "project": "TopPicksPlus.csproj",
+    "test-projects": ["TopPicksPlus.Tests.csproj"],
+    "mutate": ["**/Logic/**/*.cs"],
+    "reporters": ["progress", "markdown"],
+    "thresholds": { "high": 90, "low": 80, "break": 80 }
+  }
+}

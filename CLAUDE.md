@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 4 – Scaffold (spec approved D13; Stage 3 decisions D14–D19 made by Claude, owner delegated them 2026-11-08).
+**Stage:** 4 – Scaffold (layout approved D20; scaffold on branch `scaffold`, goldfish review next).
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -14,13 +14,25 @@ Follows the build-software-safely method: talk and docs first, no code before th
 ## Docs
 - docs/spec.md – what it does (F1–F10)
 - docs/checks.md – how the owner tests it (C1–C25)
-- docs/decisions.md – what's decided (D1–D19) and what's still open
+- docs/decisions.md – what's decided (D1–D20) and what's still open
 - docs/data.md – settings, managed list, play log, run record
+- docs/modules.md – the six parts and their walls
+- docs/security.md – level 1 security baseline
+- docs/protected.md – protected journeys P1–P2
+- docs/releases.md – release plan and log
 
 ## Folders
 | Folder | Purpose |
 |--------|---------|
 | docs/ | Spec, checks, decisions, handover, logbook |
+| src/TopPicksPlus/Logic | The rules, pure and fully tested |
+| src/TopPicksPlus/Store | The plugin's own data files |
+| src/TopPicksPlus/Artwork | Drawing the numbered pictures |
+| src/TopPicksPlus/EmbyBridge | Everything that talks to Emby |
+| src/TopPicksPlus/Run | The weekly steps in order |
+| src/TopPicksPlus/Settings | Settings page and report |
+| tests/TopPicksPlus.Tests | Unit tests and the boundary check |
+| .github/workflows | The build (D16) |
 
 ## Building
 GitHub Actions builds the plugin DLL (decision D5). Nothing is built on the owner's PC.

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The plugin. One DLL (TopPicksPlus.dll), split into folders whose walls are in each README
+       and enforced by tests/TopPicksPlus.Tests/BoundaryTests.cs. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>  <!-- D14 -->
+    <AssemblyName>TopPicksPlus</AssemblyName>
+    <RootNamespace>TopPicksPlus</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- D14: Emby plugin SDK pinned exactly. Emby supplies these DLLs at run time; they are not shipped. -->
+    <PackageReference Include="MediaBrowser.Server.Core" Version="[4.9.1.90]" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TopPicksPlus.Tests" />
+  </ItemGroup>
+</Project>

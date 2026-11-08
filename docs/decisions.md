@@ -29,6 +29,7 @@ links: [spec.md]
 | D17 | 2026-11-08 | Install = copy TopPicksPlus.dll into programdata\plugins and restart Emby. Rollback = put the previous DLL back (every Release keeps its DLL) and restart. At first install the old Top Picks plugin is uninstalled from the dashboard; its DLL and settings are already backed up on the Desktop | Simple, one-step rollback. Decided by Claude |
 | D18 | 2026-11-08 | Tests: automatic unit tests (xUnit) for choosing, counting, naming, takeover and ordering logic, with mutation testing (Stryker.NET) on that logic in CI; Emby-side behaviour proved by the owner's checks in checks.md | Logic can be tested without Emby; Emby behaviour needs the real server. Decided by Claude |
 | D19 | 2026-11-08 | Code changes go on branches with pull requests; Claude merges only when the build, tests and the fresh-reviewer review pass. Nothing is pushed straight to main from here on | Keeps main always installable. Decided by Claude |
+| D20 | 2026-11-08 | Code layout: one plugin DLL split into six parts (Logic, Store, Artwork, EmbyBridge, Run, Settings) with walls in each README, enforced by an automatic boundary check (NetArchTest) on every build | Keeps the rules testable without Emby and stops parts reaching into each other. Approved by owner |
 
 ## Still to decide before building
 (none)

@@ -5,3 +5,8 @@ obj/
 .env
 *.pfx
 *.key
+*.db
+*.bak
+backups/
+StrykerOutput/
+TestResults/
