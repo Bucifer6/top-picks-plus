@@ -1,9 +1,9 @@
 ---
-summary: What Top Picks Plus does, in plain English. Every feature has a check in checks.md. Version 4: readiness fixes (D43–D60).
+summary: What Top Picks Plus does, in plain English. Every feature has a check in checks.md. Version 5: readiness fixes (D43–D74).
 links: [decisions.md, checks.md, data.md]
 ---
 
-# Top Picks Plus – spec (v4, 2026-11-08)
+# Top Picks Plus – spec (v5, 2026-11-08)
 
 **Purpose:** Every week, fill the "Latest Top Picks" row on the Emby home screen with the 10 titles people are watching most, numbered 1–10 in the right order every time, with no manual step. The owner can pin titles if they want to.
 
@@ -23,9 +23,9 @@ links: [decisions.md, checks.md, data.md]
 ## F1 – When it runs
 - Emby scheduled task **"Refresh Top Picks"**, every **Sunday at 05:00 on the server's clock**. The server is set to UK time, so the run follows the clocks when they change.
 - Can also be run with "Run now", in Emby's Scheduled Tasks or on the plugin's settings page.
-- **Only one run at a time.** If a run is asked for while one is going, the request is turned down and the settings page says a run is already in progress. If a run hits an error while Emby keeps going, it is retried 5 minutes later, up to 3 times in all, then marked failed (D44).
+- **Only one run at a time.** If a run is asked for while one is going, the request is turned down and the settings page says a run is already in progress. If a run hits an error while Emby keeps going, it is resumed 5 minutes later: the first attempt plus up to 3 resumes, then it is marked failed (D44, D68). A scheduled or Run now request while an unfinished run is waiting resumes that run instead (D68).
 - **Missed run:** if Emby starts up and the last successful run (finished or incomplete, D31) was more than 7 days ago, the plugin runs once, 10 minutes after start-up, unless an unfinished run was resumed. Right after first install there is no last run, so it waits for Sunday or Run now (D41).
-- **Start-up order (D35):** old-plugin guard first (if the old plugin is loaded, nothing else happens: no runs, no play logging, no watched sync, D51; chunk 1 exception D59); then resume an unfinished run; otherwise the order guard at 2 minutes; then the missed-run rule at 10 minutes.
+- **Start-up order (D35):** old-plugin guard first (if the old plugin is loaded, nothing else happens: no runs, no play logging, no watched sync, D51); then resume an unfinished run; otherwise the order guard at 2 minutes; then the missed-run rule at 10 minutes.
 
 ## F2 – Choosing the 10 (fully automatic)
 The list is built automatically every week. **No manual step is ever needed.** Pins are optional.
@@ -41,6 +41,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - **Folder name:** `Title (Year)`. Characters Windows doesn't allow in folder names, and trailing dots or spaces, are removed. With no year it's just `Title`. If two picks would end up with the same folder name, the second gets ` - 2` added. The managed list links each folder to its source title's ID, so renamed titles never leave orphan folders behind.
 - **Movie:** `<folder>.strm` pointing to the movie's main video file (for a movie with several versions, the one Emby plays by default) and `<folder>.nfo` holding the source title's metadata, including its age rating and a `<dateadded>` equal to its rank date. External subtitle files (.srt, .ass, .ssa, .vtt, .sub) of that version are copied alongside with matching names. The .nfo fields are listed in D30.
 - **Series:** `tvshow.nfo`, then `Season N` folders (`Specials` for season 0) with a .strm and .nfo for every available episode, named `Series - SxxEyy - Episode title`, with each episode's external subtitles copied the same way as a movie's. Multi-episode files, missing numbers, title cleaning and long paths: D49. The .nfo `<dateadded>` format: D50.
+- **Series images:** each episode's thumb and each season's poster are copied too (D70).
 - **Subtitles and themes:** the whole subtitle suffix is kept (`.en.forced.srt`), `.idx` goes with its `.sub`, and subtitles are refreshed every run; theme songs are handled like theme videos (D55).
 - **New copies:** a folder name that clashes with any folder already in top-picks gets ` - 2`; Windows reserved names get `_` added (D30).
 - **Staying copies** keep their folder name even if the source title is renamed. In a staying series, new episodes are added and episode files the plugin made that are no longer available are deleted; nothing else in the folder is touched (D30).
@@ -68,11 +69,11 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - What the row may show while a run is in progress: for a few minutes, a mix of last week's and this week's titles. When the run finishes, the row is complete and in order.
 
 ## F6 – Counting plays
-- The plugin listens for Emby's "playback stopped" event on every item. For each one it notes the user, the source title, the day (UK date), how many minutes were watched (stop position minus start position, D29), and whether Emby marked the item as played.
-- **A play on a copy counts towards its source title.** The plugin looks the copy up in the managed list, so this week's picks get credit when people watch them from the row.
+- The plugin listens for Emby's "playback stopped" event on movies and episodes (nothing else is logged; the day is the UK date of the stop, D70). For each one it notes the user, the source title, the day (UK date), how many minutes were watched (stop position minus start position, D29), and whether Emby marked the item as played.
+- **A play on a copy counts towards its source title.** The plugin looks the copy up in the managed list, so this week's picks get credit when people watch them from the row. A copy not on the list (an old-plugin copy before takeover) is traced to its source through its .strm file (D64).
 - **What counts as watched:** a user counts for a title on a day if, that day, Emby marked something in the title as played, or their watching time on the title adds up to at least 50% of the runtime, or at least 20 minutes when the runtime isn't known. Two sittings of 30% each count. For a series this is per episode: minutes of different episodes don't add up (D22).
 - Plays are kept for **90 days** in the plugin's own data file. Older ones are deleted every time it runs.
-- **First run:** if the Playback Reporting plugin's history can be read, the last 7 days are imported from it, once only, so the first list isn't empty. If it can't be read, the first week uses each user's "last played" dates from Emby instead (D25, D47). Only plays from before the plugin started listening are imported, so nothing counts twice (D46). The report says which was used.
+- **First run:** if the Playback Reporting plugin's history can be read, the last 7 days are imported from it, once only, so the first list isn't empty. If it can't be read, the first week uses each user's "last played" dates from Emby instead (D25, D47). Only plays from before the plugin started listening are imported, so nothing counts twice (D46); on go-live day, Run now is pressed straight after install so the whole week is imported (D63, D64). The report says which was used.
 - The plugin keeps its own record, rather than reading Playback Reporting each week, so it keeps working if that third-party plugin breaks or is removed (decision D9).
 
 ## F7 – Watched status follows the real title
@@ -101,7 +102,12 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - The build targets a fixed Emby plugin SDK version, recorded in the repo.
 - After every Emby server upgrade, the owner runs check C20 ("Run now", then look at the row). The plugin also writes its version and the Emby version at the top of each run report.
 
+## Going live (D63)
+Nothing goes on the server until every part is built. On go-live day: uninstall the old plugin, install Top Picks Plus, restart Emby, press Run now, then try the checks. To undo it that day, uninstall Top Picks Plus and put the old plugin back.
+
 ## Known limits (accepted)
+- Uninstalling Top Picks Plus leaves the copies and its data where they are (D73).
+- A media folder in top-picks that the plugin doesn't manage shows in the row; the report names it (D73).
 - The same film in two libraries (say Movies and a 4K library) counts as two titles (D55).
 - A title removed and added again in Emby gets a new ID, so its pin shows "missing" and is added again (D48).
 - Pins from the old plugin are re-entered by hand.

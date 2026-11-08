@@ -18,4 +18,4 @@
 **Must not use:** Emby SDK, SkiaSharp, System.IO (including `Path`), System.Net, TimeZoneInfo, Newtonsoft, Microsoft.Extensions, SQLitePCL, any other part of the plugin.
 **Note for folder-name rules (F3):** write the list of characters Windows forbids into Logic yourself; don't use `Path.GetInvalidFileNameChars()`, which is blocked here and returns almost nothing on the Linux build machine.
 **Records:** the plain record types the rules work on (pick, play, managed entry) live here; Storage saves and loads them.
-**Tests:** `tests/TopPicksPlus.Tests/Logic`. Mutation testing (Stryker.NET) on this folder is not in CI yet: the first Logic build chunk must add it in the same pull request, pinned in a dotnet tool manifest, limited to this folder, with a break-at threshold so it can fail the build (D18).
+**Tests:** `tests/TopPicksPlus.Tests/Logic`. Mutation testing (Stryker.NET) is not in CI yet: chunk 1 adds it, pinned in a dotnet tool manifest, on Logic and Storage, in the Windows job, failing below 80% (D66).

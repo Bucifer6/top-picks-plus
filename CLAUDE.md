@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 5 readiness in progress – first review scored 72; readiness fixes D43–D62 and checks C51–C65 on branch spec/readiness-fixes. Next: owner questions, then re-score.
+**Stage:** 5 readiness in progress – second review scored 71; fixes D63–D74 and checks C66–C75 on branch spec/readiness-fixes. Next: a fresh re-score.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -12,9 +12,9 @@ Follows the build-software-safely method: talk and docs first, no code before th
 (none yet)
 
 ## Docs
-- docs/spec.md – what it does (F1–F10, v4)
-- docs/checks.md – how the owner tests it (C1–C65)
-- docs/decisions.md – what's decided (D1–D62) and what's still open
+- docs/spec.md – what it does (F1–F10, v5)
+- docs/checks.md – how the owner tests it (C1–C75)
+- docs/decisions.md – what's decided (D1–D74) and what's still open
 - docs/data.md – settings, managed list, play log, run record
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
 
@@ -29,7 +29,7 @@ Follows the build-software-safely method: talk and docs first, no code before th
 | src/TopPicksPlus/EmbyLink | Everything that talks to Emby: task, events, swap, dates, guard, row check |
 | src/TopPicksPlus/Settings | Admin settings page and run report |
 | tests/ | xUnit tests for Logic; Boundaries/ is the boundary check |
-| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. Stryker added by the first Logic chunk; a Windows test job and global.json are added by chunk 1 (D43, D57) |
+| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. A Windows test job, global.json and Stryker are added by chunk 1 (D43, D57, D66) |
 
 ## Building
 Boundary check: tests/TopPicksPlus.Tests/Boundaries (runs on every change; layout approved by the owner 2026-11-08).

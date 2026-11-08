@@ -5,7 +5,7 @@ links: [spec.md]
 
 # Data
 
-All plugin data lives in `programdata\plugins\TopPicksPlus\` on the server (JSON files written atomically with System.Text.Json, D24: write a temp file, then rename). Nothing is sent anywhere.
+Each JSON file carries `"version": 1`; a newer version makes runs refuse (`dataNewer`, D72). All plugin data lives in `programdata\plugins\TopPicksPlus\` on the server (JSON files written atomically with System.Text.Json, D24: write a temp file, then rename). Nothing is sent anywhere.
 
 ## Settings (Emby plugin configuration, `plugins\configurations\TopPicksPlus.xml`)
 | Field | Meaning |
@@ -20,7 +20,7 @@ All plugin data lives in `programdata\plugins\TopPicksPlus\` on the server (JSON
 **IDs:** every item and library ID stored anywhere here is Emby's numeric InternalId; user IDs are Emby user GUIDs (D48).
 
 ## managed.json – the managed list
-One entry per copy folder, **keyed by `folder`** (never by sourceId): `sourceId` (Emby ID of the source title, empty for an adopted folder that matched nothing), `kind` (Movie / Series), `folder` (folder name inside the Top Picks folder), `state` (`incoming` / `active` / `leaving`, D26), `rank` (1–10, or none if adopted and not yet removed), `rankDateUtc` (none when unranked; the order guard skips those), `adopted` (true if taken over from the old plugin), `items` (each video file in the copy: path relative to the folder → source item ID, D28), `files` (every other file the plugin wrote in the folder).
+One entry per copy folder, **keyed by `folder`** (never by sourceId): `sourceId` (Emby ID of the source title, empty for an adopted folder that matched nothing), `kind` (Movie / Series), `folder` (folder name inside the Top Picks folder), `state` (`incoming` / `active` / `leaving`, D26), `rank` (1–10, or none for any unranked copy, D74), `rankDateUtc` (none when unranked; the order guard skips those), `adopted` (true if taken over from the old plugin), `items` (each video file in the copy: path relative to the folder → source item ID, D28), `files` (every other file the plugin wrote in the folder).
 Rules: a folder is only ever deleted if it is in this list; inside a staying copy, only files in `items` or `files` are ever deleted. If this file can't be read, every run refuses (D32).
 
 ## plays.json – the play log
@@ -28,7 +28,7 @@ One entry per playback stopped: `userId`, `sourceId` (movie or series, never the
 Entries older than the 90 full UK days before the run day are removed (plays from the run day itself are kept) on each run (D21). If unreadable, it is renamed `plays.damaged-YYYY-MM-DD.json` and a new log started (D32). A viewer-day (F2) is computed from these entries, not stored.
 
 ## run.json – current or last run
-`runId`, `startedUtc`, `rankTimeUtc` (D27), `step` (prepare / swap / rescan / dates / artwork / check / record / done), `status` (running / finished / incomplete / failed), `resumeCount`, `picks` (rank, sourceId, folder, reason `pinned`/`viewerDays`/`filler`, viewerDays, copyApplied, dateApplied, artworkFailed), `missingPins`, `playsLast7Days`, `seedSource` (none / playbackReporting / lastPlayed, D25), `rowCheck` (passed, user used, what Emby returned, retried), `pluginVersion`, `embyVersion`, `message`, `lastSuccessfulRunUtc` (the only record of it; finished or incomplete counts, D31), `lastRefusal` (time, reason `alreadyRunning`/`oldPluginLoaded`/`libraryMissing`/`librarySetup`/`dataDamaged`; never overwrites the run).
+`runId`, `startedUtc`, `rankTimeUtc` (D27), `step` (prepare / swap / rescan / dates / artwork / check / record / done), `status` (running / finished / incomplete / failed), `resumeCount`, `picks` (rank, sourceId, folder, reason `pinned`/`viewerDays`/`filler`, viewerDays, copyApplied, dateApplied, artworkFailed), `missingPins`, `playsLast7Days`, `seedSource` (none / playbackReporting / lastPlayed, D25), `rowCheck` (passed, user used, what Emby returned, retried), `pluginVersion`, `embyVersion`, `message`, `lastSuccessfulRunUtc` (the only record of it; finished or incomplete counts, D31), `lastRefusal` (time, reason `alreadyRunning`/`oldPluginLoaded`/`libraryMissing`/`librarySetup`/`dataDamaged`/`dataNewer`; never overwrites the run).
 Saved at every step change. Used to resume an unfinished run (F5, D26) and to show the report (F8).
 
 ## staging\ – scratch folder
