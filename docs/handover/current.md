@@ -11,7 +11,7 @@ Spec v3 written from the scaffold review, then re-reviewed by three fresh agents
 
 ## What is still owed (smallest first)
 1. Owner: delete the throwaway branch `probe/boundary-bites` on GitHub (Claude can't). Harmless.
-2. Owner: answer the "watched titles hidden from Latest" question (below). Blocker 1 can't be fixed without it.
+2. (done: owner chose "copies never look watched", D26.)
 3. Spec v4: fix everything in docs/reviews/2026-11-08-spec-v3-review.md. The 8 Blockers come first (Blocker 1 needs the owner's answer), then the Should-fix list, then the Nits. Follow card 0005 for every new rule: check it against the F4 step list, run.json `step`, data.md and the part's walls in the same edit.
 4. Any fix that changes a wall (a part's "may use" / "must not use", e.g. Blocker 2) needs the owner's OK first, with matching edits to the READMEs, docs/modules.md and tests/TopPicksPlus.Tests/BoundaryTests.cs.
 5. Re-run the three goldfish (comprehension, builder readiness, security) on spec v4. Merge pull request 1 only if none finds a Blocker. Stage 4 then passes.
@@ -29,11 +29,11 @@ Spec v3 written from the scaffold review, then re-reviewed by three fresh agents
 - Emby's HTTP port is 48096 locally, 8096 publicly behind Caddy.
 
 ## Waiting on the owner
-- **Watched titles and the Latest row (review Blocker 1):** Emby may hide titles a user has already watched from "Latest" rows. Options put to the owner on 2026-11-08: (a) the plugin keeps the copies looking unwatched, so the row always shows all 10 for everyone, while the real titles still get the watched tick; (b) keep the watched ticks on copies and accept shorter rows for people who've seen a pick; (c) the owner turns that setting off for every user. Claude recommended (a). Record the answer as a decision.
+- Nothing on watched titles: answered 2026-11-08 as D26 (copies never look watched). Spec v4 must apply it to F7, C14, C15 and the row check.
 - Possibly: whether card 0006 should become a standing rule (needs the owner's OK).
 
 ## Next job
-Spec v4: get the owner's answer on watched titles, then fix the spec v3 review file item by item, then the goldfish re-review. Read first: CLAUDE.md, docs/reviews/2026-11-08-spec-v3-review.md, docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
+Spec v4: apply D26, then fix the spec v3 review file item by item, then the goldfish re-review. Read first: CLAUDE.md, docs/reviews/2026-11-08-spec-v3-review.md, docs/spec.md, docs/data.md, docs/checks.md, docs/modules.md, the part READMEs.
 
 ## Cards that applied
 0001 (order through Emby, not the .nfo), 0002 (wall test must prove it can fail), 0004 (scaffold record). New this job: 0005, 0006.

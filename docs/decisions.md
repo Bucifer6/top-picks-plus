@@ -37,5 +37,7 @@ links: [spec.md]
 | D24 | 2026-11-08 | The one-off Playback Reporting import reads its database read-only through the SQLite library Emby already ships, compiled against but not shipped (like SkiaSharp, D15); its version is read from the server before that build chunk. Any failure just skips the import | No new package to install; the import is a one-time nicety (D9). Decided by Claude |
 | D25 | 2026-11-08 | If any folder of a chosen or pinned library can't be reached, the run is refused and nothing changes | A disconnected drive would otherwise look like every file is missing and replace good copies with filler. Decided by Claude |
 
+| D26 | 2026-11-08 | Copies never look watched: when a user watches or marks a copy, the played state and resume point go to the real title and the copy is set back to unwatched; copies never take played state from the source. Replaces F7's "source to copy" and C15's "keeps your watched tick on its copy" | So the row shows all 10 for everyone, even with Emby's hide-watched-in-Latest setting on (review Blocker 1). Owner's choice |
+
 ## Still to decide before building
 (none)
