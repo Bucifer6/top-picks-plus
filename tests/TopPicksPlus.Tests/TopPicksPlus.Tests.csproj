@@ -16,6 +16,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- D56, D65: the tests (never the plugin) bring SkiaSharp 2.88.3 and its native library for Linux and Windows. -->
+    <PackageReference Include="SkiaSharp" Version="[2.88.3]" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="[2.88.3]" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="[2.88.3]" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- D65/D97: the one SkiaSharp 2.88.3 advisory, accepted; anything else still fails. -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-j7hp-h8jx-5ppr" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../src/TopPicksPlus/TopPicksPlus.csproj" />
   </ItemGroup>
 
