@@ -1,5 +1,5 @@
 ---
-summary: What Top Picks Plus does, in plain English. Every feature has a check in checks.md. Version 3: spec gaps from the scaffold review settled (D20–D36).
+summary: What Top Picks Plus does, in plain English. Every feature has a check in checks.md. Version 3: spec gaps from the scaffold review settled (D20–D42).
 links: [decisions.md, checks.md, data.md]
 ---
 
@@ -24,7 +24,7 @@ links: [decisions.md, checks.md, data.md]
 - Emby scheduled task **"Refresh Top Picks"**, every **Sunday at 05:00 on the server's clock**. The server is set to UK time, so the run follows the clocks when they change.
 - Can also be run with "Run now", in Emby's Scheduled Tasks or on the plugin's settings page.
 - **Only one run at a time.** If a run is asked for while one is going, the request is turned down and the settings page says a run is already in progress.
-- **Missed run:** if Emby starts up and the last successful run (finished or incomplete, D31) was more than 7 days ago, the plugin runs once, 10 minutes after start-up, unless an unfinished run was resumed.
+- **Missed run:** if Emby starts up and the last successful run (finished or incomplete, D31) was more than 7 days ago, the plugin runs once, 10 minutes after start-up, unless an unfinished run was resumed. Right after first install there is no last run, so it waits for Sunday or Run now (D41).
 - **Start-up order (D35):** old-plugin guard first (if the old plugin is loaded, nothing else happens); then resume an unfinished run; otherwise the order guard at 2 minutes; then the missed-run rule at 10 minutes.
 
 ## F2 – Choosing the 10 (fully automatic)
@@ -41,17 +41,18 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - **Folder name:** `Title (Year)`. Characters Windows doesn't allow in folder names, and trailing dots or spaces, are removed. With no year it's just `Title`. If two picks would end up with the same folder name, the second gets ` - 2` added. The managed list links each folder to its source title's ID, so renamed titles never leave orphan folders behind.
 - **Movie:** `<folder>.strm` pointing to the movie's main video file (for a movie with several versions, the one Emby plays by default) and `<folder>.nfo` holding the source title's metadata, including its age rating and a `<dateadded>` equal to its rank date. External subtitle files (.srt, .ass, .ssa, .vtt, .sub) of that version are copied alongside with matching names. The .nfo fields are listed in D30.
 - **Series:** `tvshow.nfo`, then `Season N` folders with a .strm and .nfo for every available episode, named `Series - SxxEyy - Episode title`, with each episode's external subtitles copied the same way as a movie's.
-- **Staying copies** keep their folder name even if the source title is renamed. A folder name that clashes with any folder already in top-picks gets ` - 2`. In a staying series, new episodes are added and episode files the plugin made that are no longer available are deleted; nothing else in the folder is touched (D30).
+- **New copies:** a folder name that clashes with any folder already in top-picks gets ` - 2`; Windows reserved names get `_` added (D30).
+- **Staying copies** keep their folder name even if the source title is renamed. In a staying series, new episodes are added and episode files the plugin made that are no longer available are deleted; nothing else in the folder is touched (D30).
 - **Artwork:** `fanart.jpg` (the source backdrop), `logo.png` (the source logo, if there is one) and the theme video (`backdrops\theme.mp4`, if the source has one). Theme videos are copied only when a copy is first created, not every week. `folder.png` and `thumb.png` are drawn by the plugin at 1000×562: the backdrop, darkened on the left, a large white rank number (1–10) on the left, and the logo over the picture. With no logo, the title is written in large white text. With no backdrop, the poster is used on a dark background.
 
 ## F4 – Each week's update, in order
 1. **Prepare** this week's copies in a staging folder outside every library: `programdata\plugins\TopPicksPlus\staging`. Emby never sees half-written files there. The 10 picks and the rank time are fixed now and saved in the run record.
 2. **Swap in:**
-   In this order, so a restart at any moment is safe (D26):
+   First, anything an earlier run left half-done is finished (D39). Then, in this order, so a restart at any moment is safe (D26, D40):
    - Copies of titles that **drop out** are deleted (marked "leaving" on the managed list first, removed from it after).
    - Copies of titles that **stay** are updated in place, one file at a time: the same folder, with the .strm and .nfo rewritten and the artwork replaced. The folder isn't deleted and recreated, so Emby keeps the same item and the user's watched state on the copy.
    - **New** titles are added to the managed list first, then their folders are moved in from staging.
-   - An old-plugin folder that is still a pick is replaced by a fresh copy, never updated in place (D28).
+   - An old-plugin folder that is still a pick is treated as a drop-out plus a new copy, never updated in place (D40).
 3. **Rescan** only the Top Picks library, and wait until every copy is in the library: up to 15 minutes, or 30 minutes if a series has more than 200 episodes.
 4. **Set the order:** for each copy, set the date added directly in Emby to its rank date. For a series, the series and every one of its episodes get the rank date, so a show can never jump up the row because one episode was added later. The same date is already in the .nfo (step 1), so a later refresh that re-reads the .nfo can't undo it.
 5. **Refresh artwork** for each copy so the number on the picture matches. Then read each date added back and set it again if the refresh changed it.
@@ -76,7 +77,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 ## F7 – Watched status follows the real title
 - When a user watches a copy and Emby marks it as played, the plugin marks the matching source movie or episode as played for that user too. When a user stops part-way, the resume point is copied to the source item.
 - When a copy is created or updated, it takes on each user's played state from the source title, so a copy someone has already seen shows the tick.
-- **Known limitation, accepted by the owner:** the copies appear in search next to the real titles, as they do today.
+- **Known limitations, accepted by the owner:** the copies appear in search next to the real titles, as they do today; and a user blocked from a whole library still sees that library's titles in the Top Picks row (age ratings still apply, D42).
 
 ## F8 – Settings page and run report (Dashboard → Plugins → Top Picks Plus; administrators only)
 - **Libraries** to choose from. The Top Picks library is never offered.
@@ -86,8 +87,8 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - **Last run report:** when it ran, finished / incomplete / failed, and each of the 10 titles with its rank, why it was picked (pinned / X viewer-days / filler) and whether its copy and date were applied. The row check result shows exactly what Emby returned if it didn't pass. Also shown: the number of plays recorded in the last 7 days, missing pins, any artwork that failed, and the last refused run with its reason (D31).
 
 ## F9 – Safety
-- **Deletes only what it made:** it deletes only folders on the managed list, only inside the Top Picks folder, and never a file or folder it didn't create.
-- **First-run takeover:** before the first run, folders already in the Top Picks folder that contain at least one .strm file and one .nfo file are taken to be the old plugin's and added to the managed list, linked to their source title through the path in their .strm file (D28). Anything else, including loose files in the Top Picks folder, is left alone forever.
+- **Deletes only what it manages:** it deletes only folders on the managed list (the whole folder, including anything inside), only direct children of the Top Picks folder after the safety checks in D37, and inside a staying copy only the files it wrote. Nothing that isn't on the managed list is ever touched.
+- **First-run takeover:** before the first run, folders already in the Top Picks folder that contain, counting their subfolders, at least one .strm file and one .nfo file (D38) are taken to be the old plugin's and added to the managed list, linked to their source title through the path in their .strm file (D28). Anything else, including loose files in the Top Picks folder, is left alone forever.
 - **Old plugin guard:** if the old plugin is loaded in Emby (exactly: assembly `Emby.TopPicks` or plugin ID `672630FC-6FB8-4207-9C7B-AB414CD85B53`, D33), every run refuses to start and the report says to uninstall it first.
 - **Damaged data:** if the managed list can't be read, every run refuses and nothing is deleted. A damaged play log or run record is set aside (renamed) and a fresh one started; the report says so (D32).
 - **Missing library:** if no library uses the Top Picks folder, the run refuses to start and says so.

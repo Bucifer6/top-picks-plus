@@ -57,3 +57,7 @@ Behaviour questions for the owner (one at a time, with a recommendation):
 - Owed items 1–10 → D24–D36, written into spec v3, data.md and the folder READMEs. Facts used: Emby runs on .NET 8.0.32 and carries SkiaSharp 2.88.3 and SQLitePCL.pretty 1.2.2 (system folder); Playback Reporting's table layout (its database); the old plugin's assembly name and ID (Emby.TopPicks.dll 1.0.0.63).
 - Owed item 11 (checks) → C16, C18, C24 tightened; C26–C38 added.
 - Not proved yet, by design: reading Playback Reporting through Emby's SQLite (D25 has a fallback), and the old plugin's ID (assembly name matches too). Both are checked in their build chunks.
+
+## Fresh review of the fixes (2026-11-08): 2 Blockers, 10 Should fix, 6 Nits, all handled
+- Fixed: delete containment (1, Blocker) → D37, C45; takeover counts subfolders (2, Blocker) → D38, C46; safety wording (3) → F9; 90-day trim kept the run day (4); leftovers and failed resume (5) → D39, C47; file-level order (6) and adopted-folder handling (7) → D40; Q1 "hide watched" and how the check works (8) → D20; import runtime and fallback rows (9) → D25; first install (10) → D41; missing checks (11) → C39–C47; System.Text.Json version (13) → 8.0.6; numeric ID tie-break (14); C21 30-minute case (15); Settings README and C23 (16); new-copy name clash and reserved names (17); damaged-file name clash (18).
+- Asked the owner: library-level blocks (12) → D42, accepted as a known limitation.

@@ -27,9 +27,9 @@ links: [spec.md, decisions.md]
 | C18 | F9 | Before the first run, create a folder "Keep me" in top-picks holding only note.txt. After two runs, the folder and note.txt are still there, unchanged. Separately, an old-plugin folder for a title that's no longer a pick is removed on the first run, and one that is still a pick is replaced by a fresh copy. |
 | C19 | F9 | With the old Top Picks plugin still installed, the task refuses to run and the report says to uninstall it. |
 | C20 | F10 | After an Emby upgrade, Run now: the run finishes, the row is in order, and the report shows the new Emby version. |
-| C21 | F5 | Restart Emby in the middle of a run. Within 15 minutes of it coming back, the row is complete and in order, and the report says the run finished. |
+| C21 | F5 | Restart Emby in the middle of a run. Within 15 minutes of it coming back (30 if a pick is a series with over 200 episodes), the row is complete and in order, and the report says the run finished. |
 | C22 | F1 | Press Run now twice quickly. The second is turned down with "a run is already in progress". |
-| C23 | F8 | Settings: add, reorder and remove pins; choose libraries. The Top Picks library is not offered. The report shows rank, reason and row-check result for each title. |
+| C23 | F8 | Settings: add, reorder and remove pins; choose libraries and the row-check user. The Top Picks library is not offered. The report shows rank, reason and row-check result for each title. |
 | C24 | F6 | A play from 91 days ago is no longer in the log after a run. (Also an automatic test.) |
 | C25 | F2 | Choose only your Movies library: the next run has no series. |
 | C26 | F1 | Stop Emby for over a week (or set the last successful run back 8 days on a test copy), start it: about 10 minutes later a run happens by itself. |
@@ -41,7 +41,16 @@ links: [spec.md, decisions.md]
 | C32 | F2 | Choose only Movies, and pin a title from Kids: the pin is still used. |
 | C33 | F2 | (Automatic) The 7-day window for a Sunday run is the previous Sunday to Saturday; a mid-week run uses the 7 days before it. |
 | C34 | F6 | (Automatic) 30% of one episode plus 30% of another on the same day doesn't count; two 30% sittings of the same episode do. |
-| C35 | F2 | (Automatic) Titles tied on everything come out in the same order every time (lowest ID first). |
+| C35 | F2 | (Automatic) Titles tied on everything come out in the same order every time (lowest ID as a number first, so 99 before 100). |
 | C36 | F5 | (Automatic, plus C21) Stopping a run at any step and resuming it ends with the same 10 copies, the same rank dates, no folder in top-picks missing from the managed list, and nothing unmanaged deleted. |
 | C37 | F9 | (Automatic) If managed.json is damaged, a run refuses with "data damaged" and deletes nothing; a damaged plays.json is renamed and a new one started. |
 | C38 | F8 | Press Run now while a run is going: the running report is not replaced; the refusal shows separately. |
+| C39 | F3 | A series that stays a pick gains a new episode in its real library: the next run adds it to the copy. An episode removed from the real library disappears from the copy. Any file you put in the copy folder yourself is left alone while the title stays. |
+| C40 | F9 | (Automatic) A damaged run.json is renamed and the next run starts normally. |
+| C41 | F7 | A title you've already watched becomes a new pick: its copy shows your watched tick straight away. |
+| C42 | F3 | A title with a theme video that stays a pick for two weeks: the theme video is copied the first week only (its file date doesn't change). |
+| C43 | F8 | (Automatic) When the artwork drawing fails, the copy gets the plain backdrop and the report marks that pick "artwork failed". |
+| C44 | F1/F9 | With the old plugin installed, restart Emby: nothing runs (no resume, no order guard, no missed run) and the report says to uninstall it. |
+| C45 | F9 | (Automatic) A managed entry whose folder is empty, ".", "..", a path, or a junction pointing elsewhere is never deleted; the report names it. |
+| C46 | F9 | (Automatic) An old-plugin series folder (tvshow.nfo at the top, .strm files only in Season folders) is adopted at takeover. |
+| C47 | F4 | (Automatic) A run after a failed run finishes the old run's "leaving" deletes and drops its stray "incoming" copies; nothing is orphaned. |

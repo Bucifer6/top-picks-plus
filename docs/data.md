@@ -22,7 +22,7 @@ Rules: a folder is only ever deleted if it is in this list; inside a staying cop
 
 ## plays.json – the play log
 One entry per playback stopped: `userId`, `sourceId` (movie or series, never the copy), `episodeId` (if any), `dayUk` (YYYY-MM-DD), `minutes` (stop − start position, D29), `markedPlayed` (true/false), `runtimeMinutes` (of the movie or episode, or null).
-Entries outside the 90 full UK days before the run day are removed on each run (D21). If unreadable, it is renamed `plays.damaged-YYYY-MM-DD.json` and a new log started (D32). A viewer-day (F2) is computed from these entries, not stored.
+Entries older than the 90 full UK days before the run day are removed (plays from the run day itself are kept) on each run (D21). If unreadable, it is renamed `plays.damaged-YYYY-MM-DD.json` and a new log started (D32). A viewer-day (F2) is computed from these entries, not stored.
 
 ## run.json – current or last run
 `runId`, `startedUtc`, `rankTimeUtc` (D27), `step` (prepare / swap / rescan / dates / artwork / check / record / done), `status` (running / finished / incomplete / failed), `resumeCount`, `picks` (rank, sourceId, folder, reason `pinned`/`viewerDays`/`filler`, viewerDays, copyApplied, dateApplied, artworkFailed), `missingPins`, `playsLast7Days`, `seedSource` (none / playbackReporting / lastPlayed, D25), `rowCheck` (passed, user used, what Emby returned), `pluginVersion`, `embyVersion`, `message`, `lastSuccessfulRunUtc` (the only record of it; finished or incomplete counts, D31), `lastRefusal` (time, reason `alreadyRunning`/`oldPluginLoaded`/`libraryMissing`/`dataDamaged`; never overwrites the run).
