@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 4 – Scaffold, not yet passed. Branch `scaffold`, pull request 1 unmerged. Spec v8 re-review found 2 narrow Blockers (docs/reviews/2026-11-08-spec-v8-review.md); spec v9 next. Claude merges PRs once build, tests and review pass (D27).
+**Stage:** 4 – Scaffold, not yet passed. Branch `scaffold`, pull request 1 unmerged. Spec v9 written (v8 review handled in docs/reviews/2026-11-08-spec-v8-handling.md); its re-review decides whether Stage 4 passes. Claude merges PRs once build, tests and review pass (D27).
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -13,8 +13,8 @@ Follows the build-software-safely method: talk and docs first, no code before th
 
 ## Docs
 - docs/spec.md – what it does (F1–F10)
-- docs/checks.md – how the owner tests it (C1–C82)
-- docs/decisions.md – what's decided (D1–D54) and what's still open
+- docs/checks.md – how the owner tests it (C1–C83)
+- docs/decisions.md – what's decided (D1–D55) and what's still open
 - docs/data.md – settings, run state, managed list, play log, run record
 - docs/modules.md – the six parts and their walls
 - docs/security.md – level 1 security baseline
