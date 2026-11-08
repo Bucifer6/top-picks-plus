@@ -3,7 +3,7 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 4 – Scaffold (spec approved D13; Stage 3 decisions D14–D19 made by Claude, owner delegated them 2026-11-08).
+**Stage:** 4 – Scaffold done (layout approved by the owner 2026-11-08, PR #2, to be merged by the owner). Before Stage 5: settle the spec gaps in docs/reviews/2026-11-08-scaffold-review.md.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -16,13 +16,23 @@ Follows the build-software-safely method: talk and docs first, no code before th
 - docs/checks.md – how the owner tests it (C1–C25)
 - docs/decisions.md – what's decided (D1–D19) and what's still open
 - docs/data.md – settings, managed list, play log, run record
+- docs/reviews/ – challenge round and scaffold review, with what's still owed
 
 ## Folders
 | Folder | Purpose |
 |--------|---------|
 | docs/ | Spec, checks, decisions, handover, logbook |
+| src/TopPicksPlus/ | The plugin (one DLL). Parts and their walls: src/TopPicksPlus/README.md |
+| src/TopPicksPlus/Logic | Pure rules (choosing, counting, naming, rank times, takeover); no Emby |
+| src/TopPicksPlus/Storage | managed.json, plays.json, run.json, staging; atomic writes |
+| src/TopPicksPlus/Artwork | Numbered 1000x562 pictures (SkiaSharp, not shipped) |
+| src/TopPicksPlus/EmbyLink | Everything that talks to Emby: task, events, swap, dates, guard, row check |
+| src/TopPicksPlus/Settings | Admin settings page and run report |
+| tests/ | xUnit tests for Logic; Boundaries/ is the boundary check |
+| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. Stryker added by the first Logic chunk |
 
 ## Building
+Boundary check: tests/TopPicksPlus.Tests/Boundaries (runs on every change; layout approved by the owner 2026-11-08).
 GitHub Actions builds the plugin DLL (decision D5). Nothing is built on the owner's PC.
 
 ## Facts found 2026-11-08

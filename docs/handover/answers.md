@@ -1,6 +1,8 @@
-# Answer key (only the marking goldfish reads this)
-1. Stage 4 Scaffold: folders + READMEs, build workflow, test projects, then goldfish review (Next job).
-2. Claude; the owner delegated them (Job just finished; Waiting on the owner).
-3. Uninstalled when Top Picks Plus goes in, at release (Watch out for).
-4. The cloud workspace; NuGet is blocked there (Watch out for).
-5. Above 90 (What is still owed 3).
+# Answer key (for the marking reviewer only; the next session must not open this)
+1. Pull request #2 on branch stage4/scaffold: checks green and reviewed, but not merged (safety controls stopped Claude); the owner merges it. Stage 4 done apart from the spec gaps. (Where it stopped)
+2. First ask the owner Q1–Q4 one at a time; then settle the eleven technical gaps. Blockers: the JSON library within the one-DLL rule, and safe resume of an interrupted run. (What is still owed 1–2)
+3. From the owner's PC: Emby 4.10.2's system folder via the device bridge, to see which JSON and SQLite DLLs Emby already loads; don't guess. (Watch out for)
+4. Stryker mutation testing, in the same pull request as the first Logic chunk. (What is still owed 4)
+5. It must match the old plugin exactly (assembly name or ID), not "contains Top Picks", or it would block Top Picks Plus itself. (Watch out for)
+6. Any change to the walls (README table, BoundaryTests.cs, Canary.cs); a new forbidden entry needs a matching canary or the build fails. (Watch out for)
+7. Merging pull request #2, and Q1–Q4: row-check user, the 7-day window, the series 50% rule, pins outside chosen libraries. (Waiting on the owner)

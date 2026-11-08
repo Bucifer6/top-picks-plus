@@ -1,28 +1,31 @@
 # Handover
 
 ## Job just finished
-Spec job and Stage 3: spec approved (D13); owner delegated technical decisions, recorded as D14–D19.
+Stage 4 scaffold: folders with READMEs, build workflow, test project, boundary check with canaries, and three fresh reviews (docs/reviews/2026-11-08-scaffold-review.md).
 
 ## Where it stopped
-Stage 4 (Scaffold) not started. Branch main, docs only, no code.
+Stage 4 done apart from the spec gaps the review found. Branch stage4/scaffold, pull request #2: all checks green and three reviews done, but NOT merged. The safety controls here stopped Claude merging it; the owner merges it on GitHub. Still no plugin code.
 
 ## What is still owed (smallest first)
-1. (done: D14–D19)
-2. Stage 4 scaffold: folders with READMEs, build workflow, boundary check; goldfish review.
-3. Stage 5 readiness goldfish (score must be above 90).
-4. Stage 6 build in chunks the owner can check, Stage 7 review, Stage 8 release (old plugin removed at the same time).
+1. Ask the owner the four behaviour questions Q1–Q4 in the scaffold review, one at a time, each with its recommendation; record the answers as decisions.
+2. Settle the eleven technical gaps listed under "Owed: next job" in the scaffold review (two were Blockers: the JSON library within the one-DLL rule, and safe resume of an interrupted run). Record each as a decision or as spec/data wording, and add the missing checks.
+3. Stage 5 readiness: a fresh reviewer restates the plan and scores it; it must score above 90 and the owner must agree the restatement.
+4. Stage 6 build in chunks the owner can check. The first Logic chunk must add Stryker mutation testing to CI in the same pull request. Then Stage 7 review, and Stage 8 release (the old plugin is removed at the same time).
 
 ## Watch out for
-- Old plugin (Emby.TopPicks.dll) is still installed and must be uninstalled when Top Picks Plus goes in (F9 guard).
-- device_bash on the owner's PC is broken (virtualisation off); listing and staging files works. top-picks and plugins\configurations folders are connected directly.
-- NuGet is blocked in the cloud workspace, so nothing can be compiled there; GitHub Actions only.
-- Emby's HTTP port is 48096 locally (system.xml), public 8096 behind Caddy.
+- Item 2's JSON question needs facts from the owner's PC: which JSON and SQLite DLLs Emby 4.10.2 already loads (look in Emby's system folder through the device bridge). Don't guess.
+- Old plugin (Emby.TopPicks.dll) is still installed; F9's guard should match it exactly (by assembly name or ID, not "contains Top Picks"), or it would block Top Picks Plus too.
+- device_bash on the owner's PC is broken; listing and staging files works.
+- NuGet is blocked in the cloud workspace, so nothing compiles here; GitHub Actions only.
+- The shallow clone only fetches main: to track a new branch, add a fetch refspec for it.
+- Any change to the walls (src/TopPicksPlus/README.md table, BoundaryTests.cs, Canary.cs) needs the owner's approval; adding a forbidden entry needs a matching canary or the build fails.
 
 ## Waiting on the owner
-Nothing right now; owner has delegated technical decisions to Claude; still bring anything hard to undo.
+- Merge pull request #2 on GitHub (Merge button). Check it is merged before starting the next job; if not, work on the stage4/scaffold branch.
+- Q1–Q4 in docs/reviews/2026-11-08-scaffold-review.md (row-check user, the 7-day window, series 50% rule, pins outside chosen libraries).
 
 ## Next job
-Stage 4 scaffold: folders + READMEs, build workflow (D16), test projects (D18), then goldfish review. Read first: CLAUDE.md, docs/spec.md, docs/decisions.md, docs/data.md.
+Spec gaps: ask Q1–Q4, settle the eleven technical gaps, add the missing checks. Read first: CLAUDE.md, docs/reviews/2026-11-08-scaffold-review.md, docs/spec.md, docs/data.md, docs/checks.md, docs/decisions.md.
 
 ## Cards that applied
-0001
+0001 (date set directly on the item; EmbyLink README). New this job: 0002, 0003.

@@ -1,5 +1,5 @@
 ---
-summary: Decisions the owner has made, with date. Nothing is decided unless it is here.
+summary: Decisions, with date and who made them (the owner, or Claude where the owner delegated). Nothing is decided unless it is here.
 links: [spec.md]
 ---
 
