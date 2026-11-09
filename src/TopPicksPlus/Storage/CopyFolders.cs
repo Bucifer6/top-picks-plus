@@ -189,7 +189,7 @@ public sealed class CopyFolders
         if (parent == null || string.IsNullOrEmpty(name))
             return "name can't be resolved";
         var found = new DirectoryInfo(parent).EnumerateFileSystemInfos().Any(e => Names.Equals(e.Name, name));
-        return found ? null : "name reaches a different file or folder (short name)";
+        return found ? null : SafePaths.ShortNameProblem;
     }
 
     // ---------------- Staging (D26, D35, D37) ----------------

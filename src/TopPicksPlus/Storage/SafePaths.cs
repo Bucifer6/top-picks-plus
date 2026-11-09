@@ -13,6 +13,9 @@ internal static class SafePaths
 {
     private static readonly StringComparison PathCase = StringComparison.OrdinalIgnoreCase;
 
+    /// <summary>The reason given when a name reaches a file or folder listed under another name (D119).</summary>
+    public const string ShortNameProblem = "name reaches a different file or folder (short name)";
+
     /// <summary>A full path without a trailing separator, so two spellings of one folder compare equal.</summary>
     public static string Full(string path) =>
         Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
@@ -68,6 +71,12 @@ internal static class SafePaths
             problem = "folder is not directly inside its parent folder";
             return null;
         }
+        // D119: on Windows, GetFullPath expands a short name (LONGFO~1) into the long one, which would reach another folder.
+        if (!string.Equals(Path.GetFileName(full), name, PathCase))
+        {
+            problem = ShortNameProblem;
+            return null;
+        }
         return full;
     }
 
@@ -104,6 +113,12 @@ internal static class SafePaths
         if (!full.StartsWith(folderFull + Path.DirectorySeparatorChar, PathCase))
         {
             problem = "path resolves outside the copy";
+            return null;
+        }
+        // D119: every part must come back as written (GetFullPath expands short names on Windows).
+        if (!string.Equals(full, folderFull + Path.DirectorySeparatorChar + string.Join(Path.DirectorySeparatorChar.ToString(), parts), PathCase))
+        {
+            problem = ShortNameProblem;
             return null;
         }
         var walk = folderFull;

@@ -336,21 +336,34 @@ public class DeleteTests
     // ---- D119 (B42): exact names, so a Windows short name can't reach another folder ----
 
     [SkippableFact, Trait("Check", "C45")]
-    public void C45_B42_a_Windows_short_name_is_refused_and_the_long_folder_is_untouched()
+    public void C45_B42_a_Windows_short_name_is_refused_and_the_long_folder_is_untouched_windows()
     {
         using var s = new Sandbox();
         var dir = s.Folder("Long folder name (2020)", "x.strm");
         var shortName = ShortNames.Make(dir, "LONGFO~1");
         Skip.If(shortName == null, "this volume has no 8.3 short names, so a short name can't reach anything here");
-        var resolves = Directory.Exists(Path.Combine(s.TopPicks, shortName!));
-        Skip.IfNot(resolves, "short name '" + shortName + "' was reported but doesn't open the folder on this volume, so it can't reach anything");
+        Assert.True(Directory.Exists(Path.Combine(s.TopPicks, shortName!)), "the short name should open the long folder");
         s.Data.UpdateRun(_ => { });
         s.Data.SaveManaged(new[] { Listed(shortName!) });
 
         var result = DropOut(s, shortName!);
 
+        Assert.True(File.Exists(Path.Combine(dir, "x.strm")), "the long folder was deleted through its short name");
         Assert.Equal("name reaches a different file or folder (short name)", Assert.Single(result.Refused).Reason);
-        Assert.True(File.Exists(Path.Combine(dir, "x.strm")));
+
+        // The same for a file path inside a copy: a short spelling of a file or folder on the way is refused.
+        var file = Path.Combine(dir, "Subtitle file long name.en.srt");
+        Sandbox.Write(file);
+        var shortFile = ShortNames.Make(file, "SUBTIT~1.SRT");
+        if (shortFile != null)
+        {
+            // Even listed on the entry under its short spelling, the file must not be reached.
+            s.Data.SaveManaged(new[] { new ManagedEntry("Long folder name (2020)", 1, TitleKind.Movie, EntryState.Active, null, null, false,
+                null, new[] { shortFile }) });
+            var fileResult = s.Copies.Apply(new[] { new PlanStep(StepKind.DeleteFile, "Long folder name (2020)", path: shortFile) });
+            Assert.True(File.Exists(file), "a file was deleted through its short name");
+            Assert.Single(fileResult.Refused);
+        }
     }
 
     [Fact, Trait("Check", "C45")]
