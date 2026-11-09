@@ -8,7 +8,8 @@
 - the order guard after scans and at start-up, and resuming an unfinished run (F5);
 - listening for playback stopped and recording plays (F6), the one-off Playback Reporting import;
 - copying watched state and resume points (F7);
-- the row check as a non-administrator user (F4 step 6);
+- the row check as a non-administrator user (F4 step 6), comparing ranked copies only (D83);
+- running a run's steps in the D80 order (guards, import, takeover, leftovers, prepare …); guards again at every resume, before `resumeCount` goes up; a refusal leaves the waiting run alone and the next trigger after it clears resumes it; a problem found mid-step goes through the retry path (D94); reading and saving the plugin's flags through Storage's state.json (D93), never through PluginConfiguration;
 - the safety guards: old plugin loaded (exact match, D33), Top Picks library missing, delete only managed folders inside the Top Picks folder (F9);
 - linking copy files to source items by path (D28), minutes watched from start/stop positions (D29), the Playback Reporting read through Emby's own SQLite library (D25), the start-up order (D35), takeover (D38), and the in-memory run lock and retry rule (D44). The delete-containment checks (D37), leftovers (D39) and file-level order (D40) are carried out by Storage (D43).
 
@@ -16,4 +17,5 @@
 **Does not belong:** the rules themselves (Logic), any file change or JSON file handling (Storage, D43), drawing (Artwork), the admin page (Settings).
 **May use:** Logic, Storage, Artwork, project root, Emby SDK.
 **Must not use:** Settings, SkiaSharp.
-**Tested by:** the owner's checks in docs/checks.md on the real server (D18). Its safety rules are tested automatically in Storage and Logic (D43).
+**Tested by:** the owner's checks in docs/checks.md on the real server (D18). Every rule behind an "(Automatic)" check is a Logic function built in chunk 1 (D79); EmbyLink only wires it to Emby, proved by code review and the go-live checks (D73). No fake-Emby tests. Its safety rules are tested automatically in Storage and Logic (D43).
+**On-server proofs:** loading in 4.10.2, the Playback Reporting time format and IDs, and how Emby reads .nfo dates come from the separate proof plugin (`proof/TopPicksProof/`, D76, D77) before chunk 4 is kept. Never install any part of Top Picks Plus early to prove these.

@@ -11,3 +11,4 @@ summary: Index of live logbook cards
 | 0006 | insight | EmbyLink, Logic, process | A plan to release part of a replacement early must say how it handles what the old system is still doing |
 | 0007 | method | docs, process | When a new decision changes an older one, mark the older row and fix every README that repeats it |
 | 0008 | method | handover, process | Every "never do X" in a handover carries its reason |
+| 0009 | insight | docs, process | A whole-plan readiness score can plateau; stop chasing the score |

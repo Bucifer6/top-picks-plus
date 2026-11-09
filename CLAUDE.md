@@ -3,7 +3,8 @@
 **Purpose:** each week, put the 10 best titles (manual pins + most watched) in the "Latest Top Picks" home-screen row, numbered and in the right order every time.
 
 **Rigour level:** 1 – Personal.
-**Stage:** 5 readiness in progress – reviews scored 72 then 71; fixes D43–D75 and checks C51–C75 on branch spec/readiness-fixes (owner to merge). Next: a fresh re-score.
+**Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
+**Stage:** 6 Build. Stage 5 passed 2026-11-08 (fix-check 4: no Blockers; owner agreed the restatement). Docs on branch spec/readiness-fixes-2 (owner to merge). Build order (D92): chunk 3 Artwork, then 1 Logic, 2 Storage, proof plugin, 4 EmbyLink, 5 Settings.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
@@ -12,10 +13,11 @@ Follows the build-software-safely method: talk and docs first, no code before th
 (none yet)
 
 ## Docs
-- docs/spec.md – what it does (F1–F10, v5)
-- docs/checks.md – how the owner tests it (C1–C75)
-- docs/decisions.md – what's decided (D1–D75) and what's still open
-- docs/data.md – settings, managed list, play log, run record
+- docs/spec.md – what it does (F1–F10, v7)
+- docs/checks.md – how the owner tests it (C1–C97)
+- docs/decisions.md – what's decided (D1–D94) and what's still open
+- docs/data.md – settings, plugin flags (state.json), managed list, play log, run record
+- docs/backlog.md – findings set aside for the chunk that deals with them; each chunk's builder fixes or decides its items
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
 
 ## Folders
@@ -24,12 +26,13 @@ Follows the build-software-safely method: talk and docs first, no code before th
 | docs/ | Spec, checks, decisions, handover, logbook |
 | src/TopPicksPlus/ | The plugin (one DLL). Parts and their walls: src/TopPicksPlus/README.md |
 | src/TopPicksPlus/Logic | Pure rules (choosing, counting, naming, rank times, takeover); no Emby |
-| src/TopPicksPlus/Storage | managed.json, plays.json, run.json, staging, and every file change in top-picks (D43); atomic writes |
+| src/TopPicksPlus/Storage | managed.json, plays.json, run.json, state.json (the plugin's own flags, D93), staging, and every file change in top-picks (D43); atomic writes |
 | src/TopPicksPlus/Artwork | Numbered 1000x562 pictures (SkiaSharp, not shipped) |
 | src/TopPicksPlus/EmbyLink | Everything that talks to Emby: task, events, swap, dates, guard, row check |
 | src/TopPicksPlus/Settings | Admin settings page and run report |
-| tests/ | xUnit tests for Logic; Boundaries/ is the boundary check |
-| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. A Windows test job, global.json and Stryker are added by chunk 1 (D43, D57, D66) |
+| tests/ | xUnit tests for Logic, Storage and Artwork; Boundaries/ is the boundary check |
+| proof/TopPicksProof/ | Separate tiny proof plugin (never Top Picks Plus), installed before chunk 4 is kept to prove things on the server (D76, D77) |
+| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. A Windows test job, global.json and Stryker are added by chunk 1, the SkiaSharp audit exception by chunk 3, the proof job by chunk 4 (D87) |
 
 ## Building
 Boundary check: tests/TopPicksPlus.Tests/Boundaries (runs on every change; layout approved by the owner 2026-11-08).
