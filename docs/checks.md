@@ -98,7 +98,7 @@ links: [spec.md, decisions.md]
 | C89 | F3 | A movie with two versions becomes a pick: playing its copy plays the version Emby plays by default for the real movie. |
 | C90 | F8 | The report shows the number of plays recorded in the last 7 days, and it goes up after you watch something past halfway and Run now again. |
 | C91 | F6 | [Amended by D93.] (Automatic) Storage half: `listeningSinceUtc` is saved in state.json once and a later save leaves it unchanged; it isn't saved while state.json is damaged. Logic half: it isn't saved while the old plugin is loaded; the import takes plays up to `listeningSinceUtc`, including earlier the same day; next week's window counts those run-day plays once (D91, D93). |
-| C92 | F1 | (Automatic) With run.json damaged and `takeoverDone` true (state.json), start-up starts the missed run 10 minutes later; with `TakeoverDone` false, it doesn't (D90). |
+| C92 | F1 | [Amended by D93.] (Automatic) With run.json damaged and `takeoverDone` true (state.json), start-up starts the missed run 10 minutes later; with `TakeoverDone` false, it doesn't (D90). |
 | C93 | F3 | (Automatic) .strm text is the path alone (UTF-8, no byte-order mark, no line ending); provider IDs are `<uniqueid type="imdb">`; a theme keeps its own extension; a subtitle removed from the source is removed from a staying copy (D90). |
 
 | C94 | F9 | (Automatic) With state.json unreadable, every run refuses with "state damaged"; state.json is not renamed, recreated or rewritten, nothing is deleted, `listeningSinceUtc` isn't saved, and the refusal's detail says to restore state.json from a backup (deleting it would redo the takeover and the import). A missing state.json is not damaged: all three flags start unset (D93). |
@@ -110,9 +110,9 @@ links: [spec.md, decisions.md]
 | C100 | F9 | (Automatic, Storage) managed.json deleted after takeover: the next run adopts the copy folders again and nothing in top-picks is left unmanaged (D95). |
 
 ## Which chunk proves which check (D69)
-- **Chunk 1 – Logic:** C6, C7, C8, C10, C12, C13, C24, C33, C34, C35, C51, C52, C53, C54, C55, C56, C57, C58, C59, C60, C63, C64, C69, C71, C73, C74, C75, C77, C81, C82, C86, C88, the Logic half of C91, C92, C94 (the refusal), C95, C96, C97 (the run and resume rules, D94), the name rules of C80, the plan half of C43, the .strm/.nfo text of C93, and the Logic halves of C26, C28, C29, C61, C62 (D79).
+- **Chunk 1 – Logic:** C6, C7, C8, C10, C12, C13, C24, C33, C34, C35, C51, C52, C53, C54, C55, C56, C57, C58, C59, C60, C63, C64, C69, C71, C73, C74, C75, C77, C81, C82, C86, C88, the Logic half of C91, C92, C94 (the refusal), C95, C96, C97 (the run and resume rules, D94), the name rules of C80, the plan half of C43, the .strm/.nfo text of C93, and the Logic halves of C26, C28, C29, C61, C62 (D79); the pin rules of C68 and the Logic half of C83 (D107).
 - **Chunk 2 – Storage:** C36, C37, C40, C45, C46, C47, C48, C49, C50, C70, C72, C78, C79, C80, C83, the Storage half of C91, C94 (state.json left alone), C95 (only `lastRefusal` written; nothing for data newer), the file half of C43 and C93. C98, C99, C100.
 - **Chunk 3 – Artwork:** C43 (drawing returns "failed"), C65 (samples kept as a CI artifact, D87).
 - **Chunk 4 – EmbyLink:** starts with the proof plugin, whose results (C76, C62 test library) are in before chunk 4 is kept (D76); then only wiring, proved by code review and the go-live checks (D73, D79).
-- **Chunk 5 – Settings and report:** C68; shows the D81 fields (seen on go-live day).
+- **Chunk 5 – Settings and report:** calls the C68 pin rules (tested in chunk 1, D107); shows the D81 fields (seen on go-live day).
 - **Go-live day, on the server (D63, D86):** C1–C5, C9, C11, C14–C23, C25, C27, C30–C32, C38, C39, C41, C42, C44, C61, C66, C67, C84, C85, C87, C89, C90. Order: C44 and C19 first, with both plugins installed and the old one's triggers removed; C18's "Keep me" folder is made before that (D86). C9 means pinning a title and removing it from its real library, and C5 means adding an episode to a series that is a pick, so they use the real libraries on purpose.

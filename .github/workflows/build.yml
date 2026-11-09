@@ -1,25 +1,45 @@
-# D16: build and test on every branch and pull request; a version tag (v1.0.0 etc.)
-# publishes a GitHub Release with TopPicksPlus.dll attached.
+# D16, D87, D115: build and test pull requests (not drafts), pushes to main and v* tags. A version tag (v1.0.0 etc.)
+# publishes a GitHub Release with TopPicksPlus.dll attached. Plain branch pushes don't run (CI minutes cost money):
+# open a pull request, as a draft while work is in progress, and mark it ready when it should build.
 name: build
 
 on:
   push:
-    branches: ['**']
+    branches: [main]
     tags: ['v*']
+    # Docs-only changes don't build. GitHub never applies path filters to tag pushes, so every v* tag still builds.
+    paths-ignore: ['docs/**', '**/*.md']
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore: ['docs/**', '**/*.md']
+
+# A newer push to the same branch or pull request cancels the run still going for the older one.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
   build:
+    # Draft pull requests don't run (D115).
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
+      # D57, D87(b): the SDK comes from global.json (8.0.4xx, latest patch). NuGet packages are cached, keyed on the
+      # project files and tool manifest (every package version is pinned there; there are no lock files).
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: |
+            src/TopPicksPlus/TopPicksPlus.csproj
+            tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj
+            .config/dotnet-tools.json
 
       - name: Work out version
         id: ver
@@ -60,9 +80,20 @@ jobs:
       - name: Check the plugin ships no SkiaSharp (D15)
         shell: bash
         run: |
+          # Any file or folder with "skia" in its name, at any depth (runtimes/*/native too), fails the build.
+          skia_files() { find "$1" -iname '*skia*' -print; }
+          # Prove the check bites (card 0003, B36): a native library hidden in a runtimes folder, and a managed
+          # SkiaSharp.dll next to the plugin, must both be found; a folder with only the plugin must pass.
+          canary="$RUNNER_TEMP/skia-canary"
+          mkdir -p "$canary/clean" "$canary/native/runtimes/win-x64/native" "$canary/managed"
+          touch "$canary/clean/TopPicksPlus.dll" "$canary/native/TopPicksPlus.dll" "$canary/native/runtimes/win-x64/native/libSkiaSharp.dll" "$canary/managed/SkiaSharp.dll"
+          [ -z "$(skia_files "$canary/clean")" ] || { echo "No-SkiaSharp check flags a clean folder"; exit 1; }
+          [ -n "$(skia_files "$canary/native")" ] || { echo "No-SkiaSharp check missed a native SkiaSharp library"; exit 1; }
+          [ -n "$(skia_files "$canary/managed")" ] || { echo "No-SkiaSharp check missed SkiaSharp.dll"; exit 1; }
           out=src/TopPicksPlus/bin/Release/netstandard2.0
-          ls -la "$out"
-          if ls "$out" | grep -qi skia; then echo "SkiaSharp files found next to TopPicksPlus.dll; D15 says it is never shipped"; exit 1; fi
+          ls -laR "$out"
+          found="$(skia_files "$out")"
+          if [ -n "$found" ]; then echo "SkiaSharp files found next to TopPicksPlus.dll; D15 says it is never shipped:"; echo "$found"; exit 1; fi
 
       - name: Check the DLL carries the version
         shell: bash
@@ -77,8 +108,8 @@ jobs:
       - name: Dependency vulnerability audit
         shell: bash
         run: |
-          # Policy: any known-vulnerable package (direct or pulled in) fails the build,
-          # except the named exceptions below, each recorded as a decision.
+          # Policy (D87 b): any known-vulnerable package (direct or pulled in) fails the build, except the named
+          # exceptions below, each recorded as a decision (today only D65/D97). The filter is self-tested below.
           dotnet list src/TopPicksPlus/TopPicksPlus.csproj package --vulnerable --include-transitive | tee audit.txt
           dotnet list tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj package --vulnerable --include-transitive | tee -a audit.txt
           # D65 exception (added by chunk 3, D87 c, D97): SkiaSharp 2.88.3 and SkiaSharp.NativeAssets.* 2.88.3 only.
@@ -100,8 +131,67 @@ jobs:
           path: src/TopPicksPlus/bin/Release/netstandard2.0/TopPicksPlus.dll
           retention-days: 3
 
+  # D43, D66, D87(a), D105: every test on Windows (junction tests run here), then Stryker on Logic and Storage, failing
+  # below 80%. Windows minutes count double, so this job only builds, tests and mutates: no DLL, no audit.
+  test-windows:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Stryker's --since needs the base branch's history.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: |
+            src/TopPicksPlus/TopPicksPlus.csproj
+            tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj
+            .config/dotnet-tools.json
+
+      - name: Restore
+        run: |
+          dotnet restore tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj
+          dotnet tool restore
+
+      - name: Build
+        run: dotnet build tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj -c Release --no-restore
+
+      - name: Tests and boundary check (Windows)
+        run: dotnet test tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj -c Release --no-build --logger "console;verbosity=minimal"
+
+      # D105: pull requests mutate only code changed against the base branch, pushes to main only the merged change;
+      # a v* tag mutates everything. Settings (files, filter, the 80% bar) are in tests/TopPicksPlus.Tests/stryker-config.json.
+      - name: Mutation testing (Stryker, Logic and Storage, 80% or fail)
+        working-directory: tests/TopPicksPlus.Tests
+        run: |
+          case "$GITHUB_EVENT_NAME:$GITHUB_REF" in
+            pull_request:*) since="--since:origin/$GITHUB_BASE_REF" ;;
+            push:refs/heads/main) since="--since:HEAD~1" ;;
+            *) since="" ;;
+          esac
+          echo "Stryker scope: ${since:-full run}"
+          dotnet stryker --config-file stryker-config.json $since --concurrency 4 --output "$GITHUB_WORKSPACE/stryker"
+
+      - name: Keep the Stryker report
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stryker-report-${{ github.run_number }}
+          path: stryker/reports/
+          if-no-files-found: warn
+          retention-days: 7
+
   secrets-scan:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       pull-requests: read
@@ -117,8 +207,9 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build, secrets-scan]
+    needs: [build, test-windows, secrets-scan]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
     steps:

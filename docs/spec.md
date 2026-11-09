@@ -80,7 +80,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 
 ## F7 – Watched status follows the real title
 - When a user watches a copy and Emby marks it as played, the plugin marks the matching source movie or episode as played for that user too. When a user stops part-way, the resume point is copied to the source item. Marking a copy watched or unwatched by hand is copied to the source too (D55).
-- When a copy is created or updated, it takes on each user's played state from the source title, so a copy someone has already seen shows the tick.
+- When a copy is created or updated, it takes on each user's played state from the source title, so a copy someone has already seen shows the tick. This happens in step "dates", after the rescan; the plugin's own write on a copy is not copied back to the source (D103).
 - **Known limitations, accepted by the owner:** the copies appear in search next to the real titles, as they do today; and a user blocked from a whole library still sees that library's titles in the Top Picks row (age ratings still apply, D42).
 
 ## F8 – Settings page and run report (Dashboard → Plugins → Top Picks Plus; administrators only)
