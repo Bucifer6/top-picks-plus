@@ -24,7 +24,7 @@ public static class Counting
     public static (DateTime First, DateTime Last) Window(DateTime runDayUk)
     {
         var day = runDayUk.Date;
-        return (day.AddDays(-WindowDays + 1), day);
+        return (day.AddDays(-WindowDays), day.AddDays(-1));
     }
 
     /// <summary>True if the UK day is inside the 7-day window for the run day.</summary>
@@ -41,7 +41,7 @@ public static class Counting
     /// </summary>
     public static IReadOnlyList<Play> Trim(IEnumerable<Play> plays, DateTime runDayUk)
     {
-        var oldestKept = runDayUk.Date.AddDays(-KeepDays - 1);
+        var oldestKept = runDayUk.Date.AddDays(-KeepDays);
         return plays.Where(p => p.DayUk >= oldestKept).ToList();
     }
 
@@ -77,7 +77,7 @@ public static class Counting
             return true;
         var total = sittings.Sum(p => p.Minutes);
         var runtime = sittings.Select(p => p.RuntimeMinutes).FirstOrDefault(r => r.HasValue && r.Value > 0);
-        return runtime.HasValue ? total > runtime.Value / 2 + 1 : total >= MinutesWhenNoRuntime + 5;
+        return runtime.HasValue ? total >= runtime.Value / 2 : total >= MinutesWhenNoRuntime;
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ public static class Counting
         foreach (var userDay in userDays)
         {
             var counts = userDay
-                .GroupBy(p => 0)
+                .GroupBy(p => p.EpisodeId)
                 .Any(item => Counts(item.ToList()));
             if (!counts)
                 continue;

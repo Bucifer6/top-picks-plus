@@ -245,7 +245,7 @@ public static class RunRules
 
     /// <summary>D78: below 3 resumes started, a resume is planned; at 3, the run fails.</summary>
     public static AfterStop OnAttemptStopped(int resumeCount) =>
-        resumeCount <= MaxResumes ? AfterStop.PlanResume : AfterStop.Fail;
+        resumeCount < MaxResumes ? AfterStop.PlanResume : AfterStop.Fail;
 
     /// <summary>The <c>failReason</c> text for a failed run (D81, D94): always "error" plus the message, never a refusal reason.</summary>
     public static string FailReason(string? message) =>
@@ -285,7 +285,7 @@ public static class RunRules
     public static bool MissedRunDue(DateTime? lastSuccessfulRunUtc, bool takeoverDone, DateTime nowUtc)
     {
         if (!lastSuccessfulRunUtc.HasValue)
-            return false;
+            return takeoverDone;
         return nowUtc - lastSuccessfulRunUtc.Value > MissedRunAge;
     }
 

@@ -103,7 +103,7 @@ public static class Choosing
             c = (y.PremiereDate ?? DateTime.MinValue).CompareTo(x.PremiereDate ?? DateTime.MinValue);
             if (c != 0)
                 return c;
-            return string.CompareOrdinal(x.SourceId.ToString(), y.SourceId.ToString());
+            return x.SourceId.CompareTo(y.SourceId);
         }
     }
 }

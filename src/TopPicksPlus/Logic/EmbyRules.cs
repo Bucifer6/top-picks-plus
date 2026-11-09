@@ -183,7 +183,7 @@ public static class EmbyRules
     /// <summary>D33: exact match on the assembly name (ignoring case) or the ID. Never matches Top Picks Plus itself (C74).</summary>
     public static bool IsOldPlugin(InstalledPlugin plugin)
     {
-        if (plugin.Id == Guid.Empty || string.Equals(plugin.AssemblyName, ThisPluginAssembly, StringComparison.OrdinalIgnoreCase))
+        if (plugin.Id == ThisPluginId || string.Equals(plugin.AssemblyName, ThisPluginAssembly, StringComparison.OrdinalIgnoreCase))
             return false;
         return plugin.Id == OldPluginId || string.Equals(plugin.AssemblyName, OldPluginAssembly, StringComparison.OrdinalIgnoreCase);
     }
@@ -318,7 +318,7 @@ public static class EmbyRules
         var inOrder = true;
         for (var i = 1; i < act.Count; i++)
         {
-            if (act[i] < 0)
+            if (act[i] <= act[i - 1])
                 inOrder = false;
         }
         var passed = inOrder && exp.SequenceEqual(act);

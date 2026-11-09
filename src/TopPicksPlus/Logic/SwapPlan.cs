@@ -170,7 +170,7 @@ public static class SwapPlan
         foreach (var e in drops)
         {
             if (e.State != EntryState.Leaving || e.Rank.HasValue || e.RankDateUtc.HasValue)
-                { }
+                steps.Add(new PlanStep(StepKind.MarkLeaving, e.Folder));
         }
         var changes = pickList
             .Where(p => staying.ContainsKey(p.SourceId))
