@@ -13,6 +13,8 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
+    <!-- D71: junction tests skip with a reason off Windows (xUnit 2 has no runtime skip). Test-only, pinned exactly. -->
+    <PackageReference Include="Xunit.SkippableFact" Version="[1.4.13]" />
   </ItemGroup>
 
   <ItemGroup>

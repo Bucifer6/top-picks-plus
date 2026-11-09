@@ -10,7 +10,7 @@
 - rank times: pick 1 = run time, each pick one hour earlier (F4, card 0001);
 - the first-run takeover rule: a folder counts as the old plugin's if it, including its subfolders, holds at least one .strm and one .nfo (F9, D38); whether a folder name is safe to delete (D37);
 - the text of every .strm and .nfo (D30); the 7-day and 90-day windows (D21); the per-episode 50% rule (D22); the resume plan for an unfinished run (D26);
-- which copies drop out, stay or are new (F4 step 2); whether a copy's date needs resetting (F5); the missed-run rule (F1, including the damaged-run.json case, D90);
+- which copies drop out, stay or are new (F4 step 2); whether a copy's date needs resetting (F5); the missed-run rule (F1, including the damaged-run.json case, D90); whether a run does the takeover, including when managed.json is missing (D123);
 - the order of a run (guards → import → takeover → leftovers → prepare …) and what a resume repeats at each step (D80); counting resumes (D78); which status wins (D84);
 - **the rules behind chunk 4's automatic checks (D79), built in chunk 1:** the default row-check user from a plain user list (D20, C57); the old-plugin match on assembly name or ID (D33, C74); what the old-plugin guard and "data newer" stop (D51, D85, C63, C83); crediting a play through the managed list, then the .strm path (D64, C71); ignoring imported rows whose item has gone; the import window up to `ListeningSinceUtc` (D91); the row-check comparison of ranked copies and its extras (D83);
 - the name rules for file paths inside a copy: relative, plain names, no `.`/`..`, no forbidden characters (D82; Storage does the rest).

@@ -17,3 +17,5 @@ summary: Index of live logbook cards
 | 0012 | insight | boundaries, tests, Logic | The wall check reads string constants as type names |
 | 0013 | method | tests, ci | Deliberate breaks must still compile under warnings-as-errors |
 | 0014 | insight | ci, tests | Stryker --since runs every covered mutant when any test file changes |
+| 0015 | insight | Storage, safety, tests | Windows full-path resolution expands 8.3 short names; a direct-child check alone lets a short name reach another folder |
+| 0016 | build | Storage, ci, tests | Chunk 2 built Storage with tests per check, Windows-only tests proved to run, and 12 rules proved by deliberate breaks |

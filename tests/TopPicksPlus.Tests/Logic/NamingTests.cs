@@ -172,6 +172,25 @@ public class NamingTests
     public void D37_plain_folder_names_pass(string folder) =>
         Assert.Null(PathRules.FolderNameProblem(folder));
 
+    [Fact, Trait("Check", "C51")]
+    public void C51_B39_a_subtitle_suffix_longer_than_the_20_character_allowance_is_not_copied()
+    {
+        // 40 characters after the video name: would push the path past 240 (D106, D122).
+        const string longSuffix = ".English.SDH.forced.hearing-impaired.srt";
+        Assert.Equal(40, longSuffix.Length);
+        Assert.Null(Naming.SubtitleCopyName("Film.mkv", "Film" + longSuffix, "Copy"));
+        // Exactly 20 is allowed; 21 is not.
+        var twenty = ".abcdefghijklmno.srt";
+        Assert.Equal(20, twenty.Length);
+        Assert.Equal("Copy" + twenty, Naming.SubtitleCopyName("Film.mkv", "Film" + twenty, "Copy"));
+        Assert.Null(Naming.SubtitleCopyName("Film.mkv", "Film.abcdefghijklmnop.srt", "Copy"));
+        // So a base name cut to its budget plus any copied subtitle always fits.
+        var root = 60;
+        var budget = Naming.EpisodeNameBudget(root, "F", "Season 1");
+        var copy = Naming.SubtitleCopyName("Film.mkv", "Film" + twenty, new string('x', budget))!;
+        Assert.True(Naming.Fits(root, "F\\Season 1\\" + copy));
+    }
+
     [Fact, Trait("Check", "C70")]
     public void C70_subtitles_keep_their_full_suffix_and_idx_goes_with_sub()
     {

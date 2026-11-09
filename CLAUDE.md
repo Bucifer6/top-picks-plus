@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunk 3 (Artwork) merged. Chunk 1 (Logic) built and reviewed: PR #7 waiting for the owner. Next: chunk 2 Storage, then proof plugin, 4 EmbyLink, 5 Settings (D92).
+**Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunk 3 (Artwork) and chunk 1 (Logic) merged. Chunk 2 (Storage) built and reviewed: PR #8 waiting for the owner. Next: the proof plugin, then 4 EmbyLink, 5 Settings (D92).
 **CI budget:** public repo since 2026-11-09, so Actions minutes are free; still keep runs lean (CI runs only on non-draft PRs, main and v* tags). Everything committed is public: never commit secrets, and keep personal details out of new docs.
 
 ## Rules
@@ -16,7 +16,7 @@ Follows the build-software-safely method: talk and docs first, no code before th
 ## Docs
 - docs/spec.md – what it does (F1–F10, v7)
 - docs/checks.md – how the owner tests it (C1–C100)
-- docs/decisions.md – what's decided (D1–D116) and what's still open
+- docs/decisions.md – what's decided (D1–D128) and what's still open
 - docs/data.md – settings, plugin flags (state.json), managed list, play log, run record
 - docs/backlog.md – findings set aside for the chunk that deals with them; each chunk's builder fixes or decides its items
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
