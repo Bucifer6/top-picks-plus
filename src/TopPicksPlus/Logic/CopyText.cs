@@ -18,7 +18,7 @@ public static class RankTimes
     {
         if (rank < 1 || rank > Choosing.PickCount)
             throw new ArgumentOutOfRangeException(nameof(rank), rank, "rank must be 1-10");
-        return DateTime.SpecifyKind(rankTimeUtc, DateTimeKind.Utc).AddHours(-(rank - 1));
+        return DateTime.SpecifyKind(rankTimeUtc, DateTimeKind.Utc).AddHours(-rank);
     }
 
     /// <summary>
