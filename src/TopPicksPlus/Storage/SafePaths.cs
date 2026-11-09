@@ -20,8 +20,6 @@ internal static class SafePaths
     public static string Full(string path) =>
         Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-    public static bool SamePath(string a, string b) => string.Equals(Full(a), Full(b), PathCase);
-
     /// <summary>True if the file or folder exists and is a junction, symbolic link or other reparse point.</summary>
     public static bool IsLink(string path)
     {
@@ -212,7 +210,10 @@ internal static class SafePaths
     [ThreadStatic]
     internal static Action<string>? BeforeReplace;
 
-    /// <summary>Temp files written by <see cref="WriteAtomic"/> end in this; a stop can leave one, removed by the next save's clean-up.</summary>
+    /// <summary>
+    /// Temp files written by <see cref="WriteAtomic"/> end in this. Only a power cut between writing and renaming can leave one;
+    /// it is never read as data (a load reads only the real file name), and emptying staging removes any there.
+    /// </summary>
     public const string TempSuffix = ".tpp-tmp";
 
     /// <summary>

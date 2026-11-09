@@ -251,8 +251,6 @@ public sealed class CopyFolders
     public void CopyIntoStaging(string folder, string relativePath, string sourceFile) =>
         WriteStagingFile(folder, relativePath, File.ReadAllBytes(sourceFile));
 
-    public bool StagingHas(string folder) => CheckedFolder(Staging, folder, out _) is string f && Directory.Exists(f);
-
     // ---------------- Carrying out Logic's plans (D26, D39, D40, D43, D101) ----------------
 
     /// <summary>
