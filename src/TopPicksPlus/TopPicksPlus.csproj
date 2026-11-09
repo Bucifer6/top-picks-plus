@@ -17,6 +17,29 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- D15, D34: SkiaSharp 2.88.3 exactly, the copy Emby 4.10.2 loads. Compiled against, never shipped:
+         no runtime or native files are copied, and nothing flows on to projects that reference this one. -->
+    <PackageReference Include="SkiaSharp" Version="[2.88.3]" ExcludeAssets="runtime;native" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- D65: GHSA-j7hp-h8jx-5ppr (libwebp in SkiaSharp before 2.88.6) is accepted because the plugin draws with
+         Emby's own SkiaSharp and ships none; only this advisory is ignored at restore. See D97. -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-j7hp-h8jx-5ppr" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- D62: the Anton font and its SIL OFL 1.1 licence travel inside the DLL. -->
+    <EmbeddedResource Include="Artwork/Anton-Regular.ttf" LogicalName="TopPicksPlus.Artwork.Anton-Regular.ttf" />
+    <EmbeddedResource Include="Artwork/OFL.txt" LogicalName="TopPicksPlus.Artwork.OFL.txt" />
+    <None Remove="Artwork/Anton-Regular.ttf;Artwork/OFL.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TopPicksPlus.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="**/README.md" />
   </ItemGroup>
 

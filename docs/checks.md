@@ -71,7 +71,7 @@ links: [spec.md, decisions.md]
 | C62 | F4 | [Amended by D76.] (Proof plugin part (c), before chunk 4 is kept, D50, D67, D76) In a throwaway test library, the proof plugin writes one .nfo dated in summer time and one in winter time: after a metadata refresh, Emby shows the same date added. Plus (Automatic, chunk 1) a run on a clock-change Sunday writes each pick's local time with its own offset. |
 | C63 | F9 | (Automatic) With the old plugin loaded , no plays are logged and no watched state is copied (D51). |
 | C64 | Boundary | (Automatic) Logic may use names that only start like a forbidden one (e.g. `System.IObservable<T>`): the boundary check doesn't fail on them. |
-| C65 | F3 | Before the first artwork chunk is kept, look at three sample pictures (with a logo, without a logo, rank 10): they look like today's row in docs/reference/artwork/ (D62). |
+| C65 | F3 | Before the first artwork chunk is kept, look at three sample pictures (with a logo, without a logo, rank 10): they look like today's row in docs/reference/artwork/ (D62). **Approved by the owner 2026-11-08** (samples from CI run 42503121978). The later capitals change (D100) changes only the title case on the no-logo samples; the layout is unchanged. |
 | C66 | F10 | Go-live: Top Picks Plus shows in Dashboard → Plugins on Emby 4.10.2 with its version (D14). |
 | C67 | F8 | [Amended by D79.] (Go-live, plus code review) Signed in as a non-administrator, you can't open the settings page or use Run now or the report. |
 | C68 | F8 | (Automatic) The settings page refuses an 11th pin, a duplicate pin, and an episode or collection (D61, D74). |
