@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using TopPicksPlus.Logic;
 using TopPicksPlus.Storage;
 using Xunit;
@@ -106,9 +105,11 @@ public class SafePathsTests
         var f = Path.Combine(s.Outside, "x.json");
         SafePaths.WriteAtomic(f, new byte[] { 1 });
         var held = new FileStream(f, FileMode.Open, FileAccess.Read, FileShare.Read);
-        var release = Task.Run(() => { Thread.Sleep(120); held.Dispose(); });
+        // A dedicated thread (not the busy test thread pool) lets go of the file 150 ms after the save starts trying.
+        var release = new Thread(() => { Thread.Sleep(150); held.Dispose(); });
+        release.Start();
         SafePaths.WriteAtomic(f, new byte[] { 2 });
-        release.Wait();
+        release.Join();
         Assert.Equal(new byte[] { 2 }, File.ReadAllBytes(f));
         Assert.Single(Directory.GetFiles(s.Outside));
     }

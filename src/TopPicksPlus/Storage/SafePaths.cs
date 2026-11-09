@@ -240,16 +240,17 @@ internal static class SafePaths
             catch (IOException) when (attempt < ReplaceAttempts && File.Exists(temp))
             {
                 // Windows can refuse for a moment while another program (a virus scanner, say) has the file open.
-                System.Threading.Thread.Sleep(50 * attempt);
+                System.Threading.Thread.Sleep(100 * attempt);
             }
             catch (UnauthorizedAccessException) when (attempt < ReplaceAttempts && File.Exists(temp))
             {
-                System.Threading.Thread.Sleep(50 * attempt);
+                System.Threading.Thread.Sleep(100 * attempt);
             }
         }
     }
 
-    private const int ReplaceAttempts = 5;
+    /// <summary>Tries before a save gives up: waits of 0.1 to 0.6 s, about 2 s in all.</summary>
+    private const int ReplaceAttempts = 7;
 
     private static void ReplaceOnce(string temp, string full)
     {
