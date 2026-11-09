@@ -138,6 +138,13 @@ internal static class SafePaths
     /// </summary>
     public static void DeleteTree(string folderFull)
     {
+        // D126: checked again here, at the moment of deleting. A folder swapped for a junction or link after the D37 check is
+        // removed as a link; its target is never entered.
+        if (IsLink(folderFull))
+        {
+            RemoveLink(new DirectoryInfo(folderFull));
+            return;
+        }
         foreach (var entry in new DirectoryInfo(folderFull).EnumerateFileSystemInfos())
         {
             if ((entry.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
@@ -182,7 +189,8 @@ internal static class SafePaths
     /// old file in one step, so a stop at any moment leaves either the old file or the new one, never half of one. The temp name is
     /// unique, so two writers never share it.
     /// </summary>
-    public static void WriteAtomic(string full, byte[] bytes)
+    /// <param name="backupFull">If set, the old file is kept under this name in the same single replace (D127); else it is gone.</param>
+    public static void WriteAtomic(string full, byte[] bytes, string? backupFull = null)
     {
         var dir = Path.GetDirectoryName(full) ?? throw new IOException("no folder for " + full);
         var temp = Path.Combine(dir, Path.GetFileName(full) + "." + Guid.NewGuid().ToString("N") + TempSuffix);
@@ -194,12 +202,19 @@ internal static class SafePaths
                 stream.Flush(flushToDisk: true);
             }
             BeforeReplace?.Invoke(full);
-            Replace(temp, full);
+            Replace(temp, full, backupFull);
         }
         finally
         {
-            if (File.Exists(temp))
-                File.Delete(temp);
+            // Clean-up must never hide the real error (or turn a success into a failure): a temp file left behind is harmless.
+            try
+            {
+                if (File.Exists(temp))
+                    File.Delete(temp);
+            }
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+            {
+            }
         }
     }
 
@@ -228,13 +243,13 @@ internal static class SafePaths
         return copy.ToArray();
     }
 
-    private static void Replace(string temp, string full)
+    private static void Replace(string temp, string full, string? backupFull)
     {
         for (var attempt = 1; ; attempt++)
         {
             try
             {
-                ReplaceOnce(temp, full);
+                ReplaceOnce(temp, full, backupFull);
                 return;
             }
             catch (IOException) when (attempt < ReplaceAttempts && File.Exists(temp))
@@ -252,11 +267,11 @@ internal static class SafePaths
     /// <summary>Tries before a save gives up: waits of 0.1 to 0.6 s, about 2 s in all.</summary>
     private const int ReplaceAttempts = 7;
 
-    private static void ReplaceOnce(string temp, string full)
+    private static void ReplaceOnce(string temp, string full, string? backupFull)
     {
         if (File.Exists(full))
         {
-            File.Replace(temp, full, destinationBackupFileName: null, ignoreMetadataErrors: true);
+            File.Replace(temp, full, destinationBackupFileName: backupFull, ignoreMetadataErrors: true);
             return;
         }
         try

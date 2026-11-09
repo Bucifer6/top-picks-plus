@@ -175,7 +175,7 @@ jobs:
           notpassed=$(grep -oE 'testName="[^"]*_(junction|windows)[^"]*" [^>]*outcome="[A-Za-z]+"' "$trx" | grep -v 'outcome="Passed"' || true)
           echo "Junction tests passed on Windows: $ran"
           [ -z "$notpassed" ] || { echo "Junction tests that did not pass:"; echo "$notpassed"; exit 1; }
-          [ "$ran" -ge 8 ] || { echo "Expected at least 8 junction tests to run and pass on Windows, found $ran"; exit 1; }
+          [ "$ran" -ge 11 ] || { echo "Expected at least 11 junction tests to run and pass on Windows, found $ran"; exit 1; }
 
       # D105: pull requests mutate only code changed against the base branch, pushes to main only the merged change;
       # a v* tag mutates everything. Settings (files, filter, the 80% bar) are in tests/TopPicksPlus.Tests/stryker-config.json.

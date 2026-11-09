@@ -362,8 +362,14 @@ public sealed class CopyFolders
     private string? AddIncoming(PlanStep s, Func<ManagedEntry, CopyContents?>? newCopyContents)
     {
         var entry = s.Entry ?? throw new InvalidOperationException("AddIncoming needs its entry");
-        if (CheckedFolder(TopPicks, entry.Folder, out var problem) == null)
+        var full = CheckedFolder(TopPicks, entry.Folder, out var problem);
+        if (full == null)
             return problem;
+        // D126: a folder already in top-picks that isn't on the list is someone else's (the owner's): never take it over, or the
+        // move-in would count it as moved in and a later drop-out would delete it. On a resume the entry is already listed.
+        var listed = _data.ManagedForWork().Any(e => Names.Equals(e.Folder, entry.Folder));
+        if (!listed && SafePaths.Exists(full))
+            return "folder already exists and is not on the managed list";
         var contents = entry.Items.Count == 0 && entry.Files.Count == 0 ? newCopyContents?.Invoke(entry) : null;
         if (contents != null)
             entry = WithFiles(entry, contents.Items.Select(kv => new KeyValuePair<string, long?>(kv.Key, kv.Value)), contents.Files);

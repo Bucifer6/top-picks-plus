@@ -187,7 +187,8 @@ public sealed class DataFolder
             }
             catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException)
             {
-                continue;
+                // D128: a file that can't be opened at all might be newer, so nothing is written; it counts as damaged.
+                throw new DamagedFileException(Path.GetFileName(path));
             }
             var v = Json.Version(text);
             if (v.HasValue && v.Value > CurrentVersion)
@@ -227,8 +228,11 @@ public sealed class DataFolder
         }
     }
 
-    /// <summary>Replaces managed.json with these entries (still refused over a damaged or newer file).</summary>
-    public void SaveManaged(IEnumerable<ManagedEntry> entries) => UpdateManaged(_ => entries.ToList());
+    /// <summary>
+    /// Replaces managed.json with these entries (still refused over a damaged or newer file). Tests only: the plugin changes
+    /// managed.json through <see cref="UpdateManaged"/>, a read-modify-write of the file as it is on disk (D120).
+    /// </summary>
+    internal void SaveManaged(IEnumerable<ManagedEntry> entries) => UpdateManaged(_ => entries.ToList());
 
     /// <summary>Changes plays.json as it is on disk and saves it. A damaged plays.json must be set aside first (D32).</summary>
     public PlayLog UpdatePlays(Func<PlayLog, PlayLog> change)
@@ -329,7 +333,7 @@ public sealed class DataFolder
             {
                 UpdateRun(r => r.LastRefusal = new RefusalRecord { Time = Json.Utc(nowUtc), Reason = reason, Detail = detail });
             }
-            catch (DataNewerException)
+            catch (Exception e) when (e is DataNewerException || e is DamagedFileException)
             {
                 return false;
             }
@@ -455,8 +459,11 @@ public sealed class DataFolder
                     : Json.Utc(nowUtc),
             };
             setAsideName = SafePaths.FreeName(Root, StateFileName + ".damaged-" + Json.Utc(nowUtc).ToString("yyyyMMdd'T'HHmmss'Z'", CultureInfo.InvariantCulture), string.Empty);
-            File.Move(StatePath, Path.Combine(Root, setAsideName));
-            Save(StatePath, state);
+            // D127: one step. The rebuilt file replaces state.json and the damaged one is kept under its new name in the same
+            // replace, so a stop at any moment leaves either the damaged state.json (rebuilt again next time) or the new one.
+            state.Version = CurrentVersion;
+            EnsureNothingNewer();
+            SafePaths.WriteAtomic(StatePath, Json.Utf8.GetBytes(Json.Write(state)), Path.Combine(Root, setAsideName));
         }
         AddNotice("stateRebuilt", "state.json couldn't be read; renamed to " + setAsideName + " and rebuilt from the other files", nowUtc);
         return RebuildOutcome.Rebuilt;
@@ -479,7 +486,7 @@ public sealed class DataFolder
             {
                 UpdateState(s => s.ListeningSinceUtc = Json.Utc(utc));
             }
-            catch (DataNewerException)
+            catch (Exception e) when (e is DataNewerException || e is DamagedFileException)
             {
                 return false;
             }
