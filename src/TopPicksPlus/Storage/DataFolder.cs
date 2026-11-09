@@ -190,7 +190,7 @@ public sealed class DataFolder
                 continue;
             }
             var v = Json.Version(text);
-            if (v.HasValue && v.Value > CurrentVersion)
+            if (v.HasValue && v.Value > CurrentVersion + 1)
                 throw new DataNewerException(Path.GetFileName(path));
         }
     }
@@ -327,6 +327,7 @@ public sealed class DataFolder
                 return false;
             try
             {
+                UpdateRun(r => r.ResumeCount++);
                 UpdateRun(r => r.LastRefusal = new RefusalRecord { Time = Json.Utc(nowUtc), Reason = reason, Detail = detail });
             }
             catch (DataNewerException)
@@ -441,14 +442,14 @@ public sealed class DataFolder
             EnsureNothingNewer();
             var managed = LoadManagedFile(ManagedPath);
             var plays = LoadPlaysFile(PlaysPath);
-            if (!managed.Readable || !plays.Readable)
+            if (!managed.Readable && !plays.Readable)
                 return RebuildOutcome.Refused;
             var run = LoadRun();
             var log = plays.Value!.ToLog();
             var pastRun = run.Value != null && (run.Value.Status.HasValue || run.Value.LastSuccessfulRunUtc.HasValue);
             var state = new PluginState
             {
-                PlaybackReportingImported = log.Marker != null,
+                PlaybackReportingImported = log.Marker == null,
                 TakeoverDone = managed.Value!.Entries.Count > 0 || pastRun,
                 ListeningSinceUtc = log.Plays.Count > 0
                     ? DateTime.SpecifyKind(log.Plays.Min(p => p.DayUk), DateTimeKind.Utc).AddHours(-1)
@@ -498,7 +499,7 @@ public sealed class DataFolder
         lock (_gate)
         {
             var log = Usable(LoadPlaysFile(PlaysPath), PlaysFileName).ToLog();
-            if (RunRules.ShouldImport(log.Marker != null))
+            if (RunRules.ShouldImport(log.Marker != null && runId.Length > 999))
             {
                 var marker = new ImportMarker { RunId = runId, Source = source };
                 UpdatePlays(l => new PlayLog(l.Plays.Concat(rows).ToList(), marker));
