@@ -342,6 +342,8 @@ public class DeleteTests
         var dir = s.Folder("Long folder name (2020)", "x.strm");
         var shortName = ShortNames.Make(dir, "LONGFO~1");
         Skip.If(shortName == null, "this volume has no 8.3 short names, so a short name can't reach anything here");
+        var resolves = Directory.Exists(Path.Combine(s.TopPicks, shortName!));
+        Skip.IfNot(resolves, "short name '" + shortName + "' was reported but doesn't open the folder on this volume, so it can't reach anything");
         s.Data.UpdateRun(_ => { });
         s.Data.SaveManaged(new[] { Listed(shortName!) });
 

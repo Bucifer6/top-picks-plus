@@ -27,15 +27,10 @@ public class RefusalTests
         return s;
     }
 
-    private static readonly string[] Files = { DataFolder.ManagedFileName, DataFolder.PlaysFileName, DataFolder.RunFileName, DataFolder.StateFileName };
-
-    public static TheoryData<string> EachFile()
+    public static TheoryData<string> EachFile => new TheoryData<string>
     {
-        var d = new TheoryData<string>();
-        foreach (var f in Files)
-            d.Add(f);
-        return d;
-    }
+        DataFolder.ManagedFileName, DataFolder.PlaysFileName, DataFolder.RunFileName, DataFolder.StateFileName,
+    };
 
     private static void MakeNewer(Sandbox s, string file)
     {
