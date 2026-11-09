@@ -14,7 +14,7 @@ Still nothing on the owner's server.
 
 ## Watch out for
 - **Draft pull requests don't run CI any more (D115).** Open as draft if the permission check insists, then mark it ready, or nothing builds.
-- **CI minutes (owner pays):** a PR run costs about 11 billed minutes (Windows counts double); a PR that changes tests is a full Stryker run (card 0014). Keep pushes few; dotnet can't run here, so CI is the only build.
+- **The repo is public (owner, 2026-11-09):** Actions minutes are free, but everything committed is readable by anyone. Never commit secrets or new personal details. A PR that changes tests is a full Stryker run (card 0014); dotnet can't run here, so CI is the only build.
 - **Deliberate breaks must compile** (card 0013): warnings are errors, so change a number, not `if (false)`.
 - **Walled modules: no namespace-looking string constants** (card 0012), or the wall check fails.
 - **No backup (D95, owner).** A damaged state.json is rebuilt from the other files; a damaged managed.json is deleted by the owner and the copies are adopted again. Never write "restore from backup": the owner chose not to keep one.
@@ -25,7 +25,6 @@ Still nothing on the owner's server.
 
 ## Waiting on the owner
 - Merge #7.
-- Optional: keep or drop the Windows test job (about 11 minutes per PR run). Claude kept it.
 
 ## Next job
 Build chunk 2 (Storage). Read first: CLAUDE.md, src/TopPicksPlus/Storage/README.md, docs/data.md, docs/decisions.md (D24, D32, D37, D38, D43, D80–D82, D85, D93–D96, D101–D116), docs/checks.md chunk 2 list, docs/backlog.md Storage rows.

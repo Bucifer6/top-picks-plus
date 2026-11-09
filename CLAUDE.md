@@ -5,7 +5,7 @@
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
 **Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunk 3 (Artwork) merged. Chunk 1 (Logic) built and reviewed: PR #7 waiting for the owner. Next: chunk 2 Storage, then proof plugin, 4 EmbyLink, 5 Settings (D92).
-**CI budget:** private repo; the owner pays for Actions minutes. CI runs only on non-draft PRs, main and v* tags; about 11 billed minutes per PR run (Windows counts double). Keep pushes few.
+**CI budget:** public repo since 2026-11-09, so Actions minutes are free; still keep runs lean (CI runs only on non-draft PRs, main and v* tags). Everything committed is public: never commit secrets, and keep personal details out of new docs.
 
 ## Rules
 Follows the build-software-safely method: talk and docs first, no code before the readiness gate; the owner makes big decisions; reviews come from fresh agents; one job per session with a handover in docs/handover/.
