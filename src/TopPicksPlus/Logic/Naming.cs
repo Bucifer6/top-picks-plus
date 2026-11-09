@@ -208,7 +208,9 @@ public static class Naming
 
     /// <summary>
     /// A subtitle's name in the copy (D55): everything after the source video's name is kept, so <c>Film.en.forced.srt</c>
-    /// next to <c>Film.mkv</c> becomes <c>&lt;copy&gt;.en.forced.srt</c>. Null if the file isn't a subtitle of that video.
+    /// next to <c>Film.mkv</c> becomes <c>&lt;copy&gt;.en.forced.srt</c>. Null if the file isn't a subtitle of that video, or if
+    /// its suffix is longer than the <see cref="SuffixAllowance"/> every base name leaves free (D106, D122, B39): such a subtitle
+    /// is not copied, so no path ever passes 240 characters. Cutting the suffix would break its language and forced tags.
     /// </summary>
     public static string? SubtitleCopyName(string sourceVideoFileName, string sourceSubtitleFileName, string copyBaseName)
     {
@@ -219,6 +221,8 @@ public static class Naming
         if (!sourceSubtitleFileName.StartsWith(videoBase + ".", StringComparison.OrdinalIgnoreCase))
             return null;
         var suffix = sourceSubtitleFileName.Substring(videoBase.Length);
+        if (suffix.Length > SuffixAllowance)
+            return null;
         return copyBaseName + suffix;
     }
 }

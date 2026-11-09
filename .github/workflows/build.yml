@@ -163,8 +163,19 @@ jobs:
       - name: Build
         run: dotnet build tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj -c Release --no-restore
 
+      # D43, D71, card 0003: junction tests skip off Windows, so prove here that they ran and passed. The trx log lists each
+      # test's outcome; any test whose name ends in "_junction" that was skipped or missing fails the job.
       - name: Tests and boundary check (Windows)
-        run: dotnet test tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj -c Release --no-build --logger "console;verbosity=minimal"
+        run: dotnet test tests/TopPicksPlus.Tests/TopPicksPlus.Tests.csproj -c Release --no-build --logger "console;verbosity=minimal" --logger "trx;LogFileName=windows.trx" --results-directory "$RUNNER_TEMP/trx"
+
+      - name: Junction tests ran and passed on Windows (D43)
+        run: |
+          trx="$RUNNER_TEMP/trx/windows.trx"
+          ran=$(grep -oE 'testName="[^"]*_junction[^"]*" [^>]*outcome="Passed"' "$trx" | wc -l)
+          notpassed=$(grep -oE 'testName="[^"]*_junction[^"]*" [^>]*outcome="[A-Za-z]+"' "$trx" | grep -v 'outcome="Passed"' || true)
+          echo "Junction tests passed on Windows: $ran"
+          [ -z "$notpassed" ] || { echo "Junction tests that did not pass:"; echo "$notpassed"; exit 1; }
+          [ "$ran" -ge 7 ] || { echo "Expected at least 7 junction tests to run and pass on Windows, found $ran"; exit 1; }
 
       # D105: pull requests mutate only code changed against the base branch, pushes to main only the merged change;
       # a v* tag mutates everything. Settings (files, filter, the 80% bar) are in tests/TopPicksPlus.Tests/stryker-config.json.
@@ -173,7 +184,8 @@ jobs:
         run: |
           case "$GITHUB_EVENT_NAME:$GITHUB_REF" in
             pull_request:*) since="--since:origin/$GITHUB_BASE_REF" ;;
-            push:refs/heads/main) since="--since:HEAD~1" ;;
+            # The merge commit's first parent is main before the merge (HEAD~1 alone isn't a ref Stryker can resolve).
+            push:refs/heads/main) since="--since:$(git rev-parse HEAD~1)" ;;
             *) since="" ;;
           esac
           echo "Stryker scope: ${since:-full run}"

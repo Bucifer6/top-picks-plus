@@ -313,6 +313,14 @@ public static class RunRules
     public static RunStep FirstStep(bool playbackReportingImported, bool takeoverDone) =>
         !playbackReportingImported ? RunStep.Import : !takeoverDone ? RunStep.Takeover : RunStep.Leftovers;
 
+    /// <summary>
+    /// Whether a run does the takeover step (D38, D95, D123, B40): while <c>takeoverDone</c> is false, and also when managed.json
+    /// is missing although <c>takeoverDone</c> is true (the owner deleted a damaged managed.json), so the copies in top-picks are
+    /// adopted again and nothing is left unmanaged (C100). Pass <c>!TakeoverNeeded(...)</c> as <c>takeoverDone</c> to
+    /// <see cref="FirstStep"/> and <see cref="NextStep"/>.
+    /// </summary>
+    public static bool TakeoverNeeded(bool takeoverDone, bool managedMissing) => !takeoverDone || managedMissing;
+
     /// <summary>The step after <paramref name="step"/> (D80). Takeover is skipped when already done.</summary>
     public static RunStep NextStep(RunStep step, bool takeoverDone)
     {

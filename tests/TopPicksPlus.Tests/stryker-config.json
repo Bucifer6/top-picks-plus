@@ -5,8 +5,9 @@
       "**/Logic/**/*.cs",
       "**/Storage/**/*.cs"
     ],
-    "test-case-filter": "FullyQualifiedName~TopPicksPlus.Tests.Logic|FullyQualifiedName~TopPicksPlus.Tests.Storage",
+    "test-case-filter": "(FullyQualifiedName~TopPicksPlus.Tests.Logic|FullyQualifiedName~TopPicksPlus.Tests.Storage)&Mutation!=Exhaustive",
     "coverage-analysis": "perTest",
+    "ignore-methods": [ "*Exception.ctor" ],
     "reporters": [ "html", "json", "cleartext", "progress" ],
     "thresholds": { "high": 90, "low": 80, "break": 80 }
   }

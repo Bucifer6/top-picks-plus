@@ -311,6 +311,17 @@ public class RunRulesTests
 
     // ---- The order of a run ----
 
+    [Fact, Trait("Check", "C100")]
+    public void C100_B40_takeover_is_needed_until_done_and_again_when_managed_json_is_missing()
+    {
+        Assert.True(RunRules.TakeoverNeeded(takeoverDone: false, managedMissing: false));
+        Assert.True(RunRules.TakeoverNeeded(takeoverDone: false, managedMissing: true));
+        Assert.True(RunRules.TakeoverNeeded(takeoverDone: true, managedMissing: true));
+        Assert.False(RunRules.TakeoverNeeded(takeoverDone: true, managedMissing: false));
+        Assert.Equal(RunStep.Takeover, RunRules.FirstStep(true, !RunRules.TakeoverNeeded(true, true)));
+        Assert.Equal(RunStep.Takeover, RunRules.NextStep(RunStep.Import, !RunRules.TakeoverNeeded(true, true)));
+    }
+
     [Fact, Trait("Check", "C36")]
     public void Run_order_is_import_takeover_leftovers_prepare_then_the_swap_steps()
     {

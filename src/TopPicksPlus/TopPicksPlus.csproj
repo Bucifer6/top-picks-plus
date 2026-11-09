@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- D24: System.Text.Json 8.0.6 exactly, used only by Storage. Compiled against, never shipped: Emby 4.10.2 runs on .NET 8,
+         whose shared framework always has System.Text.Json 8. -->
+    <PackageReference Include="System.Text.Json" Version="[8.0.6]" ExcludeAssets="runtime;native" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- D15, D34: SkiaSharp 2.88.3 exactly, the copy Emby 4.10.2 loads. Compiled against, never shipped:
          no runtime or native files are copied, and nothing flows on to projects that reference this one. -->
     <PackageReference Include="SkiaSharp" Version="[2.88.3]" ExcludeAssets="runtime;native" PrivateAssets="all" />
