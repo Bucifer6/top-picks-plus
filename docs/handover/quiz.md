@@ -1,6 +1,6 @@
 # Handover quiz (answer from current.md alone; do not open answers.md)
-1. Which two pull requests are waiting, in what order must they be merged, and what does each hold?
-2. What is the Stage 5 gate now, and what happens to review findings below Blocker?
-3. Which three CI additions does chunk 1 owe, and why weren't they added already?
-4. What happens when the plugin's state.json or managed.json is damaged, and what must never be added to the docs about it?
-5. How do you get sample pictures in front of the owner from this workspace?
+1. Which pull request is waiting, and what does it hold?
+2. Why might a pushed commit show no CI run, and when is that fine?
+3. Which backlog rows must the Storage builder handle first, and what does B40 ask?
+4. What happens when state.json or managed.json is damaged, and what must never be written about it, and why?
+5. Name two rules for a deliberate-break commit or a walled module that cost a CI run to learn.
