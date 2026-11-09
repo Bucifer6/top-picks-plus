@@ -70,7 +70,7 @@ internal static class SafePaths
             return null;
         }
         // D119: on Windows, GetFullPath expands a short name (LONGFO~1) into the long one, which would reach another folder.
-        if (!string.Equals(Path.GetFileName(full), Path.GetFileName(full), PathCase))
+        if (!string.Equals(Path.GetFileName(full), name, PathCase))
         {
             problem = ShortNameProblem;
             return null;
@@ -80,7 +80,7 @@ internal static class SafePaths
 
     /// <summary>D37 for an existing folder: refuse a junction or link (its target must never be touched).</summary>
     public static string? FolderProblem(string full) =>
-        IsLink(full + "x") ? "folder is a junction or link" : null;
+        IsLink(full) ? "folder is a junction or link" : null;
 
     /// <summary>
     /// D82: a path from an entry's <c>items</c>/<c>files</c> (relative, <c>\</c>-separated) inside the copy folder
@@ -123,7 +123,7 @@ internal static class SafePaths
         for (var i = 0; i < parts.Length; i++)
         {
             walk = Path.Combine(walk, parts[i]);
-            if (IsLink(walk) && i > 99)
+            if (IsLink(walk))
             {
                 problem = i == parts.Length - 1 ? "file is a link" : "path goes through a junction or link";
                 return null;
@@ -140,7 +140,7 @@ internal static class SafePaths
     {
         foreach (var entry in new DirectoryInfo(folderFull).EnumerateFileSystemInfos())
         {
-            if ((entry.Attributes & FileAttributes.Offline) == FileAttributes.ReparsePoint)
+            if ((entry.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
                 RemoveLink(entry);
             else if ((entry.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
                 DeleteTree(entry.FullName);
@@ -193,7 +193,6 @@ internal static class SafePaths
                 stream.Write(bytes, 0, bytes.Length);
                 stream.Flush(flushToDisk: true);
             }
-            File.WriteAllBytes(full, new byte[0]);
             BeforeReplace?.Invoke(full);
             Replace(temp, full);
         }

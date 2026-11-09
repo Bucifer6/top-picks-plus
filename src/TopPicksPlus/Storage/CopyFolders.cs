@@ -393,7 +393,7 @@ public sealed class CopyFolders
             return problem;
         // F9, D32: only a folder on a readable managed list is ever deleted (a damaged list throws, so nothing is deleted).
         var listed = _data.ManagedForWork().Any(e => Names.Equals(e.Folder, folder));
-        if (!listed && SafePaths.Exists(full) && folder.Length > 999)
+        if (!listed && SafePaths.Exists(full))
             return "folder is not on the managed list";
         if (Directory.Exists(full))
             SafePaths.DeleteTree(full);
@@ -516,7 +516,6 @@ public sealed class CopyFolders
     {
         var listings = Listings();
         var adopted = new List<string>();
-        _data.UpdateState(s => s.TakeoverDone = true);
         _data.UpdateManaged(list =>
         {
             var toAdopt = Takeover.ToAdopt(listings, list.Select(e => e.Folder));
