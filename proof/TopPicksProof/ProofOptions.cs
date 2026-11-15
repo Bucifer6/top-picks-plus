@@ -14,15 +14,7 @@ public class ProofOptions : EditableOptionsBase
 
     public override string EditorDescription =>
         "Temporary proof for Top Picks Plus. It never touches the Top Picks folder or row and deletes nothing. "
-        + "Fill in the two files, tick the box, press Save, then close this page and open it again to see the results.";
-
-    public CaptionItem CaptionLastPlayed { get; set; } = new CaptionItem("Last played date");
-
-    [DisplayName("A video you last watched in summer")]
-    [Description("Pick the file of a film or episode you last watched before 26 October 2026 and not since, "
-        + "and note the time Playback Reporting shows for that play.")]
-    [EditFilePicker]
-    public string LastPlayedFile { get; set; } = string.Empty;
+        + "Pick a movie file, tick the box, press Save, then close this page and open it again to see the results.";
 
     public CaptionItem CaptionDateAdded { get; set; } = new CaptionItem("Date added from .nfo files");
 

@@ -32,7 +32,7 @@ public sealed class ProofPlugin : BasePluginSimpleUI<ProofOptions>
     // Runs each time the page opens, so the results are always fresh and nothing is kept between openings.
     protected override ProofOptions OnBeforeShowUI(ProofOptions options)
     {
-        options.Results = proofs.Report(options, Version);
+        options.Results = proofs.Report(Version);
         logger.Info("Top Picks Proof results:\n{0}", options.Results);
         return options;
     }

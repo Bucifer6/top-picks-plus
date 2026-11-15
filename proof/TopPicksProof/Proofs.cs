@@ -8,7 +8,6 @@ using MediaBrowser.Common;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
-using MediaBrowser.Model.Querying;
 
 namespace TopPicksProof;
 
@@ -30,7 +29,7 @@ internal sealed class Proofs
 
     private string ProofRoot => Path.Combine(host.Resolve<IApplicationPaths>().DataPath, "top-picks-proof");
 
-    public string Report(ProofOptions options, Version pluginVersion)
+    public string Report(Version pluginVersion)
     {
         var text = new StringBuilder();
         text.AppendLine("TOP PICKS PROOF RESULTS");
@@ -38,8 +37,7 @@ internal sealed class Proofs
         text.AppendLine("2. Playback Reporting file: not read. The pinned Emby SDK (4.9.1.90) has no SQLite library to compile against, "
             + "so the first week comes from each person's last played dates instead (D25, D129).");
         text.AppendLine();
-        text.AppendLine(Part("3. Last played date", () => LastPlayed(options.LastPlayedFile)));
-        text.AppendLine(Part("4. Date added from .nfo", DateAdded));
+        text.AppendLine(Part("3. Date added from .nfo", DateAdded));
         return text.ToString();
     }
 
@@ -78,35 +76,6 @@ internal sealed class Proofs
         return $"Top Picks Proof {pluginVersion} is running in {host.Name} {host.ApplicationVersion} ({host.OperatingSystemDisplayName}).\n"
             + $"Server time zone: {zone.Id}, now UTC{DateTimeOffset.Now.ToString("zzz", CultureInfo.InvariantCulture)}. "
             + $"Checked {DateTimeOffset.UtcNow.ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC.";
-    }
-
-    private string LastPlayed(string videoFile)
-    {
-        if (string.IsNullOrWhiteSpace(videoFile))
-        {
-            return "Not checked yet: pick a video you last watched in summer, then press Save.";
-        }
-
-        var item = host.Resolve<ILibraryManager>().FindByPath(videoFile, false);
-        if (item == null)
-        {
-            return "Emby has no item for that file. Pick the file of a film or episode in your libraries.";
-        }
-
-        var userData = host.Resolve<IUserDataManager>();
-        var lines = new List<string>();
-        foreach (var user in host.Resolve<IUserManager>().GetUserList(new UserQuery()))
-        {
-            var data = userData.GetUserData(user, item);
-            if (data?.LastPlayedDate is DateTimeOffset played)
-            {
-                lines.Add($"{user.Name}: as stored {played.ToString(TimeFormat + " zzz", CultureInfo.InvariantCulture)}"
-                    + $" = {ServerTime(played)} server time (played: {data.Played}, play count: {data.PlayCount})");
-            }
-        }
-
-        return $"\"{item.Name}\" (Emby id {item.InternalId})\n"
-            + (lines.Count == 0 ? "Nobody has a last played date for it." : string.Join("\n", lines));
     }
 
     private string DateAdded()
