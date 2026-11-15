@@ -23,6 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- D146: the Emby SDK (4.9.1.90) is built against System.Memory 4.0.2.0 (package 4.6.0); System.Text.Json 8.0.6 brings
+         4.0.1.2, which fails the build (CS1705) once EmbyLink uses the SDK. Compiled against, never shipped: Emby runs on .NET 8,
+         whose shared framework has System.Memory. -->
+    <PackageReference Include="System.Memory" Version="[4.6.0]" ExcludeAssets="runtime;native" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- D15, D34: SkiaSharp 2.88.3 exactly, the copy Emby 4.10.2 loads. Compiled against, never shipped:
          no runtime or native files are copied, and nothing flows on to projects that reference this one. -->
     <PackageReference Include="SkiaSharp" Version="[2.88.3]" ExcludeAssets="runtime;native" PrivateAssets="all" />

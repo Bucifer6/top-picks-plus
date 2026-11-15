@@ -30,6 +30,21 @@ public class FailureTests
 
     [Theory]
     [MemberData(nameof(BadImages))]
+    [Trait("Check", "C43")]
+    public void CanRead_is_false_for_a_picture_Artwork_cannot_read(string what, byte[]? bad)
+    {
+        Assert.False(RankArtwork.CanRead(bad), what);
+    }
+
+    [Fact]
+    [Trait("Check", "C43")]
+    public void CanRead_is_true_for_a_readable_picture()
+    {
+        Assert.True(RankArtwork.CanRead(Good));
+    }
+
+    [Theory]
+    [MemberData(nameof(BadImages))]
     public void Bad_backdrop_and_no_poster_returns_failed(string what, byte[]? bad)
     {
         var result = RankArtwork.Draw(bad, Good, null, 1, "Title");

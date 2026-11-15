@@ -102,6 +102,23 @@ public static class RankArtwork
         }
     }
 
+    /// <summary>
+    /// D112 (B38): whether Artwork can read this picture (the same decode the drawing uses), so the fallback only ever saves a
+    /// backdrop or poster that can be shown. Never throws.
+    /// </summary>
+    public static bool CanRead(byte[]? bytes)
+    {
+        try
+        {
+            using var bitmap = Decode(bytes);
+            return bitmap != null;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     // Decodes fully or not at all: unreadable, truncated, empty or oversized input gives null.
     private static SKBitmap? Decode(byte[]? bytes)
     {

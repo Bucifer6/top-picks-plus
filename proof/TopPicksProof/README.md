@@ -17,7 +17,7 @@ It does **not** read Playback Reporting: the pinned SDK has no SQLite library, s
 **Built by:** CI, in its own `proof` job; the DLL is kept 3 days as the artifact `TopPicksProof-0.0.0-proof.<run>`, never attached to a Release (D77, D87). The job also fails if a future SDK ever ships SQLite files (D129).
 **May use:** Emby SDK, .NET. **Must not use:** anything in src/TopPicksPlus.
 **Tested by:** check C76 on the server; no automatic tests.
-**Afterwards:** chunk 4's pull request deletes this folder and the `proof` job once the results are recorded (D130).
+**When:** after chunks 4 and 5 are built, before Top Picks Plus is installed (D134). **Afterwards:** the pull request that records the results deletes this folder and the `proof` job (D130, D134).
 
 ## Owner's steps on the server (B4; for the owner to confirm)
 
