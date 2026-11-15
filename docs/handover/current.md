@@ -4,7 +4,7 @@
 Proof plugin built (proof/TopPicksProof) on branch build/proof-plugin, with its CI `proof` job, and reviewed by a fresh agent (no Blockers; Should-fix 1–6 and most nits fixed; B48 set aside). Decisions D129–D133, backlog B4, B20, B25 done, CODEMAP.md added, cards 0017–0018.
 
 ## Where it stopped
-Stage 6 Build. Pull request for build/proof-plugin (link in the PR list). The SDK can't read Playback Reporting (D129), so the proof only proves (a) loading in 4.10.2 and (c) .nfo date added (three copies: July, January, July with its offset written out, D131, D132). Nothing of Top Picks Plus is on the owner's server.
+Stage 6 Build. Pull request #9 (build/proof-plugin). CI green on 4bf886e (run 43740625296: build, Windows tests and Stryker, proof, secrets scan); proof DLL artifact `TopPicksProof-0.0.0-proof.125`. Later commits are docs only, so CI skips them. The SDK can't read Playback Reporting (D129), so the proof only proves (a) loading in 4.10.2 and (c) .nfo date added (three copies: July, January, July with its offset written out, D131, D132). Nothing of Top Picks Plus is on the owner's server.
 
 ## What is still owed (smallest first)
 1. Owner confirms the server steps in proof/TopPicksProof/README.md (B4), downloads `TopPicksProof-0.0.0-proof.<run>` from the PR's latest CI run (kept 3 days: push or re-run CI if it expired; merging isn't needed first), runs the steps and pastes the results. Merging the PR is separate.
