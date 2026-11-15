@@ -200,6 +200,56 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+  # D76, D77, D87(e): the separate proof plugin. Its DLL is kept 3 days and never attached to a Release (the release job
+  # neither needs this job nor downloads its artifact, whose name doesn't match TopPicksPlus-*). Removed by chunk 4 (D130).
+  proof:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: proof/TopPicksProof/TopPicksProof.csproj
+
+      - name: Build the proof plugin
+        run: dotnet build proof/TopPicksProof/TopPicksProof.csproj -c Release -p:Version=0.0.0-proof.${{ github.run_number }}
+
+      # D25, D129: the pinned SDK brings no SQLite library to compile against, so the plugin's import uses the "last
+      # played" fallback. If a future SDK ever brings one, this fails so the decision is looked at again.
+      - name: The pinned SDK has no SQLite library (D25)
+        shell: bash
+        run: |
+          packages="$(dotnet nuget locals global-packages --list | sed 's/^global-packages: *//')"
+          [ -d "$packages/mediabrowser.server.core/4.9.1.90/lib" ] || { echo "SDK package not found in $packages"; exit 1; }
+          found="$(find "$packages/mediabrowser.server.core" "$packages/mediabrowser.common" -iname '*sqlite*' -print)"
+          if [ -n "$found" ]; then echo "The SDK now ships SQLite files; revisit D25/D129:"; echo "$found"; exit 1; fi
+
+      - name: Check the DLL carries the version
+        shell: bash
+        run: |
+          v='0.0.0-proof.${{ github.run_number }}'
+          dll=proof/TopPicksProof/bin/Release/netstandard2.0/TopPicksProof.dll
+          { strings -a -el "$dll"; strings -a "$dll"; } | grep -qE "(^|[^0-9.])${v//./\\.}(\\+|$)" \
+            || { echo "TopPicksProof.dll does not carry version $v"; exit 1; }
+
+      - name: Dependency vulnerability audit
+        shell: bash
+        run: |
+          dotnet list proof/TopPicksProof/TopPicksProof.csproj package --vulnerable --include-transitive | tee audit.txt
+          if grep -qE '^[[:space:]]*>' audit.txt; then echo "Vulnerable packages found in the proof plugin"; exit 1; fi
+
+      - name: Keep the proof DLL for 3 days
+        uses: actions/upload-artifact@v4
+        with:
+          name: TopPicksProof-0.0.0-proof.${{ github.run_number }}
+          path: proof/TopPicksProof/bin/Release/netstandard2.0/TopPicksProof.dll
+          if-no-files-found: error
+          retention-days: 3
+
   secrets-scan:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
