@@ -19,7 +19,7 @@ using TopPicksPlus.Logic;
 
 namespace TopPicksPlus.Settings;
 
-/// <summary>The settings page as Emby's plugin UI sees it (F8): one page, the plugin's main configuration page.</summary>
+/// <summary>The settings page as Emby's plugin UI sees it (F8, D148): one page, the plugin's main configuration page.</summary>
 public sealed class SettingsController : IPluginUIPageController
 {
     private readonly string _pluginId;
@@ -31,6 +31,7 @@ public sealed class SettingsController : IPluginUIPageController
         {
             Name = "TopPicksPlusSettings",
             DisplayName = "Top Picks Plus",
+            // D148: also listed in the dashboard's side menu, so the report is one click away.
             EnableInMainMenu = true,
             MenuIcon = "list_alt",
             IsMainConfigPage = true,
@@ -47,7 +48,8 @@ public sealed class SettingsController : IPluginUIPageController
 /// <summary>
 /// What the page does (F8, D61, D74, D93, D148): fills the choices and the report, carries out the buttons, and saves the owner's
 /// settings (libraries, row-check user, pins) in Emby's plugin settings. It never writes state.json or any other data file (D93):
-/// Run now asks EmbyLink, which applies the normal guards.
+/// Run now asks EmbyLink, which applies the normal guards (D94). Every allowed value is worked out from Emby on the server, never
+/// trusted from what the page posts back.
 /// </summary>
 public sealed class SettingsView : IPluginPageView
 {
@@ -56,10 +58,19 @@ public sealed class SettingsView : IPluginPageView
     public SettingsView(string pluginId)
     {
         PluginId = pluginId;
-        ContentData = Fill(new SettingsPage(), null);
+        var page = new SettingsPage();
+        var settings = Settings;
+        page.Libraries = string.Join(",", (settings.LibraryIds ?? new long[0]).Select(Text));
+        page.RowCheckUser = settings.RowCheckUserId ?? string.Empty;
+        ContentData = Fill(page, null);
     }
 
-    public event EventHandler<GenericEventArgs<IPluginUIView>>? UIViewInfoChanged;
+    // Emby's interface needs the event; this page never raises it (it is refreshed by its own buttons).
+    public event EventHandler<GenericEventArgs<IPluginUIView>>? UIViewInfoChanged
+    {
+        add { }
+        remove { }
+    }
 
     public string Caption => "Top Picks Plus";
 
@@ -82,7 +93,7 @@ public sealed class SettingsView : IPluginPageView
 
     public bool AllowBack { get; set; } = true;
 
-    private SettingsPage Page => ContentData as SettingsPage ?? new SettingsPage();
+    private static PluginConfiguration Settings => Plugin.Instance?.Configuration ?? new PluginConfiguration();
 
     public bool IsCommandAllowed(string commandKey) => true;
 
@@ -94,7 +105,11 @@ public sealed class SettingsView : IPluginPageView
 
     public Task<IPluginUIView> RunCommand(string itemId, string commandId, string data)
     {
-        var page = Page;
+        if (!(ContentData is SettingsPage page))
+        {
+            ContentData = Fill(new SettingsPage(), "The page couldn't be read; open it again.");
+            return Task.FromResult<IPluginUIView>(this);
+        }
         string? message = null;
         switch (commandId)
         {
@@ -104,7 +119,7 @@ public sealed class SettingsView : IPluginPageView
             case SettingsPage.SearchCommand:
                 page.SearchChoices = SearchResults(page.SearchText);
                 page.SearchResult = page.SearchChoices.FirstOrDefault()?.Value ?? string.Empty;
-                message = page.SearchChoices.Any() ? null : "Nothing found.";
+                message = page.SearchChoices.Any() ? null : Host.Current == null ? NotStarted : "Nothing found.";
                 break;
             case SettingsPage.AddPinCommand:
                 message = AddPin(page.SearchResult);
@@ -118,49 +133,61 @@ public sealed class SettingsView : IPluginPageView
             case SettingsPage.RemovePinCommand:
                 message = RemovePin(page.SelectedPin);
                 break;
+            // "Refresh this page" needs nothing more: the page is filled again below.
         }
+        // Unsaved library and row-check choices are kept as posted; only Save stores them.
         ContentData = Fill(page, message);
         return Task.FromResult<IPluginUIView>(this);
     }
 
     public Task<IPluginUIView> OnSaveCommand(string itemId, string commandId, string data)
     {
-        var page = Page;
         var plugin = Plugin.Instance;
-        if (plugin != null)
+        var h = Host.Current;
+        if (!(ContentData is SettingsPage page) || plugin == null || h == null)
         {
-            var allowed = new HashSet<string>(page.LibraryChoices.Select(c => c.Value));
-            plugin.Configuration.LibraryIds = Ids(page.Libraries).Where(id => allowed.Contains(id.ToString(CultureInfo.InvariantCulture))).ToArray();
-            plugin.Configuration.RowCheckUserId = page.UserChoices.Any(c => c.Value == page.RowCheckUser) ? page.RowCheckUser ?? string.Empty : string.Empty;
-            plugin.SaveConfiguration();
+            ContentData = Fill(ContentData as SettingsPage ?? new SettingsPage(), "Not saved: " + NotStarted);
+            return Task.FromResult<IPluginUIView>(this);
         }
+        // The allowed values come from Emby now, not from the lists the page posted back.
+        var libraries = new HashSet<long>(LibraryOptions(h).Select(o => long.Parse(o.Value, CultureInfo.InvariantCulture)));
+        var users = new HashSet<string>(EmbyFacts.AllUsers(h).Select(EmbyFacts.UserKey), StringComparer.OrdinalIgnoreCase);
+        plugin.Configuration.LibraryIds = Ids(page.Libraries).Where(libraries.Contains).ToArray();
+        plugin.Configuration.RowCheckUserId = users.Contains(page.RowCheckUser ?? string.Empty) ? page.RowCheckUser! : string.Empty;
+        plugin.SaveConfiguration();
+        page.Libraries = string.Join(",", plugin.Configuration.LibraryIds.Select(Text));
+        page.RowCheckUser = plugin.Configuration.RowCheckUserId;
         ContentData = Fill(page, "Saved.");
         return Task.FromResult<IPluginUIView>(this);
     }
 
     // ---------------- commands ----------------
 
+    private const string NotStarted = "Emby hasn't finished starting; try again in a minute.";
+
     private static string RunNow()
     {
         var h = Host.Current;
         if (h == null)
-            return "Emby hasn't finished starting; try again in a minute.";
-        if (RunEngine.LockHeld)
-            return "A run is already in progress.";
-        // The run carries on in the background; the guards decide whether it may start (D94).
+            return NotStarted;
+        // Always through the normal guards (D94): a refusal, such as a run already in progress, is recorded in the report.
         Task.Run(() => RunEngine.Request(h, Trigger.RunNow, CancellationToken.None));
-        return "Run started. Press \"Refresh this page\" to follow it.";
+        return "Run requested. Press \"Refresh this page\" to see what happened.";
     }
 
     private static string? AddPin(string? value)
     {
         var h = Host.Current;
         var plugin = Plugin.Instance;
-        if (h == null || plugin == null || !long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
+        if (h == null || plugin == null)
+            return NotStarted;
+        if (!long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
             return "Search for a title, choose it in the results, then press \"Pin it\".";
         var item = h.Library.GetItemById(id);
+        if (item == null)
+            return "That title is no longer in Emby; search again.";
         var pins = (plugin.Configuration.Pins ?? new long[0]).ToList();
-        var refusal = PinRules.CheckAdd(pins, id, item?.GetType().Name, h.RelativeToTopPicks(item?.Path) != null);
+        var refusal = PinRules.CheckAdd(pins, id, item.GetType().Name, h.RelativeToTopPicks(item.Path) != null);
         if (refusal != PinRefusal.None)
             return PinRefusalText(refusal);
         pins.Add(id);
@@ -189,15 +216,20 @@ public sealed class SettingsView : IPluginPageView
         var plugin = Plugin.Instance;
         if (plugin == null || !long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
             return "Choose a pin first.";
-        var pins = (plugin.Configuration.Pins ?? new long[0]).Where(p => p != id).ToList();
-        SavePins(plugin, pins);
+        SavePins(plugin, (plugin.Configuration.Pins ?? new long[0]).Where(p => p != id).ToList());
         return "Pin removed.";
     }
 
+    // Moving or removing never drops pins; only adding is limited to 10 (PinRules.CheckAdd).
+    private static readonly object PinGate = new object();
+
     private static void SavePins(Plugin plugin, List<long> pins)
     {
-        plugin.Configuration.Pins = pins.Take(PinRules.MaxPins).ToArray();
-        plugin.SaveConfiguration();
+        lock (PinGate)
+        {
+            plugin.Configuration.Pins = pins.ToArray();
+            plugin.SaveConfiguration();
+        }
     }
 
     private static string PinRefusalText(PinRefusal refusal) => refusal switch
@@ -214,80 +246,94 @@ public sealed class SettingsView : IPluginPageView
         var h = Host.Current;
         if (h == null || string.IsNullOrWhiteSpace(text))
             return new List<EditorSelectOption>();
+        // Asks for more than shown, so Top Picks copies (left out) can't use up the places.
         return h.Library.GetItemList(new InternalItemsQuery
             {
                 SearchTerm = text!.Trim(),
                 IncludeItemTypes = new[] { "Movie", "Series" },
                 Recursive = true,
-                Limit = SearchLimit,
+                Limit = SearchLimit * 3,
             })
             .Where(i => h.RelativeToTopPicks(i.Path) == null)
-            .Select(i => Option(i.InternalId.ToString(CultureInfo.InvariantCulture), Title(i) + " – " + i.GetType().Name))
+            .Take(SearchLimit)
+            .Select(i => Option(Text(i.InternalId), Title(i) + " – " + i.GetType().Name))
             .ToList();
     }
 
     // ---------------- filling the page ----------------
 
-    /// <summary>Fills every choice, the pins, the run status and the report from the settings and run.json (read only).</summary>
+    private static IEnumerable<EditorSelectOption> LibraryOptions(Host h)
+    {
+        var topPicks = EmbyFacts.FindTopPicksLibrary(h)?.Id;
+        return h.Library.GetVirtualFolders()
+            .Select(f => (Id: h.Library.GetInternalId(f.ItemId), f.Name))
+            .Where(f => f.Id != topPicks)
+            .Select(f => Option(Text(f.Id), f.Name))
+            .ToList();
+    }
+
+    /// <summary>Fills every choice, the pins, the run status and the report from Emby, the settings and run.json (read only).</summary>
     private static SettingsPage Fill(SettingsPage page, string? message)
     {
         var h = Host.Current;
-        var settings = Plugin.Instance?.Configuration ?? new PluginConfiguration();
-        page.PinMessage = new LabelItem(message ?? string.Empty) { IsVisible = !string.IsNullOrEmpty(message) };
-        var held = RunEngine.HeldMessage;
-        page.Held = new LabelItem(held ?? string.Empty) { IsVisible = !string.IsNullOrEmpty(held) };
-        page.RunStatus = RunEngine.LockHeld
+        var settings = Settings;
+        page.LastAction = new LabelItem(message ?? string.Empty) { IsVisible = !string.IsNullOrEmpty(message) };
+        page.RunState = RunEngine.LockHeld
             ? new StatusItem("Status", "A run is in progress.", ItemStatus.InProgress)
             : new StatusItem("Status", "No run in progress.", ItemStatus.None);
         page.RunNow = new ButtonItem("Run now") { Data1 = SettingsPage.RunNowCommand, IsEnabled = !RunEngine.LockHeld };
+        var held = RunEngine.HeldMessage;
+        page.Held = new LabelItem(held ?? string.Empty) { IsVisible = !string.IsNullOrEmpty(held) };
         if (h == null)
         {
-            page.Report = "Emby hasn't finished starting yet.";
+            page.Report = NotStarted;
             return page;
         }
 
-        var topPicks = EmbyFacts.FindTopPicksLibrary(h)?.Id;
-        page.LibraryChoices = h.Library.GetVirtualFolders()
-            .Where(f => h.Library.GetInternalId(f.ItemId) != topPicks)
-            .Select(f => Option(h.Library.GetInternalId(f.ItemId).ToString(CultureInfo.InvariantCulture), f.Name))
-            .ToList();
-        page.Libraries = string.Join(",", (settings.LibraryIds ?? new long[0]).Select(id => id.ToString(CultureInfo.InvariantCulture)));
-
-        var users = EmbyFacts.AllUsers(h);
-        page.UserChoices = new[] { Option(string.Empty, "Default") }
-            .Concat(users.Select(u => Option(EmbyFacts.UserKey(u), u.Name)))
-            .ToList();
-        page.RowCheckUser = settings.RowCheckUserId ?? string.Empty;
-
-        var run = h.Data.LoadRun();
-        var missing = new HashSet<long>(run.Value?.MissingPins ?? new List<long>());
-        var pins = settings.Pins ?? new long[0];
-        var list = new GenericItemList();
-        var pinChoices = new List<EditorSelectOption>();
-        for (var i = 0; i < pins.Length; i++)
+        try
         {
-            var item = h.Library.GetItemById(pins[i]);
-            var name = item == null ? "Title no longer in Emby (" + pins[i].ToString(CultureInfo.InvariantCulture) + ")" : Title(item);
-            var note = item == null || missing.Contains(pins[i]) ? "missing: not used in the last run" : item.GetType().Name;
-            list.Add(new GenericListItem { PrimaryText = (i + 1).ToString(CultureInfo.InvariantCulture) + ". " + name, SecondaryText = note });
-            pinChoices.Add(Option(pins[i].ToString(CultureInfo.InvariantCulture), (i + 1).ToString(CultureInfo.InvariantCulture) + ". " + name));
-        }
-        page.PinList = list;
-        page.PinChoices = pinChoices;
-        if (!pinChoices.Any(c => c.Value == page.SelectedPin))
-            page.SelectedPin = pinChoices.FirstOrDefault()?.Value ?? string.Empty;
+            page.LibraryChoices = LibraryOptions(h);
+            var users = EmbyFacts.AllUsers(h);
+            page.UserChoices = new[] { Option(string.Empty, "Default") }
+                .Concat(users.Select(u => Option(EmbyFacts.UserKey(u), u.Name)))
+                .ToList();
 
-        page.Report = ReportText.Build(h, run.Value, run.Status, held);
+            var run = h.Data.LoadRun();
+            var missing = new HashSet<long>(run.Value?.MissingPins ?? new List<long>());
+            var pins = settings.Pins ?? new long[0];
+            var list = new GenericItemList();
+            var pinChoices = new List<EditorSelectOption>();
+            for (var i = 0; i < pins.Length; i++)
+            {
+                var item = h.Library.GetItemById(pins[i]);
+                var name = item == null ? "Title no longer in Emby (" + Text(pins[i]) + ")" : Title(item);
+                var note = item == null || missing.Contains(pins[i]) ? "missing: not used in the last run" : item.GetType().Name;
+                list.Add(new GenericListItem { PrimaryText = Text(i + 1) + ". " + name, SecondaryText = note });
+                pinChoices.Add(Option(Text(pins[i]), Text(i + 1) + ". " + name));
+            }
+            page.PinList = list;
+            page.PinChoices = pinChoices;
+            if (!pinChoices.Any(c => c.Value == page.SelectedPin))
+                page.SelectedPin = pinChoices.FirstOrDefault()?.Value ?? string.Empty;
+
+            page.Report = ReportText.Build(h, run.Value, run.Status, users);
+        }
+        catch (Exception e)
+        {
+            // The page still opens (the run controls above work) if Emby can't answer one of these.
+            h.Log.ErrorException("Top Picks Plus: couldn't fill the settings page", e);
+            page.Report = "Part of this page couldn't be read from Emby: " + e.Message;
+        }
         return page;
     }
 
     private static EditorSelectOption Option(string value, string? name) =>
         new EditorSelectOption { Value = value, Name = name ?? value, IsEnabled = true };
 
-    private static string Title(BaseItem? item) =>
-        item == null ? "?" : item.ProductionYear.HasValue
-            ? item.Name + " (" + item.ProductionYear.Value.ToString(CultureInfo.InvariantCulture) + ")"
-            : item.Name ?? "?";
+    private static string Text(long n) => n.ToString(CultureInfo.InvariantCulture);
+
+    private static string Title(BaseItem item) =>
+        item.ProductionYear.HasValue ? item.Name + " (" + Text(item.ProductionYear.Value) + ")" : item.Name ?? "?";
 
     private static IEnumerable<long> Ids(string? text) =>
         (text ?? string.Empty).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
@@ -295,7 +341,4 @@ public sealed class SettingsView : IPluginPageView
             .Where(id => id.HasValue)
             .Select(id => id!.Value)
             .Distinct();
-
-    /// <summary>Tells Emby the page changed (kept for the interface; the page is refreshed by its own buttons).</summary>
-    internal void Changed() => UIViewInfoChanged?.Invoke(this, new GenericEventArgs<IPluginUIView>(this));
 }

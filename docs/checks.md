@@ -73,7 +73,7 @@ links: [spec.md, decisions.md]
 | C64 | Boundary | (Automatic) Logic may use names that only start like a forbidden one (e.g. `System.IObservable<T>`): the boundary check doesn't fail on them. |
 | C65 | F3 | Before the first artwork chunk is kept, look at three sample pictures (with a logo, without a logo, rank 10): they look like today's row in docs/reference/artwork/ (D62). **Approved by the owner 2026-11-08** (samples from CI run 42503121978). The later capitals change (D100) changes only the title case on the no-logo samples; the layout is unchanged. |
 | C66 | F10 | Go-live: Top Picks Plus shows in Dashboard → Plugins on Emby 4.10.2 with its version (D14). |
-| C67 | F8 | [Amended by D79.] (Go-live, plus code review) Signed in as a non-administrator, you can't open the settings page or use Run now or the report. |
+| C67 | F8 | [Amended by D79, D148.] (Go-live) Signed in as a non-administrator, you can't open the settings page or use Run now or the report. The page is Emby's own plugin settings page, so this checks Emby's protection (D148). |
 | C68 | F8 | (Automatic) The settings page refuses an 11th pin, a duplicate pin, and an episode or collection (D61, D74). |
 | C69 | F2 | (Automatic) Ties go to the newest content, then the newer premiere date; a pin that is also most watched appears once; a movie with no file is skipped; fewer than 10 candidates gives a shorter row. |
 | C70 | F3 | (Automatic) Subtitles keep their full suffix (`.en.forced.srt`), `.idx` goes with `.sub`, theme songs are copied the first week only, episode thumbs and season posters are copied (D55, D70). |

@@ -1,35 +1,34 @@
 # Handover
 
 ## Job just finished
-Proof plugin built (proof/TopPicksProof) on branch build/proof-plugin, with its CI `proof` job, and reviewed by a fresh agent (no Blockers; Should-fix 1–6 and most nits fixed; B48 set aside). Decisions D129–D133, backlog B4, B20, B25 done, CODEMAP.md added, cards 0017–0018.
+The whole build: proof plugin (PR #9), chunk 4 EmbyLink (PR #10) and chunk 5 Settings (PR #11), each reviewed by a fresh agent (no Blockers; Should-fix items fixed; smaller ones in the backlog). The owner chose to run the proof and the checks after the whole build (D134).
 
 ## Where it stopped
-Stage 6 Build. Pull request #9 (build/proof-plugin). CI green on 4bf886e (run 43740625296: build, Windows tests and Stryker, proof, secrets scan); proof DLL artifact `TopPicksProof-0.0.0-proof.125`. Later commits are docs only, so CI skips them. The SDK can't read Playback Reporting (D129), so the proof only proves (a) loading in 4.10.2 and (c) .nfo date added (three copies: July, January, July with its offset written out, D131, D132). Nothing of Top Picks Plus is on the owner's server.
+Stage 6 Build, done. Three stacked pull requests: #9 (base main), #10 (base #9's branch), #11 (base #10's branch). GitHub retargets each to main as the one below merges. Decisions D129–D148, cards 0017–0020. Nothing is on the owner's server yet.
 
 ## What is still owed (smallest first)
-1. Owner confirms the server steps in proof/TopPicksProof/README.md (B4), downloads `TopPicksProof-0.0.0-proof.<run>` from the PR's latest CI run (kept 3 days: push or re-run CI if it expired; merging isn't needed first), runs the steps and pastes the results. Merging the PR is separate.
-2. Claude records the results as a dated row in decisions.md and acts on them as D132 says, **before chunk 4 is kept**.
-3. Chunk 4 (EmbyLink): new branch from main; read the open EmbyLink backlog rows first; delete proof/ and the `proof` job in the same PR (D130); supply `CopyContents` and `Reprepare` (D124).
-4. Then chunk 5 (Settings) (D92).
+1. Owner merges #9, then #10, then #11 (in that order; each needs green CI on main's retarget).
+2. Owner runs the proof plugin (proof/TopPicksProof/README.md steps; B4) and pastes the results. Claude records them and acts as D132 says (amended by D134) in its own pull request, which also deletes proof/ and the `proof` job (D130).
+3. Release v1.0.0 (tag on main, only when the owner says, D57), then go-live day (D86) with the checks in docs/checks.md. Go-live notes: B26, B49, B50, B51, B53, B54.
 
 ## Watch out for
+- **Stacked PRs:** merge in order. If one is merged out of order, its base may need changing by hand.
 - **Draft pull requests don't run CI (D115)**, because a draft is work in progress: open it as a normal PR.
 - **The repo is public:** never commit secrets or personal details, because anyone can read it. When recording proof results, leave out user names and file paths.
-- **No local builds (D5),** because the owner chose CI as the only build; this can include sessions running on the owner's own PC, which is also the Emby server (D133). Never touch Emby's folders from a session.
-- **Look up Emby API signatures before writing chunk 4 code** (card 0018), because nothing compiles until CI runs: Emby.SDK repo SampleCode targets 4.9.1.90; dev.emby.media/reference has members.
-- **First-week import is "last played" only (D129),** because the SDK has no SQLite library; don't plan any Playback Reporting read.
+- **No local builds (D5),** because the owner chose CI as the only build; this session ran on the owner's PC, which is the Emby server (D133). Never touch Emby's folders from a session. Emby signatures can be read, read-only, with a reflection script over the SDK DLLs in the NuGet cache (card 0019, D145).
+- **Don't push while CI is running,** because a new push cancels the running Windows job and starts again.
+- **CI logs need a signed-in browser:** the public API gives job results and annotations but not the compiler output; open the job page in the browser pane and expand the failed step.
+- **There is no GitHub CLI on the owner's PC:** push works through git; PRs are opened in the browser pane while the owner is signed in to GitHub.
+- **Watched state only moves forward; an offline drive or vanished title never empties the row (D147),** because the owner's real library and watched ticks are at stake.
 - **Windows-only tests are named `_junction`/`_windows`**; the Windows job fails unless at least 11 pass (D125), so raise the number when adding more.
-- **Windows full paths expand 8.3 short names** (card 0015), so never trust a "direct child" check on a name not matched exactly on disk (D119).
-- **Deliberate breaks must compile** (card 0013); **no namespace-looking string constants in walled modules** (card 0012), because each cost a CI run.
 - **No backup (D95, owner).** Never write "restore from backup", because there is none.
-- **Each builder reads the open backlog rows for its chunk first** (D92). Mark amended decisions "[Amended by …]" and fix every README that repeats them (card 0007), because builders read top-down.
-- Commit as Claude (noreply@anthropic.com); a stop hook checks. There is no GitHub CLI on the owner's PC: push works through git; PRs are opened in the browser pane while the owner is signed in.
+- Commit as Claude (noreply@anthropic.com); a stop hook checks.
 
 ## Waiting on the owner
-- Confirm the server steps (B4), merge the proof PR, run the proof and paste the results.
+- Merge #9, #10, #11 in order; confirm the proof steps (B4); run the proof.
 
 ## Next job
-After the results: chunk 4 (EmbyLink). Read first: CLAUDE.md, CODEMAP.md, src/TopPicksPlus/EmbyLink/README.md, docs/decisions.md (D129–D133 and the results row), docs/backlog.md EmbyLink rows.
+Record the proof results (D132, D134), then the v1.0.0 release and go-live day (D86). Read first: CLAUDE.md, CODEMAP.md, docs/decisions.md D129–D148, docs/backlog.md Go-live rows.
 
 ## Cards that applied
-0001, 0003, 0006, 0007, 0008 (corrected), 0011 (corrected), 0012–0015; new: 0017, 0018. None retired.
+0001, 0003, 0004, 0006, 0007, 0012–0015, 0017, 0018; new: 0019, 0020. None retired.

@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunks 3 (Artwork), 1 (Logic) and 2 (Storage) merged (PR #8, 2026-11-09). Proof plugin built (PR #9); chunk 4 EmbyLink built (PR #10, stacked on #9); next 5 Settings (D92). The owner runs the proof and the checks after the whole build (D134).
+**Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunks 3 (Artwork), 1 (Logic) and 2 (Storage) merged (PR #8, 2026-11-09). The whole build is done and reviewed: proof plugin (PR #9), chunk 4 EmbyLink (PR #10, stacked on #9), chunk 5 Settings (PR #11, stacked on #10). Next: the owner merges #9, #10, #11 in order, then runs the proof (D134), then go-live day (D86).
 **CI budget:** public repo since 2026-11-09, so Actions minutes are free; still keep runs lean (CI runs only on non-draft PRs, main and v* tags). Everything committed is public: never commit secrets, and keep personal details out of new docs.
 
 ## Rules

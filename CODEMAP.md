@@ -1,5 +1,5 @@
 # Code map: Top Picks Plus
-Updated: 2026-11-15 (build/chunk4-embylink)
+Updated: 2026-11-15 (build/chunk5-settings)
 
 ## What this is
 An Emby Server plugin (one DLL, netstandard2.0, Emby SDK 4.9.1.90 pinned) that fills the "Latest Top Picks" home row with the 10 most-watched or pinned titles each week, numbered and in order. One home server; replaces the old Emby.TopPicks plugin. Built only by GitHub Actions (D5). Plain-English spec: docs/spec.md; checks: docs/checks.md.
@@ -10,7 +10,7 @@ Emby (task, events, library)  ->  EmbyLink (RunEngine -> RunSteps; EntryPoint; O
                                      |-> Logic    pure rules: choose 10, count plays, names, rank dates, swap plan
                                      |-> Storage  the four JSON files + every file change in top-picks and staging
                                      |-> Artwork  numbered 1000x562 pictures (Emby's own SkiaSharp)
-Settings page + run report (chunk 5, not built yet) -> EmbyLink, Storage, Logic
+Settings page + run report (Emby plugin UI, no endpoints of its own) -> EmbyLink, Storage (read), Logic
 proof/TopPicksProof  separate throwaway plugin; shares nothing with the above (D76)
 ```
 Walls between the parts are enforced by tests/TopPicksPlus.Tests/Boundaries (table in src/TopPicksPlus/README.md).
@@ -38,7 +38,10 @@ Nothing runs locally (D5). Open a normal (not draft) pull request: build.yml bui
 - Side effects: Emby dates (`DateCreated`) and user data (watched ticks, resume points) on copies and sources; rescans and image refreshes of the Top Picks library.
 - Watch out: nothing compiles locally (D145, card 0018); a vanished title or an offline drive must never fail every resume or empty the row (D147); watched state only moves forward (D147); System.Memory 4.6.0 is compiled against for the SDK (D146).
 
-### Settings (`src/TopPicksPlus/Settings/`) — built in chunk 5 (PR #11).
+### Settings (`src/TopPicksPlus/Settings/`) — details: its README
+- Does: the admin page (`SettingsPage` fields, `SettingsView` buttons and Save, `SettingsController`) and the plain-words run report (`ReportText`), drawn by Emby's plugin UI (D148).
+- Owns data: only the owner's settings in `plugins\configurations\TopPicksPlus.xml` (`PluginConfiguration`); never state.json (D93); run.json is read only.
+- Watch out: allowed libraries and users are worked out from Emby when saving, never from what the page posts back; Run now always goes through EmbyLink's guards (D148); admin-only rests on Emby's plugin page (C67).
 
 ### Proof plugin (`proof/TopPicksProof/`) — details: its README
 - Does: Simple UI page; proves loading in 4.10.2 and how Emby reads .nfo `<dateadded>` (D131).
@@ -56,6 +59,7 @@ Nothing runs locally (D5). Open a normal (not draft) pull request: build.yml bui
 | a wall (namespace or allowed arrow) | owner approval; canary in Boundaries | Boundaries tests |
 | `CopyText.DateAddedText` | the proof result (D132), C62 | Logic tests |
 | anything in EmbyLink | the go-live checks it touches (D73, D79); walls | all tests (CI), Boundaries |
+| anything in Settings | C67 (admin only), C68 (pins), the report fields (D81); walls (no Artwork) | Boundaries; go-live checks |
 | the .csproj package pins | the SDK still compiles (System.Memory, D146); nothing new ships (no Skia, no runtime assets) | CI build job |
 
 ## Shared things

@@ -32,13 +32,16 @@ public class SettingsPage : EditableOptionsBase
 
     public CaptionItem CaptionRun { get; set; } = new CaptionItem("Run");
 
-    public StatusItem RunStatus { get; set; } = new StatusItem("Status", string.Empty, ItemStatus.None);
+    public StatusItem RunState { get; set; } = new StatusItem("Status", string.Empty, ItemStatus.None);
 
     public ButtonItem RunNow { get; set; } = new ButtonItem("Run now") { Data1 = RunNowCommand };
 
     public ButtonItem Refresh { get; set; } = new ButtonItem("Refresh this page") { Data1 = RefreshCommand };
 
     public LabelItem Held { get; set; } = new LabelItem(string.Empty) { IsVisible = false };
+
+    /// <summary>What the last button did (shown next to the Run buttons).</summary>
+    public LabelItem LastAction { get; set; } = new LabelItem(string.Empty) { IsVisible = false };
 
     // ---------------- Libraries and row check ----------------
 
@@ -97,8 +100,6 @@ public class SettingsPage : EditableOptionsBase
     public IEnumerable<EditorSelectOption> SearchChoices { get; set; } = new List<EditorSelectOption>();
 
     public ButtonItem AddPin { get; set; } = new ButtonItem("Pin it") { Data1 = AddPinCommand };
-
-    public LabelItem PinMessage { get; set; } = new LabelItem(string.Empty) { IsVisible = false };
 
     // ---------------- Report ----------------
 
