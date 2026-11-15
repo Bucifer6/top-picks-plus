@@ -8,7 +8,8 @@ evidence: docs/handover/archive/2026-11-08-spec-gaps.md, quiz Q4 marked partly r
 date: 2026-11-08
 status: live
 seen: 1
+confirmed: 2026-11-15 (step 2 corrected)
 promoted:
 ---
 1. For each trap in "Watch out for", write the rule and a short "because …".
-2. Before saving, check every quiz answer can be found in current.md word for word in meaning; if not, fix the handover, not the key.
+2. (Corrected 2026-11-15: the quiz is no longer kept, D133.) Before saving, re-read "Watch out for" as a stranger: each line must make sense without the chat.

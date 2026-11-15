@@ -19,3 +19,5 @@ summary: Index of live logbook cards
 | 0014 | insight | ci, tests | Stryker --since runs every covered mutant when any test file changes |
 | 0015 | insight | Storage, safety, tests | Windows full-path resolution expands 8.3 short names; a direct-child check alone lets a short name reach another folder |
 | 0016 | build | Storage, ci, tests | Chunk 2 built Storage with tests per check, Windows-only tests proved to run, and 12 rules proved by deliberate breaks |
+| 0017 | insight | EmbyLink, proof, process | Check what a pinned package actually holds before planning around it |
+| 0018 | build | proof, ci | The proof plugin was built as an Emby Simple UI page |
