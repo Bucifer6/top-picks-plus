@@ -225,7 +225,18 @@ jobs:
         run: |
           packages="$(dotnet nuget locals global-packages --list | sed 's/^global-packages: *//')"
           [ -d "$packages/mediabrowser.server.core/4.9.1.90/lib" ] || { echo "SDK package not found in $packages"; exit 1; }
-          found="$(find "$packages/mediabrowser.server.core" "$packages/mediabrowser.common" -iname '*sqlite*' -print)"
+          sqlite_files() { find "$@" -iname '*sqlite*' -print; }
+          # Prove the check bites (card 0003): a SQLite DLL in a lib folder must be found, a clean folder must pass.
+          canary="$RUNNER_TEMP/sqlite-canary"
+          mkdir -p "$canary/clean/lib" "$canary/dirty/lib/netstandard2.0"
+          touch "$canary/clean/lib/MediaBrowser.Controller.dll" "$canary/dirty/lib/netstandard2.0/SQLitePCL.pretty.dll"
+          [ -z "$(sqlite_files "$canary/clean")" ] || { echo "SQLite check flags a clean folder"; exit 1; }
+          [ -n "$(sqlite_files "$canary/dirty")" ] || { echo "SQLite check missed a SQLite DLL"; exit 1; }
+          # MediaBrowser.Server.Core's only dependency is MediaBrowser.Common, so both are restored.
+          for p in mediabrowser.server.core mediabrowser.common; do
+            [ -d "$packages/$p" ] || { echo "Package $p not found in $packages"; exit 1; }
+          done
+          found="$(sqlite_files "$packages/mediabrowser.server.core" "$packages/mediabrowser.common")"
           if [ -n "$found" ]; then echo "The SDK now ships SQLite files; revisit D25/D129:"; echo "$found"; exit 1; fi
 
       - name: Check the DLL carries the version

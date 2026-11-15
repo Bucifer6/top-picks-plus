@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using MediaBrowser.Common;
 using MediaBrowser.Controller.Plugins;
 using MediaBrowser.Model.Logging;
@@ -6,7 +7,7 @@ using MediaBrowser.Model.Logging;
 namespace TopPicksProof;
 
 /// <summary>
-/// "Top Picks Proof" (D76, D77): one settings page that proves things on the owner's server before chunk 4 is kept.
+/// "Top Picks Proof" (D76, D77, D131): one settings page that proves things on the owner's server before chunk 4 is kept.
 /// It listens to nothing, deletes nothing and never touches the Top Picks folder.
 /// </summary>
 public sealed class ProofPlugin : BasePluginSimpleUI<ProofOptions>
@@ -29,17 +30,23 @@ public sealed class ProofPlugin : BasePluginSimpleUI<ProofOptions>
 
     public override Guid Id => PluginId;
 
-    // Runs each time the page opens, so the results are always fresh and nothing is kept between openings.
+    // The CI stamp (0.0.0-proof.<run>) is only in the informational version; the assembly version is 0.0.0.0.
+    private static string BuildVersion =>
+        typeof(ProofPlugin).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+
+    // Runs each time the page opens, so the results are always fresh.
     protected override ProofOptions OnBeforeShowUI(ProofOptions options)
     {
-        options.Results = proofs.Report(Version);
+        options.Results = proofs.Report(BuildVersion);
         logger.Info("Top Picks Proof results:\n{0}", options.Results);
         return options;
     }
 
     // The page has no buttons (Simple UI), so writing the test folders is a tick box acted on when the owner saves.
+    // Results are worked out again on every opening, so they are never saved with the page.
     protected override bool OnOptionsSaving(ProofOptions options)
     {
+        options.Results = string.Empty;
         if (options.WriteTestFolders)
         {
             options.WriteOutcome = proofs.WriteTestFolders(options.TestMovieFile);

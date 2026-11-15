@@ -1,13 +1,13 @@
 # Handover
 
 ## Job just finished
-Proof plugin built (proof/TopPicksProof) on branch build/proof-plugin, with its CI `proof` job. Decisions D129–D133, backlog B4, B20, B25 done, CODEMAP.md added, cards 0017–0018.
+Proof plugin built (proof/TopPicksProof) on branch build/proof-plugin, with its CI `proof` job, and reviewed by a fresh agent (no Blockers; Should-fix 1–6 and most nits fixed; B48 set aside). Decisions D129–D133, backlog B4, B20, B25 done, CODEMAP.md added, cards 0017–0018.
 
 ## Where it stopped
-Stage 6 Build. Pull request for build/proof-plugin (link in the PR list). The SDK can't read Playback Reporting (D129), so the proof only proves (a) loading in 4.10.2 and (c) .nfo date added. Nothing of Top Picks Plus is on the owner's server.
+Stage 6 Build. Pull request for build/proof-plugin (link in the PR list). The SDK can't read Playback Reporting (D129), so the proof only proves (a) loading in 4.10.2 and (c) .nfo date added (three copies: July, January, July with its offset written out, D131, D132). Nothing of Top Picks Plus is on the owner's server.
 
 ## What is still owed (smallest first)
-1. Owner confirms the server steps in proof/TopPicksProof/README.md (B4), merges the PR, downloads `TopPicksProof-0.0.0-proof.<run>` from the PR's CI run (kept 3 days: re-run CI if it expired), runs the steps and pastes the results.
+1. Owner confirms the server steps in proof/TopPicksProof/README.md (B4), downloads `TopPicksProof-0.0.0-proof.<run>` from the PR's latest CI run (kept 3 days: push or re-run CI if it expired; merging isn't needed first), runs the steps and pastes the results. Merging the PR is separate.
 2. Claude records the results as a dated row in decisions.md and acts on them as D132 says, **before chunk 4 is kept**.
 3. Chunk 4 (EmbyLink): new branch from main; read the open EmbyLink backlog rows first; delete proof/ and the `proof` job in the same PR (D130); supply `CopyContents` and `Reprepare` (D124).
 4. Then chunk 5 (Settings) (D92).

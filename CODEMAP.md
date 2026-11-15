@@ -37,7 +37,7 @@ Nothing runs locally (D5). Open a normal (not draft) pull request: build.yml bui
 
 ### Proof plugin (`proof/TopPicksProof/`) — details: its README
 - Does: Simple UI page; proves loading in 4.10.2 and how Emby reads .nfo `<dateadded>` (D131).
-- Side effects: writes four new files under `programdata\data\top-picks-proof\` once, when the owner ticks the box; deletes nothing.
+- Side effects: writes three test folders (six new files) under `programdata\data\top-picks-proof\` once, when the owner ticks the box; deletes nothing. Emby saves the page's fields (not the results) in `programdata` plugin configurations.
 - Watch out: deleted by chunk 4 after its results are recorded (D130).
 
 ## Change -> retest
@@ -46,7 +46,7 @@ Nothing runs locally (D5). Open a normal (not draft) pull request: build.yml bui
 | anything in Logic | Stryker on the changed file (80%) | all tests (CI) |
 | Storage delete/move paths | Windows-only `_junction`/`_windows` tests must run and pass (at least 11, D125) | Windows CI job |
 | a test file | Stryker becomes a full run (card 0014) | CI |
-| build.yml | each self-test canary (SkiaSharp, audit filter, version) still bites | CI on the PR |
+| build.yml | each self-test canary (SkiaSharp, audit filter, SQLite) still bites | CI on the PR |
 | the Emby SDK version | proof job's "no SQLite" step (D129), D14 | CI |
 | a wall (namespace or allowed arrow) | owner approval; canary in Boundaries | Boundaries tests |
 | `CopyText.DateAddedText` | the proof result (D132), C62 | Logic tests |

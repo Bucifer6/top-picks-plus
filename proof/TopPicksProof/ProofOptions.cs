@@ -19,11 +19,11 @@ public class ProofOptions : EditableOptionsBase
     public CaptionItem CaptionDateAdded { get; set; } = new CaptionItem("Date added from .nfo files");
 
     [DisplayName("Any movie file")]
-    [Description("The two test folders point to this file. It is only read, never changed.")]
+    [Description("The test folders point to this file. It is only read, never changed.")]
     [EditFilePicker]
     public string TestMovieFile { get; set; } = string.Empty;
 
-    [DisplayName("Write the two test folders when I press Save (only once)")]
+    [DisplayName("Write the three test folders when I press Save (only once)")]
     public bool WriteTestFolders { get; set; }
 
     [DisplayName("What happened when the test folders were written")]

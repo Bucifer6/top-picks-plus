@@ -11,16 +11,19 @@ using MediaBrowser.Controller.Library;
 
 namespace TopPicksProof;
 
-/// <summary>The proofs themselves (D76, D77, D129): what Emby reports, and the one write into top-picks-proof.</summary>
+/// <summary>The proofs themselves (D76, D77, D129, D131): what Emby reports, and the one write into top-picks-proof.</summary>
 internal sealed class Proofs
 {
     private const string TimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-    // C62: one date in summer time and one in winter time, both written as server local time like D50's format.
+    // C62: one date in summer time and one in winter time, written as server local time like D50's format, plus the
+    // summer date with its offset written out, which tells "read as UTC" apart from "converted with today's offset"
+    // even when the proof runs in winter (review finding 1, D132).
     private static readonly TestCopy[] TestCopies =
     {
         new TestCopy("Top Picks Proof July", "2026-07-15 12:00:00"),
         new TestCopy("Top Picks Proof January", "2026-01-15 12:00:00"),
+        new TestCopy("Top Picks Proof July Offset", "2026-07-15T12:00:00+01:00"),
     };
 
     private readonly IApplicationHost host;
@@ -29,10 +32,11 @@ internal sealed class Proofs
 
     private string ProofRoot => Path.Combine(host.Resolve<IApplicationPaths>().DataPath, "top-picks-proof");
 
-    public string Report(Version pluginVersion)
+    public string Report(string pluginVersion)
     {
         var text = new StringBuilder();
         text.AppendLine("TOP PICKS PROOF RESULTS");
+        text.AppendLine();
         text.AppendLine(Part("1. Loaded", () => Loaded(pluginVersion)));
         text.AppendLine("2. Playback Reporting file: not read. The pinned Emby SDK (4.9.1.90) has no SQLite library to compile against, "
             + "so the first week comes from each person's last played dates instead (D25, D129).");
@@ -41,7 +45,7 @@ internal sealed class Proofs
         return text.ToString();
     }
 
-    /// <summary>Writes the two test folders, once. Never overwrites or deletes anything.</summary>
+    /// <summary>Writes the test folders, once. Never overwrites or deletes anything.</summary>
     public string WriteTestFolders(string movieFile)
     {
         try
@@ -67,15 +71,15 @@ internal sealed class Proofs
             body = "Failed: " + ex.GetType().Name + ": " + ex.Message;
         }
 
-        return heading + "\n" + body + "\n";
+        return heading + "\n" + body;
     }
 
-    private string Loaded(Version pluginVersion)
+    private string Loaded(string pluginVersion)
     {
         var zone = TimeZoneInfo.Local;
         return $"Top Picks Proof {pluginVersion} is running in {host.Name} {host.ApplicationVersion} ({host.OperatingSystemDisplayName}).\n"
             + $"Server time zone: {zone.Id}, now UTC{DateTimeOffset.Now.ToString("zzz", CultureInfo.InvariantCulture)}. "
-            + $"Checked {DateTimeOffset.UtcNow.ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC.";
+            + $"Checked {DateTimeOffset.UtcNow.ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC.\n";
     }
 
     private string DateAdded()
@@ -92,33 +96,27 @@ internal sealed class Proofs
                 continue;
             }
 
-            var foundBy = "its path";
-            var item = library.FindByPath(strm, false);
-            if (item == null)
-            {
-                foundBy = "its name";
-                item = library.GetItemList(new InternalItemsQuery { Name = copy.Title, IncludeItemTypes = new[] { "Movie" }, Recursive = true })
+            // By path first; by title if Emby keeps the item under another path.
+            var item = library.FindByPath(strm, false)
+                ?? library.GetItemList(new InternalItemsQuery { Name = copy.Title, IncludeItemTypes = new[] { "Movie" }, Recursive = true })
                     .FirstOrDefault();
-            }
-
             if (item == null)
             {
-                lines.Add($"{copy.Title}: written as {copy.DateAdded} server time, not in Emby yet. Refresh the test library, then open this page again.");
+                lines.Add($"{copy.Title}: written as {copy.DateAdded}, not in Emby yet. Scan the test library, then open this page again.");
                 continue;
             }
 
-            lines.Add($"{copy.Title}: written as {copy.DateAdded} server time. Emby holds "
-                + $"{item.DateCreated.UtcDateTime.ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC = {ServerTime(item.DateCreated)} server time. "
-                + Verdict(copy.DateAdded, item.DateCreated) + $" (found by {foundBy}, Emby id {item.InternalId})");
+            lines.Add($"{copy.Title}: written as {copy.DateAdded} (= {copy.ExpectedUtc().ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC). "
+                + $"Emby holds {item.DateCreated.UtcDateTime.ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC "
+                + $"= {ServerTime(item.DateCreated)} server time. {Verdict(copy.ExpectedUtc(), item.DateCreated)} (Emby id {item.InternalId})");
         }
 
-        return string.Join("\n", lines);
+        return string.Join("\n", lines) + "\n";
     }
 
-    private static string Verdict(string written, DateTimeOffset held)
+    private static string Verdict(DateTime expectedUtc, DateTimeOffset held)
     {
-        var writtenLocal = DateTime.ParseExact(written, TimeFormat, CultureInfo.InvariantCulture);
-        var difference = TimeZoneInfo.ConvertTime(held, TimeZoneInfo.Local).DateTime - writtenLocal;
+        var difference = held.UtcDateTime - expectedUtc;
         if (Math.Abs(difference.TotalMinutes) < 1)
         {
             return "SAME MOMENT.";
@@ -141,11 +139,6 @@ internal sealed class Proofs
 
         var root = ProofRoot;
         var movie = Path.GetFullPath(movieFile);
-        if (movie.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-        {
-            return "Not written: the movie file must not be inside top-picks-proof.";
-        }
-
         if (Directory.Exists(root))
         {
             var found = WhatIsThere(root);
@@ -155,7 +148,7 @@ internal sealed class Proofs
                 return found.SetEquals(expected)
                     ? "Already written, so nothing was done (it writes only once)."
                     : "Not written: top-picks-proof already holds something this plugin didn't write, or an unfinished write. "
-                        + "Delete that folder by hand, then tick the box again.";
+                        + "Remove the test library if you made it, delete the top-picks-proof folder by hand, then tick the box again.";
             }
         }
 
@@ -167,11 +160,11 @@ internal sealed class Proofs
             WriteNewFile(copy.NfoPath(root), Nfo(copy));
         }
 
-        return $"Written {DateTimeOffset.UtcNow.ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC: two test folders in {root}, "
-            + $"each pointing to {movie}. Now refresh the test library.";
+        return $"Written {DateTimeOffset.UtcNow.ToString(TimeFormat, CultureInfo.InvariantCulture)} UTC. "
+            + $"Test library folder: {root}";
     }
 
-    // Everything at the top of top-picks-proof, plus what is inside the two expected folders. A link (junction) or a
+    // Everything at the top of top-picks-proof, plus what is inside the expected folders. A link (junction) or a
     // folder of another name counts as something we didn't write; links are never followed.
     private static HashSet<string> WhatIsThere(string root)
     {
@@ -219,9 +212,18 @@ internal sealed class Proofs
 
         public string Title { get; }
 
+        /// <summary>The text written into the .nfo: server local time, or a time with its offset written out.</summary>
         public string DateAdded { get; }
 
         private string FolderName => Title + " (2026)";
+
+        // A plain time means server local time on that date (D50, D67); a time with an offset means exactly that moment.
+        public DateTime ExpectedUtc() =>
+            DateAdded.Contains("T")
+                ? DateTimeOffset.ParseExact(DateAdded, "yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture).UtcDateTime
+                : TimeZoneInfo.ConvertTimeToUtc(
+                    DateTime.SpecifyKind(DateTime.ParseExact(DateAdded, TimeFormat, CultureInfo.InvariantCulture), DateTimeKind.Unspecified),
+                    TimeZoneInfo.Local);
 
         public string FolderPath(string root) => Path.Combine(root, FolderName);
 
