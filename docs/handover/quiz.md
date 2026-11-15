@@ -1,3 +1,5 @@
+> **Not kept up to date since 2026-11-09 (D133).** Kept only as a record.
+
 # Handover quiz (answer from current.md alone; do not open answers.md)
 1. Which pull request is waiting, and what does it hold?
 2. Why might a pushed commit show no CI run, and when is that fine?

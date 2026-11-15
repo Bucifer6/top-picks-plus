@@ -1,3 +1,5 @@
+> **Not kept up to date since 2026-11-09 (D133).** Kept only as a record.
+
 # Answer key (only the marking reviewer reads this)
 1. #7, build/chunk1-logic: Logic code and tests, CI changes (D105, D115), D101–D116, review fixes, backlog B38–B44, cards 0011–0014, handover. Owner merges. (Where it stopped)
 2. Draft PRs don't run CI (D115), and docs-only commits are skipped by paths-ignore; the latter is fine (later #7 commits are docs only). (Where it stopped; Watch out for)

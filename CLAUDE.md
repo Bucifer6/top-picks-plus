@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunk 3 (Artwork) and chunk 1 (Logic) merged. Chunk 2 (Storage) built and reviewed: PR #8 waiting for the owner. Next: the proof plugin, then 4 EmbyLink, 5 Settings (D92).
+**Stage:** 6 Build. Stage 5 passed 2026-11-08. Chunks 3 (Artwork), 1 (Logic) and 2 (Storage) merged (PR #8, 2026-11-09). Now: the proof plugin (branch build/proof-plugin), then 4 EmbyLink, 5 Settings (D92).
 **CI budget:** public repo since 2026-11-09, so Actions minutes are free; still keep runs lean (CI runs only on non-draft PRs, main and v* tags). Everything committed is public: never commit secrets, and keep personal details out of new docs.
 
 ## Rules
@@ -16,10 +16,12 @@ Follows the build-software-safely method: talk and docs first, no code before th
 ## Docs
 - docs/spec.md – what it does (F1–F10, v7)
 - docs/checks.md – how the owner tests it (C1–C100)
-- docs/decisions.md – what's decided (D1–D128) and what's still open
+- docs/decisions.md – what's decided (D1–D133) and what's still open
 - docs/data.md – settings, plugin flags (state.json), managed list, play log, run record
 - docs/backlog.md – findings set aside for the chunk that deals with them; each chunk's builder fixes or decides its items
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
+- CODEMAP.md – where things are and what to retest when you change them
+- docs/logbook/ – lessons (cards); the handover quiz is no longer kept (D133)
 
 ## Folders
 | Folder | Purpose |
@@ -32,8 +34,8 @@ Follows the build-software-safely method: talk and docs first, no code before th
 | src/TopPicksPlus/EmbyLink | Everything that talks to Emby: task, events, swap, dates, guard, row check |
 | src/TopPicksPlus/Settings | Admin settings page and run report |
 | tests/ | xUnit tests for Logic, Storage and Artwork; Boundaries/ is the boundary check |
-| proof/TopPicksProof/ | Separate tiny proof plugin (never Top Picks Plus), installed before chunk 4 is kept to prove things on the server (D76, D77) |
-| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. Also keeps the C65 artwork samples and checks no SkiaSharp ships; the SkiaSharp audit exception is in (D97). Chunk 1 added the Windows test job with Stryker (80% bar), global.json, NuGet caching and the trigger rules (D105, D115); the proof job comes with chunk 4 (D87) |
+| proof/TopPicksProof/ | Separate tiny proof plugin (never Top Picks Plus), installed before chunk 4 is kept to prove things on the server (D76, D77, D131); deleted by chunk 4 (D130) |
+| .github/workflows/ | build.yml: build, tests, version check, audit, secret scan; Release on a v1.2.3 tag on main. Also keeps the C65 artwork samples and checks no SkiaSharp ships; the SkiaSharp audit exception is in (D97). Chunk 1 added the Windows test job with Stryker (80% bar), global.json, NuGet caching and the trigger rules (D105, D115); the `proof` job builds the proof plugin and checks the SDK has no SQLite (D77, D129) |
 
 ## Building
 Boundary check: tests/TopPicksPlus.Tests/Boundaries (runs on every change; layout approved by the owner 2026-11-08).
