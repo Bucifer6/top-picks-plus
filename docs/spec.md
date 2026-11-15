@@ -34,8 +34,8 @@ The list is built automatically every week. **No manual step is ever needed.** P
 2. **The remaining places go to the most watched source titles**, scored as **viewer-days in the last 7 days** (the 7 full UK calendar days before the run day; for the Sunday run, the previous Sunday to Saturday, D21): each user who watched a title on a given UK calendar day adds 1. Watching 10 episodes of a series in one evening counts as 1 for that user that day. The same user on three different days counts as 3. Episodes count towards their series.
 3. **Ties:** the title whose newest content was added most recently wins: for a movie, its date added; for a series, its newest episode's date added. If that's also tied, the newer premiere date wins; if still tied, the lower source item ID (D35).
 4. **Filler:** if fewer than 10 titles were watched, the empty places go to the most recently added source titles (using the same "newest content" rule).
-5. **Candidates:** movies and series in the chosen libraries (default: every movie and TV library apart from the Top Picks library). A title appears only once. A movie is skipped if its video file can't be found. A series is skipped only if none of its episode files can be found, and missing episodes are left out.
-6. With fewer than 10 candidates the row is shorter. The run doesn't fail.
+5. **Candidates:** movies and series in the chosen libraries (default: every library whose Emby content type is movies or TV shows, apart from the Top Picks library, D136). A title appears only once. A movie is skipped if its video file can't be found. A series is skipped only if none of its episode files can be found, and missing episodes are left out.
+6. With fewer than 10 candidates the row is shorter. The run doesn't fail, unless a chosen library's folder can't be reached or no title's file can be found at all: then nothing is changed and the run is retried, so an offline drive never empties the row (D147).
 7. **Always 10.** The number of picks is fixed and can't be changed in settings.
 
 ## F3 – What each copy contains

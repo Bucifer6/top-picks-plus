@@ -23,14 +23,14 @@
 **Files (chunk 4):**
 | File | What it does |
 |------|--------------|
-| `Host.cs` | The Emby services used (B27: `IApplicationHost`, `IApplicationPaths`, `ILibraryManager`, `IUserManager`, `IUserDataManager`, `IUserViewManager`, `IProviderManager`, `IFileSystem`, `ISessionManager`, `ILogManager`), the Top Picks folder, Storage's `DataFolder` and `CopyFolders` |
+| `Host.cs` | The Emby services the run uses (`IApplicationHost`, `IApplicationPaths`, `ILibraryManager`, `IUserManager`, `IUserDataManager`, `IUserViewManager`, `IProviderManager`, `IFileSystem`, a logger), the Top Picks folder, Storage's `DataFolder` and `CopyFolders`. With `ISessionManager` and `ILogManager` (EntryPoint) that is the full SDK list (B27) |
 | `EntryPoint.cs` | `IServerEntryPoint`: start-up plan (D35, D90), `listeningSinceUtc` (D91), events (plays, watched, library changes → order guard, D135); `Startup.OldPluginLoaded` |
 | `RefreshTask.cs` | `IScheduledTask` "Refresh Top Picks", weekly Sunday 05:00 |
 | `RunEngine.cs` | The lock, triggers, refusals, retries and held messages (D44, D78, D94, D143) |
 | `RunSteps.cs` | One attempt: import, takeover, leftovers, prepare, swap, rescan, dates, artwork, check, record (D80, D137–D140, D142) |
 | `CopyBuilder.cs` | Every file of a copy, worked out again each time (D140) |
 | `Catalog.cs` | Candidates, pins, episodes (F2, D136) |
-| `EmbyFacts.cs` | Library, guards, users, old plugin, UK time, crediting (D20, D28, D33, D53, D64, D90) |
+| `EmbyFacts.cs` | Library, guards, users, old plugin, UK time, crediting, a copy's Emby items, unreachable library folders (D20, D28, D33, D53, D64, D90, D147) |
 | `OrderGuard.cs` | Puts dates back (F5, D52) |
 | `PlayLogger.cs` | Plays from playback start/stop (F6, D29, D141) |
 | `Watched.cs` | Watched state between copies and sources, with echo detection (F7, D103, D141) |

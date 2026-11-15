@@ -79,6 +79,52 @@ public static class EmbyFacts
         return ids;
     }
 
+    /// <summary>
+    /// D147: the first folder of the given libraries that can't be reached (a media drive offline), or null. A run doesn't choose
+    /// picks while one is missing, so an unplugged drive can never empty the row.
+    /// </summary>
+    public static string? UnreachableLibraryFolder(Host h, IReadOnlyCollection<long> libraryIds)
+    {
+        foreach (var folder in h.Library.GetVirtualFolders())
+        {
+            if (!libraryIds.Contains(h.Library.GetInternalId(folder.ItemId)))
+                continue;
+            foreach (var location in folder.Locations ?? Array.Empty<string>())
+            {
+                if (!SafeDirectoryExists(location))
+                    return location;
+            }
+        }
+        return null;
+    }
+
+    private static bool SafeDirectoryExists(string path)
+    {
+        try
+        {
+            return Directory.Exists(path);
+        }
+        catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// The Emby items of one copy (D28, D137): for a series, the series folder first; then each .strm with its source item. An
+    /// item Emby doesn't have yet is null.
+    /// </summary>
+    public static IReadOnlyList<(BaseItem? Item, long? SourceId)> CopyItems(Host h, ManagedEntry entry)
+    {
+        var folder = Path.Combine(h.TopPicksPath, entry.Folder);
+        var list = new List<(BaseItem?, long?)>();
+        if (entry.Kind == TitleKind.Series)
+            list.Add((h.Library.FindByPath(folder, true), null));
+        foreach (var kv in entry.Items)
+            list.Add((h.Library.FindByPath(Path.Combine(folder, kv.Key), false), kv.Value));
+        return list;
+    }
+
     /// <summary>D33: the old plugin is loaded if any installed plugin matches its assembly name or ID.</summary>
     public static bool OldPluginLoaded(Host h) =>
         EmbyRules.OldPluginLoaded((h.App.Plugins ?? Array.Empty<MediaBrowser.Common.Plugins.IPlugin>())

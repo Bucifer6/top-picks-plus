@@ -159,14 +159,27 @@ internal sealed class RunSteps
             ChoosePicks();
         var managed = Managed();
         var results = new Dictionary<string, CopyBuild>(Names);
+        var gone = new List<RunPick>();
         foreach (var pick in _run.Picks)
         {
             var build = BuildFor(pick, IsNew(pick, managed));
+            if (build == null)
+            {
+                gone.Add(pick);
+                continue;
+            }
             build.WriteTo(_h.Copies, pick.Folder);
             results[pick.Folder] = build;
         }
+        foreach (var pick in gone)
+        {
+            // D147: a pick whose title vanished since it was chosen is left out of this run (its rank stays empty), not a failure.
+            _h.Data.AddNotice("pickGone", "pick " + pick.Rank + " (title " + pick.SourceId + ") was left out: its title is no longer in Emby", DateTime.UtcNow);
+            _h.Log.Warn("Top Picks Plus: pick {0} (title {1}) was left out: its title is no longer in Emby", pick.Rank, pick.SourceId);
+        }
         _h.Data.UpdateRun(r =>
         {
+            r.Picks = r.Picks.Where(p => !gone.Any(g => g.SourceId == p.SourceId)).ToList();
             foreach (var p in r.Picks)
             {
                 if (!results.TryGetValue(p.Folder, out var b))
@@ -182,8 +195,15 @@ internal sealed class RunSteps
     {
         var settings = Host.Settings;
         var plays = _h.Data.LoadPlays().Value?.Plays ?? new List<Play>();
-        var candidates = Catalog.Candidates(_h, EmbyFacts.CandidateLibraries(_h, settings.LibraryIds ?? new long[0]));
+        var libraries = EmbyFacts.CandidateLibraries(_h, settings.LibraryIds ?? new long[0]);
+        // D147: with a media folder unreachable (a drive offline), nothing is chosen: the error is retried, never an emptied row.
+        var unreachable = EmbyFacts.UnreachableLibraryFolder(_h, libraries);
+        if (unreachable != null)
+            throw new IOException("the library folder " + unreachable + " can't be reached; is the drive connected?");
+        var candidates = Catalog.Candidates(_h, libraries);
         var chosen = Choosing.Choose(candidates, Catalog.Pins(_h, settings.Pins ?? new long[0]), Counting.ViewerDays(plays, RunDayUk));
+        if (chosen.Picks.Count == 0)
+            throw new IOException("no title's file can be found in the chosen libraries; the row is left as it is");
 
         var managed = Managed();
         var staying = chosen.Picks.ToDictionary(p => p.SourceId, p => managed.FirstOrDefault(e => SwapPlan.IsStaying(e, p.SourceId)));
@@ -212,23 +232,33 @@ internal sealed class RunSteps
     private static bool IsNew(RunPick pick, IEnumerable<ManagedEntry> managed) =>
         !managed.Any(e => SwapPlan.IsStaying(e, pick.SourceId));
 
-    private CopyBuild BuildFor(RunPick pick, bool isNew)
+    /// <summary>The pick's copy files, or null when its title is no longer a movie or series in Emby (D147).</summary>
+    private CopyBuild? BuildFor(RunPick pick, bool isNew)
     {
         var key = pick.Folder + (isNew ? "|new" : "|staying");
         if (!_builds.TryGetValue(key, out var build))
         {
             build = CopyBuilder.Build(_h, pick.SourceId, pick.Folder, pick.Rank, RankTimes.RankDate(RankTime, pick.Rank), isNew, _h.Copies.Staging.Length);
+            if (build == null)
+                return null;
             _builds[key] = build;
         }
         return build;
     }
 
-    /// <summary>D124: staging lost a copy, so it is prepared again, whole, under <paramref name="partialName"/>.</summary>
+    /// <summary>
+    /// D124: staging lost a copy, so it is prepared again, whole, under <paramref name="partialName"/>. The staging name is the
+    /// pick's folder, or, for a copy moved in under a " - N" name (D40), that entry's folder, found through its source (D147).
+    /// </summary>
     private void Reprepare(string stagingName, string partialName)
     {
+        var managed = Managed();
+        var source = managed.FirstOrDefault(e => Names.Equals(e.Folder, stagingName))?.SourceId;
         var pick = _run.Picks.FirstOrDefault(p => Names.Equals(p.Folder, stagingName))
+            ?? _run.Picks.FirstOrDefault(p => p.SourceId == source)
             ?? throw new IOException("no pick for staging folder '" + stagingName + "'");
-        BuildFor(pick, IsNew(pick, Managed())).WriteTo(_h.Copies, partialName);
+        var build = BuildFor(pick, IsNew(pick, managed)) ?? throw new IOException("the title of '" + stagingName + "' is no longer in Emby");
+        build.WriteTo(_h.Copies, partialName);
     }
 
     // ---------------- swap (F4 step 2, D26, D40, D101, D124) ----------------
@@ -244,16 +274,19 @@ internal sealed class RunSteps
             var entry = managed.FirstOrDefault(e => SwapPlan.IsStaying(e, pick.SourceId));
             if (entry == null)
                 continue;
-            var contents = BuildFor(pick, isNew: false).Contents();
+            // A staying copy whose title vanished is left exactly as it is this week (D147).
+            var contents = BuildFor(pick, isNew: false)?.Contents();
+            if (contents == null)
+                continue;
             var plan = SwapPlan.StayingFiles(entry, contents.Items, contents.Files);
             _h.Data.AddRefusedDeletes(plan.Refused.Select(RefusedDelete.From));
             Apply(plan.Steps);
         }
 
         var bySource = _run.Picks.ToDictionary(p => p.SourceId);
-        _h.Copies.Apply(
+        Apply(
             SwapPlan.SwapNew(Managed(), planned, RankTime, _h.Copies.FolderNames()),
-            e => e.SourceId.HasValue && bySource.TryGetValue(e.SourceId.Value, out var p) ? BuildFor(p, isNew: true).Contents() : null);
+            e => e.SourceId.HasValue && bySource.TryGetValue(e.SourceId.Value, out var p) ? BuildFor(p, isNew: true)?.Contents() : null);
 
         managed = Managed();
         _h.Data.UpdateRun(r =>
@@ -286,17 +319,7 @@ internal sealed class RunSteps
     /// </summary>
     private bool AllAppeared() => SwapPlan.Guarded(Managed()).All(e => CopyItems(e).All(i => i.Item != null));
 
-    /// <summary>The Emby items of one copy: the movie, or the series and each episode, with each .strm's source (D28).</summary>
-    private IReadOnlyList<(BaseItem? Item, long? SourceId)> CopyItems(ManagedEntry entry)
-    {
-        var folder = Path.Combine(_h.TopPicksPath, entry.Folder);
-        var list = new List<(BaseItem?, long?)>();
-        if (entry.Kind == TitleKind.Series)
-            list.Add((_h.Library.FindByPath(folder, true), null));
-        foreach (var kv in entry.Items)
-            list.Add((_h.Library.FindByPath(Path.Combine(folder, kv.Key), false), kv.Value));
-        return list;
-    }
+    private IReadOnlyList<(BaseItem? Item, long? SourceId)> CopyItems(ManagedEntry entry) => EmbyFacts.CopyItems(_h, entry);
 
     // ---------------- dates, watched state, artwork (F4 steps 4-5, F7, D52, D103) ----------------
 
@@ -307,7 +330,7 @@ internal sealed class RunSteps
     private void SetDates(bool copyWatched, CancellationToken ct)
     {
         var users = copyWatched ? EmbyFacts.AllUsers(_h) : Array.Empty<User>();
-        var applied = new Dictionary<string, bool>(Names);
+        var applied = new Dictionary<long, bool>();
         foreach (var entry in SwapPlan.Guarded(Managed()))
         {
             ct.ThrowIfCancellationRequested();
@@ -324,12 +347,14 @@ internal sealed class RunSteps
                         Watched.CopyPlayedOnto(_h, users, source, item, ct);
                 }
             }
-            applied[entry.Folder] = items.All(i => i.Item != null);
+            // Keyed by source, so a copy moved in under a " - N" name still matches its pick (D147).
+            if (entry.SourceId.HasValue)
+                applied[entry.SourceId.Value] = items.All(i => i.Item != null);
         }
         _h.Data.UpdateRun(r =>
         {
             foreach (var p in r.Picks)
-                p.DateApplied = applied.TryGetValue(p.Folder, out var ok) && ok;
+                p.DateApplied = applied.TryGetValue(p.SourceId, out var ok) && ok;
         });
     }
 
@@ -360,7 +385,11 @@ internal sealed class RunSteps
         var user = users.FirstOrDefault(u => string.Equals(EmbyFacts.UserKey(u), userId, StringComparison.OrdinalIgnoreCase));
         if (user == null)
         {
-            _h.Data.UpdateRun(r => r.RowCheck = new RowCheckRecord { Passed = false, Returned = new List<string> { "no user to check the row with" } });
+            _h.Data.UpdateRun(r =>
+            {
+                r.RowCheck = new RowCheckRecord { Passed = false };
+                r.Message = "The row couldn't be checked: Emby has no users.";
+            });
             return;
         }
 
@@ -439,9 +468,9 @@ internal sealed class RunSteps
     private IReadOnlyList<ManagedEntry> Managed() =>
         _h.Data.LoadManaged().Value ?? throw new InvalidOperationException("managed.json can't be read");
 
-    private void Apply(IEnumerable<PlanStep> plan)
+    private void Apply(IEnumerable<PlanStep> plan, Func<ManagedEntry, CopyContents?>? newCopyContents = null)
     {
-        var result = _h.Copies.Apply(plan);
+        var result = _h.Copies.Apply(plan, newCopyContents);
         foreach (var r in result.Refused)
             _h.Log.Warn("Top Picks Plus: refused to touch {0} {1}: {2}", r.Folder, r.Path ?? string.Empty, r.Reason);
     }

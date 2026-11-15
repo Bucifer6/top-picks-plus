@@ -17,6 +17,7 @@ public static class RunEngine
     private static readonly SemaphoreSlim RunLock = new SemaphoreSlim(1, 1);
     private static readonly object TimerGate = new object();
     private static Timer? retryTimer;
+    private static bool stopped;
 
     /// <summary>True while a run is working (D44). The order guard pauses only then.</summary>
     public static bool LockHeld => RunLock.CurrentCount == 0;
@@ -31,9 +32,10 @@ public static class RunEngine
     public static async Task Request(Host h, Trigger trigger, CancellationToken cancellationToken)
     {
         var got = await RunLock.WaitAsync(0).ConfigureAwait(false);
+        var attempt = new Attempt();
         try
         {
-            await Decide(h, trigger, got, cancellationToken).ConfigureAwait(false);
+            await Decide(h, trigger, got, attempt, cancellationToken).ConfigureAwait(false);
         }
         catch (DataNewerException e)
         {
@@ -41,9 +43,18 @@ public static class RunEngine
             HeldMessage = e.Message;
             h.Log.Error("Top Picks Plus: {0}", e.Message);
         }
+        catch (OperationCanceledException)
+        {
+            // D147: cancelled in Scheduled Tasks or Emby is stopping: no retry; the run waits for the next trigger or start-up.
+            h.Log.Info("Top Picks Plus: the run was cancelled; it carries on at the next trigger");
+        }
         catch (Exception e)
         {
-            AfterError(h, e);
+            // D147: only an attempt that really began (it holds the lock and saved its start or resume) counts as stopped (D78).
+            if (got && attempt.Began)
+                AfterError(h, e);
+            else
+                h.Log.ErrorException("Top Picks Plus: couldn't start the run; it is tried again at the next trigger", e);
         }
         finally
         {
@@ -52,7 +63,7 @@ public static class RunEngine
         }
     }
 
-    private static async Task Decide(Host h, Trigger trigger, bool got, CancellationToken ct)
+    private static async Task Decide(Host h, Trigger trigger, bool got, Attempt attempt, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
         var library = EmbyFacts.FindTopPicksLibrary(h);
@@ -67,8 +78,9 @@ public static class RunEngine
                 return;
         }
 
-        // Past the guards (only a refusal comes back without the lock).
+        // Past the guards (only a refusal comes back without the lock). A planned retry is no longer needed (D147).
         HeldMessage = null;
+        CancelRetry();
         h.Data.SetAsideDamaged(now, EmbyFacts.UkDay(now));
         if (h.Data.RebuildState(now) == RebuildOutcome.Refused)
         {
@@ -84,9 +96,11 @@ public static class RunEngine
                 return;
             case TriggerAction.StartNew:
                 StartNew(h, now);
+                attempt.Began = true;
                 break;
             default:
                 h.Data.SaveResumeCount(decision.ResumeCount);
+                attempt.Began = true;
                 h.Log.Info("Top Picks Plus: resuming the unfinished run (resume {0} of {1})", decision.ResumeCount, RunRules.MaxResumes);
                 break;
         }
@@ -99,11 +113,12 @@ public static class RunEngine
         var state = h.Data.LoadState().Value ?? new PluginState();
         var first = RunRules.FirstStep(state.PlaybackReportingImported, !h.Data.TakeoverNeeded());
         var (plugin, emby, zone) = EmbyFacts.Versions(h);
-        h.Data.StartRun(Guid.NewGuid().ToString("N"), now, first, plugin, emby, zone);
-        // D26: staging is emptied only when a new run starts.
+        // D26, D147: staging is emptied only when a new run starts, and before the run is saved, so a stop in between can never
+        // leave a running run with last week's files in staging (which a move-in would carry into top-picks).
         var problem = h.Copies.EmptyStaging();
         if (problem != null)
             throw new IOException("staging can't be emptied: " + problem);
+        h.Data.StartRun(Guid.NewGuid().ToString("N"), now, first, plugin, emby, zone);
         h.Log.Info("Top Picks Plus: new run started at step {0}", first);
     }
 
@@ -140,6 +155,8 @@ public static class RunEngine
     {
         lock (TimerGate)
         {
+            if (stopped)
+                return;
             retryTimer?.Dispose();
             retryTimer = new Timer(_ => Task.Run(() => Request(h, Trigger.Retry, CancellationToken.None)), null, RunRules.RetryDelay, Timeout.InfiniteTimeSpan);
         }
@@ -151,8 +168,24 @@ public static class RunEngine
     {
         lock (TimerGate)
         {
+            stopped = true;
             retryTimer?.Dispose();
             retryTimer = null;
         }
+    }
+
+    private static void CancelRetry()
+    {
+        lock (TimerGate)
+        {
+            retryTimer?.Dispose();
+            retryTimer = null;
+        }
+    }
+
+    /// <summary>Whether this call's attempt began: it holds the lock and saved its start or its resume (D78, D147).</summary>
+    private sealed class Attempt
+    {
+        public bool Began { get; set; }
     }
 }
