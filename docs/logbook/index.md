@@ -22,3 +22,4 @@ summary: Index of live logbook cards
 | 0017 | insight | EmbyLink, proof, process | Check what a pinned package actually holds before planning around it |
 | 0018 | build | proof, ci | The proof plugin was built as an Emby Simple UI page |
 | 0019 | build | EmbyLink, ci | Chunk 4 wired Logic and Storage to Emby; the only compile error was a System.Memory clash |
+| 0020 | build | Settings | Chunk 5 built the settings page with Emby's plugin UI; never trust posted-back choice lists |
