@@ -107,7 +107,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 - After every Emby server upgrade, the owner runs check C20 ("Run now", then look at the row). The plugin also writes its version and the Emby version at the top of each run report.
 
 ## Proof plugin (D76, D77)
-Before chunk 4 is kept, the owner installs a tiny separate plugin, "Top Picks Proof" (never Top Picks Plus), next to the old plugin. It proves a plugin built this way loads in Emby 4.10.2 and checks in a throwaway test library how Emby reads .nfo dates in summer and winter time. It never touches the Top Picks folder or the row and keeps no data. The owner copies its results into the chat, then uninstalls it.
+Before go-live (after the whole build, D134), the owner installs a tiny separate plugin, "Top Picks Proof" (never Top Picks Plus), next to the old plugin. It proves a plugin built this way loads in Emby 4.10.2 and checks in a throwaway test library how Emby reads .nfo dates in summer and winter time. It never touches the Top Picks folder or the row and keeps no data. The owner copies its results into the chat, then uninstalls it.
 
 ## Going live (D63, D86)
 Nothing of Top Picks Plus goes on the server until every part is built. On go-live day: remove the old plugin's task triggers; make the "Keep me" test folder; install Top Picks Plus with the old plugin still installed, restart, and check Top Picks Plus does nothing and asks for the old one to go (C44, C19); uninstall the old plugin, restart, press Run now, then try the other checks. To undo it that day, uninstall Top Picks Plus, put the old plugin back and restore its Sunday trigger.
