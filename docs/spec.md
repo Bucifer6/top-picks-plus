@@ -86,7 +86,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 ## F8 – Settings page and run report (Dashboard → Plugins → Top Picks Plus; administrators only)
 - **Libraries** to choose from. The Top Picks library is never offered.
 - **Row-check user** (D20).
-- **Pins:** search for a title, add it, drag to reorder, remove. Pins that can't be used are marked "missing".
+- **Pins:** search for a title, add it, move it up or down, remove (D147). Pins that can't be used are marked "missing".
 - **Run now** button, plus a "run in progress" indicator.
 - **Last run report:** when it ran, finished / incomplete / failed, and each of the 10 titles with its rank, why it was picked (pinned / X viewer-days / filler) and whether its copy and date were applied. The row check result shows exactly what Emby returned if it didn't pass. Also shown: the number of plays recorded in the last 7 days, missing pins, any artwork that failed, and the last refused run with its reason and what to change (D31). Plus, when they happen: episodes left out, imported plays ignored, deletes refused, unmanaged folders, the row-check user falling back to an administrator, why a run failed, and damaged files that were set aside (D81).
 
