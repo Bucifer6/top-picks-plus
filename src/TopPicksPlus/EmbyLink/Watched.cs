@@ -22,17 +22,20 @@ public static class Watched
 
     private static string Key(User user, BaseItem item) => EmbyFacts.UserKey(user) + ":" + item.InternalId.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
-    /// <summary>D103: copies each user's played state from <paramref name="source"/> onto the copy item, remembering each write.</summary>
+    /// <summary>
+    /// D103, D147: a copy takes on the tick of a source the user has already watched, remembering each write. It never un-ticks a
+    /// copy (a tick made while sync wasn't allowed must not be lost).
+    /// </summary>
     public static void CopyPlayedOnto(Host h, IEnumerable<User> users, BaseItem source, BaseItem copy, CancellationToken ct)
     {
         foreach (var user in users)
         {
             var from = h.UserData.GetUserData(user, source);
             var onto = h.UserData.GetUserData(user, copy);
-            if (from == null || onto == null || onto.Played == from.Played)
+            if (from == null || onto == null || !from.Played || onto.Played)
                 continue;
-            onto.Played = from.Played;
-            OwnWrites[Key(user, copy)] = (DateTime.UtcNow, from.Played);
+            onto.Played = true;
+            OwnWrites[Key(user, copy)] = (DateTime.UtcNow, true);
             h.UserData.SaveUserData(user, copy, onto, UserDataSaveReason.TogglePlayed, ct);
         }
     }
@@ -76,8 +79,26 @@ public static class Watched
             var target = h.UserData.GetUserData(user, source);
             if (target == null)
                 return;
-            target.Played = data.Played;
-            target.PlaybackPositionTicks = data.PlaybackPositionTicks;
+            // D147: a hand mark (toggle) is copied either way. A finished or stopped play only moves the source forward: it can mark
+            // it played, or give an unwatched source its resume point, but never un-watch a source the user has already seen.
+            if (e.SaveReason == UserDataSaveReason.TogglePlayed)
+            {
+                target.Played = data.Played;
+                target.PlaybackPositionTicks = data.PlaybackPositionTicks;
+            }
+            else if (data.Played)
+            {
+                target.Played = true;
+                target.PlaybackPositionTicks = 0;
+            }
+            else if (!target.Played)
+            {
+                target.PlaybackPositionTicks = data.PlaybackPositionTicks;
+            }
+            else
+            {
+                return;
+            }
             if (data.LastPlayedDate.HasValue)
                 target.LastPlayedDate = data.LastPlayedDate;
             h.UserData.SaveUserData(user, source, target, e.SaveReason, CancellationToken.None);

@@ -115,7 +115,17 @@ public sealed class EntryPoint : IServerEntryPoint
             _timers.Add(new Timer(_ => Task.Run(work), null, delay, Timeout.InfiniteTimeSpan));
     }
 
-    private void OnPlaybackStart(object? sender, PlaybackProgressEventArgs e) => PlayLogger.OnPlaybackStart(e);
+    private void OnPlaybackStart(object? sender, PlaybackProgressEventArgs e)
+    {
+        try
+        {
+            PlayLogger.OnPlaybackStart(e);
+        }
+        catch (Exception ex)
+        {
+            _h.Log.ErrorException("Top Picks Plus: couldn't note a playback start", ex);
+        }
+    }
 
     private void OnPlaybackStopped(object? sender, PlaybackStopEventArgs e) => PlayLogger.OnPlaybackStopped(_h, e);
 

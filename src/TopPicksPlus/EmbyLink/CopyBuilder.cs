@@ -80,12 +80,15 @@ public static class CopyBuilder
     private static readonly StringComparer Names = StringComparer.OrdinalIgnoreCase;
 
     /// <summary>
-    /// The files of one copy. <paramref name="folder"/> is the copy's folder name (the movie's .strm and .nfo are named after it);
+    /// The files of one copy, or null when the source title is gone. <paramref name="folder"/> is the copy's folder name (the movie's .strm and .nfo are named after it);
     /// themes are only included for a new copy (D110); <paramref name="stagingRootLength"/> limits paths (D106).
     /// </summary>
-    public static CopyBuild Build(Host h, long sourceId, string folder, int rank, DateTime rankDateUtc, bool isNew, int stagingRootLength)
+    public static CopyBuild? Build(Host h, long sourceId, string folder, int rank, DateTime rankDateUtc, bool isNew, int stagingRootLength)
     {
-        var item = h.Library.GetItemById(sourceId) ?? throw new InvalidOperationException("source title " + sourceId.ToString(CultureInfo.InvariantCulture) + " no longer exists");
+        // D147: null when the title is gone (or no longer a movie or series), so the caller can leave that pick out.
+        var item = h.Library.GetItemById(sourceId);
+        if (item == null)
+            return null;
         var dateAdded = EmbyFacts.DateAddedText(rankDateUtc);
         var files = new List<CopyFile>();
         var skipped = 0;
@@ -103,7 +106,7 @@ public static class CopyBuilder
         }
         else
         {
-            throw new InvalidOperationException("source title " + sourceId.ToString(CultureInfo.InvariantCulture) + " is not a movie or series");
+            return null;
         }
 
         AddImage(files, "fanart.jpg", ImagePath(item, ImageType.Backdrop));

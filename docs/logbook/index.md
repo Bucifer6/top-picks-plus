@@ -21,3 +21,4 @@ summary: Index of live logbook cards
 | 0016 | build | Storage, ci, tests | Chunk 2 built Storage with tests per check, Windows-only tests proved to run, and 12 rules proved by deliberate breaks |
 | 0017 | insight | EmbyLink, proof, process | Check what a pinned package actually holds before planning around it |
 | 0018 | build | proof, ci | The proof plugin was built as an Emby Simple UI page |
+| 0019 | build | EmbyLink, ci | Chunk 4 wired Logic and Storage to Emby; the only compile error was a System.Memory clash |

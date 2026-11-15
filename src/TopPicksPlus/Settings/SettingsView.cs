@@ -45,7 +45,7 @@ public sealed class SettingsController : IPluginUIPageController
 }
 
 /// <summary>
-/// What the page does (F8, D61, D74, D93, D147): fills the choices and the report, carries out the buttons, and saves the owner's
+/// What the page does (F8, D61, D74, D93, D148): fills the choices and the report, carries out the buttons, and saves the owner's
 /// settings (libraries, row-check user, pins) in Emby's plugin settings. It never writes state.json or any other data file (D93):
 /// Run now asks EmbyLink, which applies the normal guards.
 /// </summary>

@@ -30,7 +30,7 @@ public sealed class Plugin : BasePlugin<PluginConfiguration>, IHasUIPages
 
     public override Guid Id => EmbyRules.ThisPluginId;
 
-    /// <summary>The settings page (F8, D147), drawn by Emby's plugin UI.</summary>
+    /// <summary>The settings page (F8, D148), drawn by Emby's plugin UI.</summary>
     public IReadOnlyCollection<IPluginUIPageController> UIPageControllers =>
         _pages ??= new List<IPluginUIPageController> { new SettingsController(GetPluginInfo().Id) };
 

@@ -10,7 +10,7 @@ namespace TopPicksPlus.Settings;
 
 /// <summary>
 /// The settings page's fields (F8). Emby draws the page from these properties (its plugin UI framework), so there is no HTML,
-/// script or web endpoint of the plugin's own (D147). Buttons send their <c>Data1</c> as the command to <see cref="SettingsView"/>.
+/// script or web endpoint of the plugin's own (D148). Buttons send their <c>Data1</c> as the command to <see cref="SettingsView"/>.
 /// </summary>
 public class SettingsPage : EditableOptionsBase
 {

@@ -42,15 +42,11 @@ public static class OrderGuard
             var reset = 0;
             foreach (var entry in SwapPlan.Guarded(managed))
             {
-                var folder = Path.Combine(h.TopPicksPath, entry.Folder);
-                var items = entry.Kind == TitleKind.Series
-                    ? new[] { h.Library.FindByPath(folder, true) }.Concat(entry.Items.Keys.Select(k => h.Library.FindByPath(Path.Combine(folder, k), false)))
-                    : entry.Items.Keys.Select(k => h.Library.FindByPath(Path.Combine(folder, k), false));
-                foreach (var item in items.Where(i => i != null))
+                foreach (var (item, _) in EmbyFacts.CopyItems(h, entry))
                 {
                     if (RunEngine.LockHeld)
                         return;
-                    if (!RankTimes.NeedsReset(entry.RankDateUtc, item!.DateCreated.UtcDateTime))
+                    if (item == null || !RankTimes.NeedsReset(entry.RankDateUtc, item.DateCreated.UtcDateTime))
                         continue;
                     SetDate(item, entry.RankDateUtc!.Value);
                     reset++;
