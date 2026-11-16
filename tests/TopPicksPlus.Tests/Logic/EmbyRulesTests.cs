@@ -345,4 +345,52 @@ public class EmbyRulesTests
         };
         Assert.Equal(new[] { "Raw", "Stray" }, Takeover.UnmanagedFolders(folders, new[] { "managed" }));
     }
+
+    // ---- Unreachable library folders (C101, D147, D150) ----
+
+    private static LibraryFolderFact LibFolder(string location, bool reachable, bool titles) => new LibraryFolderFact(location, reachable, titles);
+
+    [Fact, Trait("Check", "C101")]
+    public void C101_a_missing_folder_emby_knows_no_titles_in_is_skipped_and_the_choice_goes_on()
+    {
+        var check = EmbyRules.CheckFolders(new[] { LibFolder("K:\\Movies", true, true), LibFolder("L:\\Movies", false, false), LibFolder("M:\\Movies", true, true) });
+        Assert.Null(check.Blocking);
+        Assert.Equal(new[] { "L:\\Movies" }, check.Skipped);
+    }
+
+    [Fact, Trait("Check", "C101")]
+    public void C101_a_missing_folder_that_holds_known_titles_still_stops_the_choice()
+    {
+        var check = EmbyRules.CheckFolders(new[] { LibFolder("L:\\Movies", false, false), LibFolder("N:\\Movies", false, true), LibFolder("Q:\\Movies", false, true) });
+        Assert.Equal("N:\\Movies", check.Blocking);
+        Assert.Equal(new[] { "L:\\Movies" }, check.Skipped);
+    }
+
+    [Fact, Trait("Check", "C101")]
+    public void C101_reachable_folders_are_neither_skipped_nor_blocking_whatever_they_hold()
+    {
+        var check = EmbyRules.CheckFolders(new[] { LibFolder("D:\\Movies", true, false), LibFolder("E:\\Movies", true, true) });
+        Assert.Null(check.Blocking);
+        Assert.Empty(check.Skipped);
+        var none = EmbyRules.CheckFolders(Array.Empty<LibraryFolderFact>());
+        Assert.Null(none.Blocking);
+        Assert.Empty(none.Skipped);
+    }
+
+    [Theory, Trait("Check", "C101")]
+    [InlineData("L:\\Movies", "L:\\Movies\\Film (2020)\\film.mkv", true)]
+    [InlineData("L:\\Movies\\", "l:/movies/Film (2020)/film.mkv", true)]
+    [InlineData("L:\\Movies", "L:\\Movies", true)]
+    [InlineData("L:\\Movies", "L:\\Movies\\", true)]
+    [InlineData("L:\\Movies", "L:\\Movies 2\\Film\\film.mkv", false)]
+    [InlineData("L:\\Movies", "L:\\Moviesx", false)]
+    [InlineData("L:\\Movies", "L:\\General\\film.mkv", false)]
+    [InlineData("L:\\Movies", "K:\\Movies\\Film\\film.mkv", false)]
+    [InlineData("L:\\Movies", "", false)]
+    [InlineData("L:\\Movies", null, false)]
+    [InlineData("", "L:\\Movies\\film.mkv", false)]
+    [InlineData("\\", "L:\\Movies\\film.mkv", false)]
+    [InlineData("\\\\NAS-SHARE\\Series\\Movies", "\\\\nas-share\\series\\movies\\Film\\film.mkv", true)]
+    public void C101_a_title_is_in_a_folder_only_inside_it_ignoring_case_and_slashes(string folder, string? path, bool expected) =>
+        Assert.Equal(expected, EmbyRules.IsInFolder(folder, path));
 }

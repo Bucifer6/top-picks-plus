@@ -21,6 +21,39 @@ public sealed class UserInfo
     public bool HasBlockedLibraries { get; }
 }
 
+/// <summary>One folder of a candidate library as EmbyLink found it (D147, D150).</summary>
+public sealed class LibraryFolderFact
+{
+    public LibraryFolderFact(string location, bool reachable, bool holdsKnownTitles)
+    {
+        Location = location;
+        Reachable = reachable;
+        HoldsKnownTitles = holdsKnownTitles;
+    }
+
+    public string Location { get; }
+    public bool Reachable { get; }
+
+    /// <summary>Emby lists at least one movie, series or episode whose path is in this folder.</summary>
+    public bool HoldsKnownTitles { get; }
+}
+
+/// <summary>What the folder check found (D150): the folder that stops the choice, if any, and the folders skipped.</summary>
+public sealed class FolderCheck
+{
+    public FolderCheck(string? blocking, IReadOnlyList<string> skipped)
+    {
+        Blocking = blocking;
+        Skipped = skipped;
+    }
+
+    /// <summary>The first unreachable folder that holds titles Emby knows; while there is one, nothing is chosen (D147).</summary>
+    public string? Blocking { get; }
+
+    /// <summary>Unreachable folders Emby knows no titles in (a leftover or never-used path); they can't change the picks.</summary>
+    public IReadOnlyList<string> Skipped { get; }
+}
+
 /// <summary>An installed plugin as Emby reports it (D33).</summary>
 public sealed class InstalledPlugin
 {
@@ -368,4 +401,45 @@ public static class EmbyRules
 
     /// <summary><c>artworkFailed</c> is set in every case but a drawn picture (D98).</summary>
     public static bool ArtworkFailed(ArtworkChoice choice) => choice != ArtworkChoice.Drawn;
+
+    /// <summary>
+    /// D147 amended by D150: an unreachable folder stops the choice only if Emby knows titles in it (a media drive offline: choosing
+    /// without them could push them out of the row). One Emby knows nothing in (a leftover or never-used path) can't change the
+    /// picks, so it is skipped and reported. Reachable folders are never either.
+    /// </summary>
+    public static FolderCheck CheckFolders(IEnumerable<LibraryFolderFact> folders)
+    {
+        string? blocking = null;
+        var skipped = new List<string>();
+        foreach (var f in folders)
+        {
+            if (f.Reachable)
+                continue;
+            if (!f.HoldsKnownTitles)
+                skipped.Add(f.Location);
+            else if (blocking == null)
+                blocking = f.Location;
+        }
+        return new FolderCheck(blocking, skipped);
+    }
+
+    /// <summary>
+    /// D150: whether an item's path is inside a library folder, ignoring case, with <c>/</c> read as <c>\</c> and trailing
+    /// separators ignored. A path equal to the folder counts (a series folder that is itself a library folder);
+    /// <c>J:\Movies 2\x</c> is not inside <c>J:\Movies</c>.
+    /// </summary>
+    public static bool IsInFolder(string folder, string? itemPath)
+    {
+        if (string.IsNullOrEmpty(itemPath))
+            return false;
+        var f = Normal(folder);
+        if (f.Length == 0)
+            return false;
+        var p = Normal(itemPath!);
+        if (string.Equals(p, f, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return p.StartsWith(f + "\\", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string Normal(string path) => path.Replace('/', '\\').TrimEnd('\\');
 }

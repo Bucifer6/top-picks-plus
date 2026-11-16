@@ -35,7 +35,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 3. **Ties:** the title whose newest content was added most recently wins: for a movie, its date added; for a series, its newest episode's date added. If that's also tied, the newer premiere date wins; if still tied, the lower source item ID (D35).
 4. **Filler:** if fewer than 10 titles were watched, the empty places go to the most recently added source titles (using the same "newest content" rule).
 5. **Candidates:** movies and series in the chosen libraries (default: every library whose Emby content type is movies or TV shows, apart from the Top Picks library, D136). A title appears only once. A movie is skipped if its video file can't be found. A series is skipped only if none of its episode files can be found, and missing episodes are left out.
-6. With fewer than 10 candidates the row is shorter. The run doesn't fail, unless a chosen library's folder can't be reached or no title's file can be found at all: then nothing is changed and the run is retried, so an offline drive never empties the row (D147).
+6. With fewer than 10 candidates the row is shorter. The run doesn't fail, unless a chosen library's folder that holds titles can't be reached or no title's file can be found at all: then nothing is changed and the run is retried, so an offline drive never empties the row (D147). A missing folder Emby knows no titles in (a leftover path) is skipped and reported instead (D150).
 7. **Always 10.** The number of picks is fixed and can't be changed in settings.
 
 ## F3 – What each copy contains

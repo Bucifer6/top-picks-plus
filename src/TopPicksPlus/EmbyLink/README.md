@@ -30,7 +30,7 @@
 | `RunSteps.cs` | One attempt: import, takeover, leftovers, prepare, swap, rescan, dates, artwork, check, record (D80, D137–D140, D142) |
 | `CopyBuilder.cs` | Every file of a copy, worked out again each time (D140) |
 | `Catalog.cs` | Candidates, pins, episodes (F2, D136) |
-| `EmbyFacts.cs` | Library, guards, users, old plugin, UK time, crediting, a copy's Emby items, unreachable library folders (D20, D28, D33, D53, D64, D90, D147) |
+| `EmbyFacts.cs` | Library, guards, users, old plugin, UK time, crediting, a copy's Emby items, library folders and whether a missing one holds titles (D20, D28, D33, D53, D64, D90, D147, D150) |
 | `OrderGuard.cs` | Puts dates back (F5, D52) |
 | `PlayLogger.cs` | Plays from playback start/stop (F6, D29, D141) |
 | `Watched.cs` | Watched state between copies and sources, with echo detection (F7, D103, D141) |

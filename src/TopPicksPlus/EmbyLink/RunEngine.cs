@@ -140,10 +140,16 @@ public static class RunEngine
             var run = h.Data.LoadRun().Value;
             if (run == null || run.Snapshot()?.Unfinished != true)
                 return;
-            if (RunRules.OnAttemptStopped(run.ResumeCount) == RunRules.AfterStop.PlanResume)
+            var resume = RunRules.OnAttemptStopped(run.ResumeCount) == RunRules.AfterStop.PlanResume;
+            if (resume)
                 PlanRetry(h);
             else
                 h.Data.FailRun(e.Message);
+            // D150: the reason goes into the report too, so the settings page says why without opening Emby's log. Written after
+            // the retry or the fail, so a problem writing it can never stop either.
+            h.Data.AddNotice("runError", "the run stopped at step " + run.Step + ": " + e.Message
+                + (resume ? "; it tries again in " + RunRules.RetryDelay.TotalMinutes + " minutes" : "; that was its last try, so it is marked failed"),
+                DateTime.UtcNow);
         }
         catch (Exception inner)
         {
