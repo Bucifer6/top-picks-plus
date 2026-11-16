@@ -370,4 +370,47 @@ public class RunRulesTests
         Assert.False(RunRules.Guards(Ok()).WriteLastRefusal);
         Assert.Null(RunRules.Guards(Ok()).Detail);
     }
+
+    // ---- Creating a missing Top Picks library (C102, D151) ----
+
+    private static readonly GuardFacts NoLibrary = new GuardFacts(libraryFound: false);
+
+    [Theory, Trait("Check", "C102")]
+    [InlineData(Trigger.Sunday, true)]
+    [InlineData(Trigger.RunNow, true)]
+    [InlineData(Trigger.MissedRun, true)]
+    [InlineData(Trigger.StartupResume, false)]
+    [InlineData(Trigger.Retry, false)]
+    public void C102_with_no_run_waiting_only_a_trigger_that_starts_a_run_creates_the_library(Trigger trigger, bool expected) =>
+        Assert.Equal(expected, RunRules.CreateLibraryFirst(trigger, null, NoLibrary, optionOn: true));
+
+    [Theory, Trait("Check", "C102")]
+    [InlineData(Trigger.StartupResume)]
+    [InlineData(Trigger.Retry)]
+    public void C102_an_unfinished_run_creates_the_library_at_any_trigger(Trigger trigger)
+    {
+        Assert.True(RunRules.CreateLibraryFirst(trigger, Waiting(), NoLibrary, optionOn: true));
+        var finished = new RunSnapshot(RunStatus.Finished, RunStep.Done, 0);
+        Assert.False(RunRules.CreateLibraryFirst(trigger, finished, NoLibrary, optionOn: true));
+    }
+
+    [Fact, Trait("Check", "C102")]
+    public void C102_nothing_is_created_with_the_option_off_or_when_another_guard_comes_first_or_the_library_is_there()
+    {
+        Assert.False(RunRules.CreateLibraryFirst(Trigger.RunNow, null, NoLibrary, optionOn: false));
+        Assert.False(RunRules.CreateLibraryFirst(Trigger.RunNow, null, new GuardFacts(libraryFound: false, oldPluginLoaded: true), true));
+        Assert.False(RunRules.CreateLibraryFirst(Trigger.RunNow, null, new GuardFacts(libraryFound: false, lockHeld: true), true));
+        Assert.False(RunRules.CreateLibraryFirst(Trigger.RunNow, null, new GuardFacts(libraryFound: false, dataNewer: true), true));
+        Assert.False(RunRules.CreateLibraryFirst(Trigger.RunNow, null, Ok(), true));
+        Assert.False(RunRules.CreateLibraryFirst(Trigger.RunNow, null, new GuardFacts(nfoReaderOn: false), true));
+    }
+
+    [Fact, Trait("Check", "C102")]
+    public void C102_the_library_is_named_top_picks_then_top_picks_plus_and_not_at_all_if_both_are_taken()
+    {
+        Assert.Equal("Top Picks", RunRules.LibraryName(new[] { "Movies", null, "Series" }));
+        Assert.Equal("Top Picks Plus", RunRules.LibraryName(new[] { "Movies", " top picks " }));
+        Assert.Null(RunRules.LibraryName(new[] { "TOP PICKS", "Top Picks Plus" }));
+        Assert.Equal("Top Picks", RunRules.LibraryName(new string?[0]));
+    }
 }

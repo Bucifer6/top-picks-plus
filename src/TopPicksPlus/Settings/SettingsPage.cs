@@ -26,7 +26,7 @@ public class SettingsPage : EditableOptionsBase
 
     public override string EditorDescription =>
         "Each week the Latest Top Picks row gets the 10 most watched titles, numbered and in order. Pins come first. "
-        + "Press Save after changing the libraries or the row-check user; pin changes are saved straight away.";
+        + "Press Save after changing the libraries, the row-check user or the library option; pin changes are saved straight away.";
 
     // ---------------- Run ----------------
 
@@ -65,6 +65,10 @@ public class SettingsPage : EditableOptionsBase
 
     [Browsable(false)]
     public IEnumerable<EditorSelectOption> UserChoices { get; set; } = new List<EditorSelectOption>();
+
+    [DisplayName("Create the Top Picks library if it's missing")]
+    [Description("When a run starts and no library uses the Top Picks folder, make one called Top Picks (Nfo reader on, no Nfo saver). An existing library is never changed.")]
+    public bool CreateLibraryIfMissing { get; set; } = true;
 
     // ---------------- Pins ----------------
 

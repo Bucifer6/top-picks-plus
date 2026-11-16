@@ -62,6 +62,7 @@ public sealed class SettingsView : IPluginPageView
         var settings = Settings;
         page.Libraries = string.Join(",", (settings.LibraryIds ?? new long[0]).Select(Text));
         page.RowCheckUser = settings.RowCheckUserId ?? string.Empty;
+        page.CreateLibraryIfMissing = settings.CreateLibraryIfMissing;
         ContentData = Fill(page, null);
     }
 
@@ -154,9 +155,11 @@ public sealed class SettingsView : IPluginPageView
         var users = new HashSet<string>(EmbyFacts.AllUsers(h).Select(EmbyFacts.UserKey), StringComparer.OrdinalIgnoreCase);
         plugin.Configuration.LibraryIds = Ids(page.Libraries).Where(libraries.Contains).ToArray();
         plugin.Configuration.RowCheckUserId = users.Contains(page.RowCheckUser ?? string.Empty) ? page.RowCheckUser! : string.Empty;
+        plugin.Configuration.CreateLibraryIfMissing = page.CreateLibraryIfMissing;
         plugin.SaveConfiguration();
         page.Libraries = string.Join(",", plugin.Configuration.LibraryIds.Select(Text));
         page.RowCheckUser = plugin.Configuration.RowCheckUserId;
+        page.CreateLibraryIfMissing = plugin.Configuration.CreateLibraryIfMissing;
         ContentData = Fill(page, "Saved.");
         return Task.FromResult<IPluginUIView>(this);
     }

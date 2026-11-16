@@ -82,6 +82,9 @@ public sealed class CopyFolders
     /// <summary>The suffix of the folder a copy is prepared again into before it is renamed into place.</summary>
     public const string PartialSuffix = ".tpp-partial";
 
+    /// <summary>D151: makes the Top Picks folder if it isn't there (an empty folder, so a library can be created on it).</summary>
+    public void EnsureTopPicksFolder() => Directory.CreateDirectory(TopPicks);
+
     // ---------------- Looking ----------------
 
     /// <summary>The folders directly in top-picks (names as on disk). Links count as folders by name, but are never entered.</summary>
