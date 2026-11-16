@@ -107,8 +107,9 @@ public class SettingsPage : EditableOptionsBase
 
     public CaptionItem CaptionReport { get; set; } = new CaptionItem("Last run report");
 
+    // No [ReadOnly(true)]: Emby 4.10.2 leaves such properties off the page entirely (B55). The report is rebuilt
+    // every time the page opens, so anything typed here is simply replaced.
     [DisplayName("")]
-    [ReadOnly(true)]
     [EditMultiline(24)]
     public string Report { get; set; } = string.Empty;
 }
