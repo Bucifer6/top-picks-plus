@@ -1,15 +1,14 @@
 # Handover
 
 ## Job just finished
-The whole build: proof plugin (PR #9), chunk 4 EmbyLink (PR #10) and chunk 5 Settings (PR #11), each reviewed by a fresh agent (no Blockers; Should-fix items fixed; smaller ones in the backlog). The owner chose to run the proof and the checks after the whole build (D134).
+2026-11-16: PRs #9, #10, #11 merged. The owner installed the proof plugin: it loads on 4.10.2, but its result boxes were missing because Emby hides `[ReadOnly(true)]` fields (B55); fixed in the proof and in the settings page's report box (merge bc11770, proof build 136 confirmed on the server). Then, at the owner's request, v1.0.0 was tagged before the proof (D149).
 
 ## Where it stopped
-Stage 6 Build, done. Three stacked pull requests: #9 (base main), #10 (base #9's branch), #11 (base #10's branch). GitHub retargets each to main as the one below merges. Decisions D129–D148, cards 0017–0020. Nothing is on the owner's server yet.
+Stage 6 Build, done; v1.0.0 released. The proof's write and read-back (steps 7–13) have not been run. Nothing of Top Picks Plus is on the owner's server yet; the proof plugin (build 136) is installed.
 
 ## What is still owed (smallest first)
-1. Owner merges #9, then #10, then #11 (in that order; each needs green CI on main's retarget).
-2. Owner runs the proof plugin (proof/TopPicksProof/README.md steps; B4) and pastes the results. Claude records them and acts as D132 says (amended by D134) in its own pull request, which also deletes proof/ and the `proof` job (D130).
-3. Release v1.0.0 (tag on main, only when the owner says, D57), then go-live day (D86) with the checks in docs/checks.md. Go-live notes: B26, B49, B50, B51, B53, B54.
+1. Owner runs the rest of the proof (proof/TopPicksProof/README.md steps 7–13) **before** installing v1.0.0, and pastes the results. Claude records them and acts as D132 says in its own pull request, which also deletes proof/ and the `proof` job (D130); any code change ships as v1.0.1 (D149).
+2. Go-live day (D86) with the checks in docs/checks.md. Go-live notes: B26, B49, B50, B51, B53, B54; also check the settings page's "Last run report" box shows (B55).
 
 ## Watch out for
 - **Stacked PRs:** merge in order. If one is merged out of order, its base may need changing by hand.
@@ -25,10 +24,10 @@ Stage 6 Build, done. Three stacked pull requests: #9 (base main), #10 (base #9's
 - Commit as Claude (noreply@anthropic.com); a stop hook checks.
 
 ## Waiting on the owner
-- Merge #9, #10, #11 in order; confirm the proof steps (B4); run the proof.
+- Run the rest of the proof (steps 7–13) and paste the results.
 
 ## Next job
-Record the proof results (D132, D134), then the v1.0.0 release and go-live day (D86). Read first: CLAUDE.md, CODEMAP.md, docs/decisions.md D129–D148, docs/backlog.md Go-live rows.
+Record the proof results (D132, D134, D149), v1.0.1 if they need a change, then go-live day (D86). Read first: CLAUDE.md, CODEMAP.md, docs/decisions.md D129–D148, docs/backlog.md Go-live rows.
 
 ## Cards that applied
 0001, 0003, 0004, 0006, 0007, 0012–0015, 0017, 0018; new: 0019, 0020. None retired.
