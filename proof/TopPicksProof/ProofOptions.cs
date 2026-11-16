@@ -26,14 +26,13 @@ public class ProofOptions : EditableOptionsBase
     [DisplayName("Write the three test folders when I press Save (only once)")]
     public bool WriteTestFolders { get; set; }
 
+    // No [ReadOnly(true)] here or on Results: Emby 4.10.2 leaves such properties off the page entirely (B55).
     [DisplayName("What happened when the test folders were written")]
-    [ReadOnly(true)]
     public string WriteOutcome { get; set; } = string.Empty;
 
     public SpacerItem Spacer { get; set; } = new SpacerItem();
 
     [DisplayName("Results (copy all of this into the chat)")]
-    [ReadOnly(true)]
     [EditMultiline(24)]
     public string Results { get; set; } = string.Empty;
 
