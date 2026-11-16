@@ -467,6 +467,8 @@ internal sealed class RunSteps
         var status = RunRules.FinalStatus(failed: false, rescanTimedOut: !AllAppeared());
         _h.Data.FinishRun(status, DateTime.UtcNow);
         _h.Log.Info("Top Picks Plus: run {0}", status);
+        // D152: keeps the slideshow (or the row) as the setting says, for users added since and libraries added or removed.
+        HomeScreen.Apply(_h);
     }
 
     // ---------------- helpers ----------------

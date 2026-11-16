@@ -31,6 +31,7 @@
 | `CopyBuilder.cs` | Every file of a copy, worked out again each time (D140) |
 | `Catalog.cs` | Candidates, pins, episodes (F2, D136) |
 | `EmbyFacts.cs` | Library, guards, users, old plugin, UK time, crediting, a copy's Emby items, library folders and whether a missing one holds titles, creating a missing Top Picks library (D20, D28, D33, D53, D64, D90, D147, D150, D151) |
+| `HomeScreen.cs` | The Top Picks slideshow on each user's home screen in place of the row, or the row back (D152) |
 | `OrderGuard.cs` | Puts dates back (F5, D52) |
 | `PlayLogger.cs` | Plays from playback start/stop (F6, D29, D141) |
 | `Watched.cs` | Watched state between copies and sources, with echo detection (F7, D103, D141) |
