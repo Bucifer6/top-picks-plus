@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TopPicksPlus.Logic;
 
@@ -232,6 +233,31 @@ public static class RunRules
         if (trigger == Trigger.StartupResume || trigger == Trigger.Retry)
             return new TriggerDecision(TriggerAction.Nothing, null, count);
         return new TriggerDecision(TriggerAction.StartNew, null, count);
+    }
+
+    /// <summary>The names tried, in order, for a library the plugin creates (D151).</summary>
+    public static readonly IReadOnlyList<string> LibraryNames = new[] { "Top Picks", "Top Picks Plus" };
+
+    /// <summary>
+    /// D151: create the Top Picks library before this trigger, when the option is on and the only thing in the way is that no
+    /// library uses the Top Picks folder: every earlier guard (data newer, already running, old plugin) passed, and the trigger
+    /// would really run (it resumes an unfinished run, or it is Sunday, Run now or the missed run). Never at the start-up resume
+    /// slot or a retry with nothing to resume, so installing the plugin alone never adds a library.
+    /// </summary>
+    public static bool CreateLibraryFirst(Trigger trigger, RunSnapshot? run, GuardFacts facts, bool optionOn)
+    {
+        if (!optionOn)
+            return false;
+        if (Guards(facts).Reason != Refusal.LibraryMissing)
+            return false;
+        return (run != null && run.Unfinished) || (trigger != Trigger.StartupResume && trigger != Trigger.Retry);
+    }
+
+    /// <summary>D151: the first of <see cref="LibraryNames"/> no library already uses (ignoring case), or null if both are taken.</summary>
+    public static string? LibraryName(IEnumerable<string?> existingNames)
+    {
+        var taken = new HashSet<string>(existingNames.Where(n => n != null).Select(n => n!.Trim()), StringComparer.OrdinalIgnoreCase);
+        return LibraryNames.FirstOrDefault(n => !taken.Contains(n));
     }
 
     /// <summary>What happens when an attempt stops without reaching done (D78): an error never changes <c>resumeCount</c>.</summary>

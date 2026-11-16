@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MediaBrowser.Controller.Entities;
+using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Querying;
 using TopPicksPlus.Logic;
@@ -33,6 +34,32 @@ public static class EmbyFacts
     /// <summary>The library whose folder is the Top Picks folder (compared ignoring case, D35), or null.</summary>
     public static TopPicksLibrary? FindTopPicksLibrary(Host h) =>
         FindLibrary(h, Same(h.TopPicksPath));
+
+    /// <summary>
+    /// D151: creates the Top Picks library on the Top Picks folder (made first if missing): mixed content, Nfo reader on, no metadata
+    /// savers, so the library-setup guard (D53) passes. Named by <see cref="RunRules.LibraryName"/>; returns the new library, or null
+    /// if both names are taken or Emby didn't list it afterwards. Only called through <see cref="RunRules.CreateLibraryFirst"/>.
+    /// </summary>
+    public static TopPicksLibrary? CreateTopPicksLibrary(Host h)
+    {
+        var name = RunRules.LibraryName(h.Library.GetVirtualFolders().Select(f => f.Name));
+        if (name == null)
+        {
+            h.Log.Warn("Top Picks Plus: no library uses the Top Picks folder, and the names {0} are both taken, so none was created",
+                string.Join(" and ", RunRules.LibraryNames));
+            return null;
+        }
+        h.Copies.EnsureTopPicksFolder();
+        var options = new LibraryOptions
+        {
+            PathInfos = new[] { new MediaPathInfo { Path = h.TopPicksPath } },
+            DisabledLocalMetadataReaders = new string[0],
+            MetadataSavers = new string[0],
+        };
+        h.Library.AddVirtualFolder(name, options, true);
+        h.Log.Info("Top Picks Plus: created the library {0} on {1} (D151)", name, h.TopPicksPath);
+        return FindTopPicksLibrary(h);
+    }
 
     private static TopPicksLibrary? FindLibrary(Host h, Func<string, bool> isTopPicks)
     {

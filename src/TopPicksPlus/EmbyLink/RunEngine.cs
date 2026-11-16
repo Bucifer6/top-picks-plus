@@ -67,8 +67,17 @@ public static class RunEngine
     {
         var now = DateTime.UtcNow;
         var library = EmbyFacts.FindTopPicksLibrary(h);
-        var facts = EmbyFacts.GuardFacts(h, h.Data.Inspect(), !got, EmbyFacts.OldPluginLoaded(h), library);
-        var decision = RunRules.OnTrigger(trigger, h.Data.LoadRun().Value?.Snapshot(), facts);
+        var health = h.Data.Inspect();
+        var oldPlugin = EmbyFacts.OldPluginLoaded(h);
+        var facts = EmbyFacts.GuardFacts(h, health, !got, oldPlugin, library);
+        var snapshot = h.Data.LoadRun().Value?.Snapshot();
+        // D151: with the option on, a missing Top Picks library is created first, then the guards are asked again.
+        if (got && RunRules.CreateLibraryFirst(trigger, snapshot, facts, Host.Settings.CreateLibraryIfMissing))
+        {
+            library = EmbyFacts.CreateTopPicksLibrary(h) ?? library;
+            facts = EmbyFacts.GuardFacts(h, health, !got, oldPlugin, library);
+        }
+        var decision = RunRules.OnTrigger(trigger, snapshot, facts);
         switch (decision.Action)
         {
             case TriggerAction.Nothing:

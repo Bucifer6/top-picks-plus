@@ -16,4 +16,10 @@ public class PluginConfiguration : BasePluginConfiguration
 
     /// <summary>The user GUID (32 hex digits) the row check looks through; empty = the default rule (D20).</summary>
     public string RowCheckUserId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// D151: when a run would start or resume and no library uses the Top Picks folder, create one (Nfo reader on, no savers).
+    /// On by default; an existing library is never changed.
+    /// </summary>
+    public bool CreateLibraryIfMissing { get; set; } = true;
 }

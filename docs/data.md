@@ -13,6 +13,7 @@ Each JSON file (managed.json, plays.json, run.json, state.json) carries `"versio
 | LibraryIds | Emby IDs of the libraries to choose from (empty = all movie and TV libraries except Top Picks) |
 | Pins | Ordered list of up to 10 movie or series Emby IDs (need not be in LibraryIds, D23, D61) |
 | RowCheckUserId | User the row check looks through; empty = default rule (D20) |
+| CreateLibraryIfMissing | true (default) = when a run would start or resume and no library uses the Top Picks folder, create one (D151) |
 
 The settings XML holds only what the owner sets on the settings page. The plugin's own flags are in state.json (D93), so saving the page can't change them.
 

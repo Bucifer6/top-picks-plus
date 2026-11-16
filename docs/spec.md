@@ -15,7 +15,7 @@ links: [decisions.md, checks.md, data.md]
 - **Source title:** the real movie or series in the owner's normal libraries (N:\Movies, K:\Series).
 - **Copy:** the Top Picks version of a source title: a folder of .strm, .nfo and image files in the Top Picks folder. A .strm file is a one-line text file holding the path of the real video file. Emby plays the real file through it.
 - **Top Picks folder:** `C:\Users\Admin\AppData\Roaming\Emby-Server\programdata\data\top-picks`.
-- **Top Picks library:** the existing Emby library whose folder is the Top Picks folder. Its "Latest" home-screen row is the "Latest Top Picks" row. The plugin finds the library by its folder path. It doesn't create or delete libraries.
+- **Top Picks library:** the existing Emby library whose folder is the Top Picks folder. Its "Latest" home-screen row is the "Latest Top Picks" row. The plugin finds the library by its folder path. It never changes or deletes a library; with the "create if missing" option (on by default) it creates one when none uses the folder (D151).
 - **Date added:** Emby's own record of when an item was added (DateCreated). The Latest row shows the newest date added first.
 - **Rank time:** the time this week's run started (UTC, to the whole minute), fixed for the whole run, including after a restart (D27). Pick 1 gets the rank time as its date added, pick 2 gets one hour earlier, and so on down to pick 10 at nine hours earlier.
 - **Managed list:** the plugin's record of which copy folders it manages, keyed by **folder name** (an adopted folder may have no source title, and two old folders may point to the same one; see data.md).
@@ -86,6 +86,7 @@ The list is built automatically every week. **No manual step is ever needed.** P
 ## F8 – Settings page and run report (Dashboard → Plugins → Top Picks Plus; administrators only)
 - **Libraries** to choose from. The Top Picks library is never offered.
 - **Row-check user** (D20).
+- **Create the Top Picks library if it's missing** (on by default, D151): a run that would start or resume with no library on the Top Picks folder first creates one called Top Picks (or Top Picks Plus if that name is taken), with the Nfo reader on and no Nfo saver.
 - **Pins:** search for a title, add it, move it up or down, remove (D148). Pins that can't be used are marked "missing".
 - **Run now** button, plus a "run in progress" indicator.
 - **Last run report:** when it ran, finished / incomplete / failed, and each of the 10 titles with its rank, why it was picked (pinned / X viewer-days / filler) and whether its copy and date were applied. The row check result shows exactly what Emby returned if it didn't pass. Also shown: the number of plays recorded in the last 7 days, missing pins, any artwork that failed, and the last refused run with its reason and what to change (D31). Plus, when they happen: episodes left out, imported plays ignored, deletes refused, unmanaged folders, the row-check user falling back to an administrator, why a run failed, and damaged files that were set aside (D81).
