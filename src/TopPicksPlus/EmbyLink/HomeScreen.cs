@@ -1,7 +1,10 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading;
+using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Entities;
 using TopPicksPlus.Logic;
 
@@ -15,6 +18,7 @@ namespace TopPicksPlus.EmbyLink;
 public static class HomeScreen
 {
     private static readonly object Gate = new object();
+    private static bool warned;
 
     public static void Apply(Host h)
     {
@@ -30,6 +34,13 @@ public static class HomeScreen
                 var on = settings.ShowAsSlideshow;
                 if (!on && !settings.SlideshowWasOn)
                     return;
+                if (!Supported)
+                {
+                    if (!warned)
+                        h.Log.Warn("Top Picks Plus: the home-screen slideshow needs Emby 4.10 or later; the row is left as it is");
+                    warned = true;
+                    return;
+                }
                 var libraryId = library.Id.ToString(CultureInfo.InvariantCulture);
                 var excluded = HomeScreenRules.ExcludedFolders(h.Library.GetVirtualFolders().Select(f =>
                 {
@@ -83,26 +94,23 @@ public static class HomeScreen
         // The row goes back before the slideshow is removed, so a stop in between can never leave a user with neither.
         if (plan.AddRow)
         {
-            h.Users.AddHomeSection(userId, new ContentSection
-            {
-                Id = HomeScreenRules.RowId(libraryId),
-                SectionType = HomeScreenRules.LatestSection,
-                ParentId = libraryId,
-            }, ct);
+            var row = new ContentSection { Id = HomeScreenRules.RowId(libraryId), SectionType = HomeScreenRules.LatestSection };
+            Set(row, "ParentId", libraryId);
+            Call(h, "AddHomeSection", userId, row, ct);
         }
         if (plan.UpdateSlideshow != null)
-            h.Users.UpdateHomeSection(userId, Slideshow(plan.UpdateSlideshow, libraryId, excluded), ct);
+            Call(h, "UpdateHomeSection", userId, Slideshow(plan.UpdateSlideshow, libraryId, excluded), ct);
         if (plan.AddSlideshow)
         {
-            h.Users.AddHomeSection(userId, Slideshow(null, libraryId, excluded), ct);
+            Call(h, "AddHomeSection", userId, Slideshow(null, libraryId, excluded), ct);
             var added = Sections(h, userId).FirstOrDefault(s => HomeScreenRules.IsSlideshow(s, libraryId));
             if (added != null)
-                h.Users.MoveHomeSections(userId, new[] { added.Id }, 0, ct);
+                Call(h, "MoveHomeSections", userId, new[] { added.Id }, 0, ct);
             else
                 h.Log.Warn("Top Picks Plus: the slideshow was added for user {0} but Emby didn't list it afterwards", userId);
         }
         if (plan.Delete.Count > 0)
-            h.Users.DeleteHomeSections(userId, plan.Delete.ToArray(), ct);
+            Call(h, "DeleteHomeSections", userId, plan.Delete.ToArray(), ct);
         // A refresh of an existing slideshow happens every time and isn't counted as a change.
         return plan.AddSlideshow || plan.AddRow || plan.Delete.Count > 0;
     }
@@ -110,25 +118,61 @@ public static class HomeScreen
     private static HomeSectionInfo[] Sections(Host h, long userId) =>
         (h.Users.GetHomeSections(userId, CancellationToken.None)?.Sections ?? Array.Empty<ContentSection>())
             .Where(s => s != null && !string.IsNullOrEmpty(s.Id))
-            .Select(s => new HomeSectionInfo(s.Id, s.SectionType, s.ViewType, s.ParentId, s.CustomName))
+            .Select(s => new HomeSectionInfo(s.Id, s.SectionType, s.ViewType, Get(s, "ParentId"), Get(s, "CustomName")))
             .ToArray();
 
     /// <summary>
     /// The slideshow: the Top Picks library's movies and series, newest date added first. Rank 1 has the newest date (F4), so this
     /// is rank order. Other libraries are listed as excluded too, as Emby's own spotlight sections do.
     /// </summary>
-    private static ContentSection Slideshow(string? id, string libraryId, string[] excluded) => new ContentSection
+    private static ContentSection Slideshow(string? id, string libraryId, string[] excluded)
     {
-        Id = id,
-        Name = HomeScreenRules.Title,
-        CustomName = HomeScreenRules.Title,
-        SectionType = HomeScreenRules.ItemsSection,
-        ViewType = HomeScreenRules.Spotlight,
-        ParentId = libraryId,
-        ItemTypes = new[] { "Movie", "Series" },
-        ExcludedFolders = excluded,
-        SortBy = "DateCreated",
-        SortOrder = "Descending",
-        CardSizeOffset = 0,
-    };
+        var s = new ContentSection
+        {
+            Id = id,
+            Name = HomeScreenRules.Title,
+            SectionType = HomeScreenRules.ItemsSection,
+            ViewType = HomeScreenRules.Spotlight,
+            ItemTypes = new[] { "Movie", "Series" },
+            ExcludedFolders = excluded,
+            SortBy = "DateCreated",
+            SortOrder = "Descending",
+            CardSizeOffset = 0,
+        };
+        Set(s, "CustomName", HomeScreenRules.Title);
+        Set(s, "ParentId", libraryId);
+        return s;
+    }
+
+    // ---------------- Emby 4.10 members (D152) ----------------
+    // The pinned SDK (4.9, D14) has GetHomeSections but not the calls that change sections, nor ContentSection's ParentId and
+    // CustomName. Emby 4.10 has them all, so they are found at run time on the server's own types; without them the slideshow
+    // isn't available and that is said once in the log.
+
+    /// <summary>True when the running Emby has every home-section call the slideshow needs.</summary>
+    public static bool Supported =>
+        new[] { "AddHomeSection", "UpdateHomeSection", "DeleteHomeSections", "MoveHomeSections" }.All(n => Method(n) != null)
+        && typeof(ContentSection).GetProperty("ParentId") != null;
+
+    private static MethodInfo? Method(string name) =>
+        typeof(IUserManager).GetMethods().FirstOrDefault(m => m.Name == name && m.GetParameters().Length >= 3);
+
+    private static void Call(Host h, string name, params object[] args)
+    {
+        var m = Method(name) ?? throw new NotSupportedException("this Emby has no " + name);
+        try
+        {
+            m.Invoke(h.Users, args);
+        }
+        catch (TargetInvocationException e) when (e.InnerException != null)
+        {
+            ExceptionDispatchInfo.Capture(e.InnerException).Throw();
+        }
+    }
+
+    private static string? Get(ContentSection s, string property) =>
+        typeof(ContentSection).GetProperty(property)?.GetValue(s) as string;
+
+    private static void Set(ContentSection s, string property, string value) =>
+        typeof(ContentSection).GetProperty(property)?.SetValue(s, value);
 }
