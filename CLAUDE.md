@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** Live. v1.0.0 installed on the owner's server 2026-11-16 (before the proof, D149) and its first run finished. Since then v1.0.1 (D150) and v1.1.0 (D151, README), v1.2.0 (D152, home-screen slideshow) and v1.2.1 (D153, B56 and B57 fixed) released. Next: see docs/handover/current.md (install v1.2.1 and try the slideshow, then the proof and go-live checks when the owner asks).
+**Stage:** Live. v1.0.0 installed on the owner's server 2026-11-16 (before the proof, D149) and its first run finished. Since then v1.0.1 (D150) and v1.1.0 (D151, README), v1.2.0 (D152, home-screen slideshow) and v1.2.1 (D153, B56 and B57 fixed) released. v1.2.1 installed on the server the same day; owner happy. Next: see docs/handover/current.md ( the proof and go-live checks when the owner asks).
 **CI budget:** public repo since 2026-11-09, so Actions minutes are free; still keep runs lean (CI runs only on non-draft PRs, main and v* tags). Everything committed is public: never commit secrets, and keep personal details out of new docs.
 
 ## Rules
