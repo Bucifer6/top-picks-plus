@@ -196,10 +196,16 @@ internal sealed class RunSteps
         var settings = Host.Settings;
         var plays = _h.Data.LoadPlays().Value?.Plays ?? new List<Play>();
         var libraries = EmbyFacts.CandidateLibraries(_h, settings.LibraryIds ?? new long[0]);
-        // D147: with a media folder unreachable (a drive offline), nothing is chosen: the error is retried, never an emptied row.
-        var unreachable = EmbyFacts.UnreachableLibraryFolder(_h, libraries);
-        if (unreachable != null)
-            throw new IOException("the library folder " + unreachable + " can't be reached; is the drive connected?");
+        // D147, D150: with a folder that holds titles unreachable (a drive offline), nothing is chosen: the error is retried, never
+        // an emptied row. A missing folder Emby knows no titles in (a leftover path) can't change the picks, so it is skipped.
+        var folders = EmbyRules.CheckFolders(EmbyFacts.LibraryFolders(_h, libraries));
+        if (folders.Blocking != null)
+            throw new IOException("the library folder " + folders.Blocking + " can't be reached; is the drive connected?");
+        foreach (var skipped in folders.Skipped)
+        {
+            _h.Data.AddNotice("folderSkipped", "the library folder " + skipped + " can't be reached and Emby has no titles in it, so it was skipped; remove it from its library if it is no longer used", DateTime.UtcNow);
+            _h.Log.Warn("Top Picks Plus: the library folder {0} can't be reached and Emby has no titles in it; skipped", skipped);
+        }
         var candidates = Catalog.Candidates(_h, libraries);
         var chosen = Choosing.Choose(candidates, Catalog.Pins(_h, settings.Pins ?? new long[0]), Counting.ViewerDays(plays, RunDayUk));
         if (chosen.Picks.Count == 0)

@@ -80,22 +80,37 @@ public static class EmbyFacts
     }
 
     /// <summary>
-    /// D147: the first folder of the given libraries that can't be reached (a media drive offline), or null. A run doesn't choose
-    /// picks while one is missing, so an unplugged drive can never empty the row.
+    /// D147, D150: every folder of the given libraries, whether it can be reached and, only for one that can't, whether Emby lists
+    /// any movie, series or episode inside it. Logic's <see cref="EmbyRules.CheckFolders"/> decides what that means.
     /// </summary>
-    public static string? UnreachableLibraryFolder(Host h, IReadOnlyCollection<long> libraryIds)
+    public static IReadOnlyList<LibraryFolderFact> LibraryFolders(Host h, IReadOnlyCollection<long> libraryIds)
     {
+        var facts = new List<LibraryFolderFact>();
         foreach (var folder in h.Library.GetVirtualFolders())
         {
-            if (!libraryIds.Contains(h.Library.GetInternalId(folder.ItemId)))
+            var id = h.Library.GetInternalId(folder.ItemId);
+            if (!libraryIds.Contains(id))
                 continue;
+            List<string>? itemPaths = null;
             foreach (var location in folder.Locations ?? Array.Empty<string>())
             {
-                if (!SafeDirectoryExists(location))
-                    return location;
+                if (SafeDirectoryExists(location))
+                {
+                    facts.Add(new LibraryFolderFact(location, true, true));
+                    continue;
+                }
+                // Read once per library, and only when a folder is missing (rare): the paths of every title Emby lists in it.
+                itemPaths ??= h.Library.GetItemList(new InternalItemsQuery
+                {
+                    AncestorIds = new[] { id },
+                    IncludeItemTypes = new[] { "Movie", "Series", "Episode" },
+                    Recursive = true,
+                    IsVirtualItem = false,
+                }).Select(i => i.Path ?? string.Empty).ToList();
+                facts.Add(new LibraryFolderFact(location, false, itemPaths.Any(p => EmbyRules.IsInFolder(location, p))));
             }
         }
-        return null;
+        return facts;
     }
 
     private static bool SafeDirectoryExists(string path)
