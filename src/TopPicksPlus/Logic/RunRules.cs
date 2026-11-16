@@ -326,6 +326,15 @@ public static class RunRules
     /// <summary>A run counts as successful if it finished or ended incomplete (D31).</summary>
     public static bool CountsAsSuccess(RunStatus status) => status == RunStatus.Finished || status == RunStatus.Incomplete;
 
+    /// <summary>B56: the longest the row check waits for a library scan that Emby is still running.</summary>
+    public static readonly TimeSpan LibraryScanWait = TimeSpan.FromMinutes(10);
+
+    /// <summary>
+    /// B56: the row check waits while Emby's library scan is still running (Latest isn't settled until it ends), but no longer
+    /// than <see cref="LibraryScanWait"/>.
+    /// </summary>
+    public static bool KeepWaitingForScan(bool scanRunning, TimeSpan waited) => scanRunning && waited < LibraryScanWait;
+
     /// <summary>
     /// The row-check retry (D45, D84): only when the ranked part failed, it hasn't been retried, and the rescan wait didn't run out.
     /// </summary>

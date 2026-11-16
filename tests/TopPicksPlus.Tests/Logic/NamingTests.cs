@@ -22,6 +22,13 @@ public class NamingTests
     [InlineData("com3", null, "com3_")]
     [InlineData("LPT9.part", null, "LPT9_.part")]
     [InlineData("COM10", null, "COM10")]
+    [InlineData("Yellowstone (2018)", 2018, "Yellowstone (2018)")]
+    [InlineData("Yellowstone(2018)", 2018, "Yellowstone (2018)")]
+    [InlineData("Dune (1984)", 2021, "Dune (1984) (2021)")]
+    [InlineData("Blade Runner 2049", 2017, "Blade Runner 2049 (2017)")]
+    [InlineData("1917", 1917, "1917 (1917)")]
+    [InlineData("(1999)", 1999, "Untitled (1999)")]
+    [InlineData("Yellowstone (2018)", null, "Yellowstone (2018)")]
     [InlineData("CONSOLE", null, "CONSOLE")]
     public void C51_folder_names(string? title, int? year, string expected) =>
         Assert.Equal(expected, Naming.FolderName(title, year));

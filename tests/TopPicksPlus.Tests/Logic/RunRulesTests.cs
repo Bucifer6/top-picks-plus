@@ -413,4 +413,14 @@ public class RunRulesTests
         Assert.Null(RunRules.LibraryName(new[] { "TOP PICKS", "Top Picks Plus" }));
         Assert.Equal("Top Picks", RunRules.LibraryName(new string?[0]));
     }
+
+    [Fact, Trait("Check", "C104")]
+    public void C104_row_check_waits_for_a_running_library_scan_up_to_ten_minutes()
+    {
+        Assert.Equal(System.TimeSpan.FromMinutes(10), RunRules.LibraryScanWait);
+        Assert.True(RunRules.KeepWaitingForScan(scanRunning: true, System.TimeSpan.Zero));
+        Assert.True(RunRules.KeepWaitingForScan(scanRunning: true, System.TimeSpan.FromMinutes(10) - System.TimeSpan.FromTicks(1)));
+        Assert.False(RunRules.KeepWaitingForScan(scanRunning: true, System.TimeSpan.FromMinutes(10)));
+        Assert.False(RunRules.KeepWaitingForScan(scanRunning: false, System.TimeSpan.Zero));
+    }
 }

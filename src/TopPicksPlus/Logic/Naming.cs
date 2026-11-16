@@ -84,13 +84,17 @@ public static class Naming
     }
 
     /// <summary>
-    /// A new copy's folder name (F3): <c>Title (Year)</c>, or <c>Title</c> with no year; cleaned; an empty title becomes
+    /// A new copy's folder name (F3): <c>Title (Year)</c>, or <c>Title</c> with no year (or when the title already ends with that
+    /// year, B57); cleaned; an empty title becomes
     /// <see cref="EmptyTitle"/>; too long a title is cut so the name fits <paramref name="maxLength"/>; reserved names get "_".
     /// </summary>
     public static string FolderName(string? title, int? year, int maxLength = MaxFolderLength)
     {
         var yearPart = year.HasValue ? " (" + year.Value.ToString(CultureInfo.InvariantCulture) + ")" : string.Empty;
         var clean = Clean(title);
+        // B57: a title that already ends with its own year, like "Yellowstone (2018)", doesn't get the year a second time.
+        if (yearPart.Length > 0 && clean.EndsWith(yearPart.Substring(1), StringComparison.Ordinal))
+            clean = clean.Substring(0, clean.Length - (yearPart.Length - 1)).TrimEnd();
         if (clean.Length == 0)
             clean = EmptyTitle;
         var room = Math.Max(1, maxLength - yearPart.Length);

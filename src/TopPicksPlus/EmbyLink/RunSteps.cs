@@ -11,6 +11,7 @@ using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Querying;
+using MediaBrowser.Model.Tasks;
 using TopPicksPlus.Logic;
 using TopPicksPlus.Storage;
 
@@ -399,12 +400,14 @@ internal sealed class RunSteps
             return;
         }
 
+        await WaitForLibraryScan(ct).ConfigureAwait(false);
         var (result, returned) = CheckOnce(user);
         var retried = false;
         if (RunRules.RetryRowCheck(result.Passed, alreadyRetried: false, rescanTimedOut: !AllAppeared()))
         {
             SetDates(copyWatched: false, ct);
             await RefreshArtwork(ct).ConfigureAwait(false);
+            await WaitForLibraryScan(ct).ConfigureAwait(false);
             (result, returned) = CheckOnce(user);
             retried = true;
         }
@@ -418,6 +421,46 @@ internal sealed class RunSteps
             Retried = retried,
         });
     }
+
+    /// <summary>
+    /// B56: on the first real run the check ran while Emby's "Scan media library" task (started by the new copies) was still
+    /// going, and Latest returned 2 of 10; a quarter of an hour later it returned all 10 in order. So the check waits for that
+    /// scan to end, up to <see cref="RunRules.LibraryScanWait"/>. If the task can't be found the check simply goes ahead.
+    /// </summary>
+    private async Task WaitForLibraryScan(CancellationToken ct)
+    {
+        var started = DateTime.UtcNow;
+        var waited = false;
+        while (RunRules.KeepWaitingForScan(LibraryScanRunning(), DateTime.UtcNow - started))
+        {
+            waited = true;
+            await Task.Delay(PollEvery, ct).ConfigureAwait(false);
+        }
+        if (!waited)
+            return;
+        if (LibraryScanRunning())
+            _h.Log.Warn("Top Picks Plus: Emby's library scan was still running after {0} minutes; checking the row anyway (B56)",
+                RunRules.LibraryScanWait.TotalMinutes);
+        else
+            await Task.Delay(PollEvery, ct).ConfigureAwait(false); // a moment for Emby to finish saving after the scan
+    }
+
+    private bool LibraryScanRunning()
+    {
+        try
+        {
+            var tasks = _h.App.Resolve<ITaskManager>()?.ScheduledTasks;
+            return tasks != null && tasks.Any(t => t.State != TaskState.Idle && IsLibraryScan(t.ScheduledTask));
+        }
+        catch (Exception e)
+        {
+            _h.Log.Debug("Top Picks Plus: couldn't read Emby's scheduled tasks: {0}", e.Message);
+            return false;
+        }
+    }
+
+    private static bool IsLibraryScan(IScheduledTask? task) =>
+        task != null && (task.Key == "RefreshLibrary" || task.GetType().Name == "RefreshMediaLibraryTask");
 
     /// <summary>
     /// D104's requests: the Latest row for the Top Picks library as the user (limit 20, grouped) against a normal query of the

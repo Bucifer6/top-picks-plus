@@ -4,7 +4,7 @@
 
 **Rigour level:** 1 – Personal.
 **Autonomy:** high (owner prefers fewer questions; rigour 1). **Change size:** Big (new plugin replacing an old one).
-**Stage:** Live. v1.0.0 installed on the owner's server 2026-11-16 (before the proof, D149) and its first run finished. Since then v1.0.1 (D150) and v1.1.0 (D151, README) and v1.2.0 (D152, home-screen slideshow) released. Next: see docs/handover/current.md (install v1.2.0 and try the slideshow, B56, B57, then the proof and go-live checks when the owner asks).
+**Stage:** Live. v1.0.0 installed on the owner's server 2026-11-16 (before the proof, D149) and its first run finished. Since then v1.0.1 (D150) and v1.1.0 (D151, README), v1.2.0 (D152, home-screen slideshow) and v1.2.1 (D153, B56 and B57 fixed) released. Next: see docs/handover/current.md (install v1.2.1 and try the slideshow, then the proof and go-live checks when the owner asks).
 **CI budget:** public repo since 2026-11-09, so Actions minutes are free; still keep runs lean (CI runs only on non-draft PRs, main and v* tags). Everything committed is public: never commit secrets, and keep personal details out of new docs.
 
 ## Rules
@@ -16,8 +16,8 @@ Follows the build-software-safely method: talk and docs first, no code before th
 ## Docs
 - README.md – for people landing on the repo: what it does, install, the Top Picks library, schedule, settings
 - docs/spec.md – what it does (F1–F10, v7)
-- docs/checks.md – how the owner tests it (C1–C103)
-- docs/decisions.md – what's decided (D1–D152) and what's still open
+- docs/checks.md – how the owner tests it (C1–C104)
+- docs/decisions.md – what's decided (D1–D153) and what's still open
 - docs/data.md – settings, plugin flags (state.json), managed list, play log, run record
 - docs/backlog.md – findings set aside for the chunk that deals with them; each chunk's builder fixes or decides its items
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
