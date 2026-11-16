@@ -14,6 +14,8 @@ Each JSON file (managed.json, plays.json, run.json, state.json) carries `"versio
 | Pins | Ordered list of up to 10 movie or series Emby IDs (need not be in LibraryIds, D23, D61) |
 | RowCheckUserId | User the row check looks through; empty = default rule (D20) |
 | CreateLibraryIfMissing | true (default) = when a run would start or resume and no library uses the Top Picks folder, create one (D151) |
+| ShowAsSlideshow | false (default) = the Latest Top Picks row; true = a Top Picks slideshow at the top of every user's home screen in place of the row (D152) |
+| SlideshowWasOn | Not on the page: set once the plugin has put the slideshow up, cleared once it has taken it off everywhere; with the option off, home screens are only touched while it is set (D152) |
 
 The settings XML holds only what the owner sets on the settings page. The plugin's own flags are in state.json (D93), so saving the page can't change them.
 

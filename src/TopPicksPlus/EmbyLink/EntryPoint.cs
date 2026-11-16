@@ -106,6 +106,8 @@ public sealed class EntryPoint : IServerEntryPoint
                     break;
             }
         }
+        // D152: the home-screen slideshow or row, as the setting says, once Emby has settled after start-up.
+        After(RunRules.StartupResumeDelay, () => Task.Run(() => HomeScreen.Apply(_h)));
         _h.Log.Info("Top Picks Plus: started ({0})", string.Join(", ", actions));
     }
 

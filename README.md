@@ -49,10 +49,21 @@ A run that stops on an error tries again 5 minutes later, up to 3 times, carryin
 | Libraries to choose from | Empty = every movie and TV library. The Top Picks library is never offered. |
 | Row-check user | The user whose view of the row is checked after each run. Default: the first user who isn't an administrator and has no restrictions. |
 | Create the Top Picks library if it's missing | On by default; see above. |
+| Show the picks as a slideshow on the home screen | Off by default; see below. |
 | Pins | Search, add, move up or down, remove. Saved straight away. |
 
 Press **Save** after changing the first three. The **Last run report** at the bottom shows each pick and why it was chosen,
 the row check, and any notices (for example a library folder that couldn't be reached).
+
+## Row or slideshow
+
+By default the picks are Emby's own **Latest Top Picks** row. Tick **Show the picks as a slideshow on the home screen** and press
+Save to put a **Top Picks** slideshow (Emby's large spotlight banner, in rank order) at the top of every user's home screen
+instead; the Latest Top Picks row is taken off at the same time. Untick it and Save to remove the slideshow and put the row back.
+
+It is a normal Emby home-screen section, so it shows in the Emby apps that show home-screen sections, and each user can still move
+it in their own home-screen settings. It is checked again at start-up and after each run, so new users get it too (and a user
+who deletes it gets it back while the option is on).
 
 ## How picks are chosen
 

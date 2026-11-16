@@ -22,4 +22,16 @@ public class PluginConfiguration : BasePluginConfiguration
     /// On by default; an existing library is never changed.
     /// </summary>
     public bool CreateLibraryIfMissing { get; set; } = true;
+
+    /// <summary>
+    /// D152: show the picks as a slideshow at the top of every user's home screen instead of the Latest Top Picks row. Off by
+    /// default; turning it off removes the slideshow and puts the row back.
+    /// </summary>
+    public bool ShowAsSlideshow { get; set; }
+
+    /// <summary>
+    /// D152: set once the plugin has put the slideshow on home screens, cleared once it has taken it off everywhere. Not on the
+    /// settings page. While false and the option is off, home screens are never touched.
+    /// </summary>
+    public bool SlideshowWasOn { get; set; }
 }

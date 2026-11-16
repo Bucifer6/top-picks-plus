@@ -26,7 +26,7 @@ public class SettingsPage : EditableOptionsBase
 
     public override string EditorDescription =>
         "Each week the Latest Top Picks row gets the 10 most watched titles, numbered and in order. Pins come first. "
-        + "Press Save after changing the libraries, the row-check user or the library option; pin changes are saved straight away.";
+        + "Press Save after changing the libraries, the row-check user, the library option or the slideshow; pin changes are saved straight away.";
 
     // ---------------- Run ----------------
 
@@ -69,6 +69,10 @@ public class SettingsPage : EditableOptionsBase
     [DisplayName("Create the Top Picks library if it's missing")]
     [Description("When a run starts and no library uses the Top Picks folder, make one called Top Picks (Nfo reader on, no Nfo saver). An existing library is never changed.")]
     public bool CreateLibraryIfMissing { get; set; } = true;
+
+    [DisplayName("Show the picks as a slideshow on the home screen")]
+    [Description("Puts a Top Picks slideshow (large banner, in rank order) at the top of every user's home screen in place of the Latest Top Picks row. Untick to remove it and put the row back. Applied when you press Save, at start-up and after each run.")]
+    public bool ShowAsSlideshow { get; set; }
 
     // ---------------- Pins ----------------
 

@@ -63,6 +63,7 @@ public sealed class SettingsView : IPluginPageView
         page.Libraries = string.Join(",", (settings.LibraryIds ?? new long[0]).Select(Text));
         page.RowCheckUser = settings.RowCheckUserId ?? string.Empty;
         page.CreateLibraryIfMissing = settings.CreateLibraryIfMissing;
+        page.ShowAsSlideshow = settings.ShowAsSlideshow;
         ContentData = Fill(page, null);
     }
 
@@ -156,10 +157,13 @@ public sealed class SettingsView : IPluginPageView
         plugin.Configuration.LibraryIds = Ids(page.Libraries).Where(libraries.Contains).ToArray();
         plugin.Configuration.RowCheckUserId = users.Contains(page.RowCheckUser ?? string.Empty) ? page.RowCheckUser! : string.Empty;
         plugin.Configuration.CreateLibraryIfMissing = page.CreateLibraryIfMissing;
+        plugin.Configuration.ShowAsSlideshow = page.ShowAsSlideshow;
         plugin.SaveConfiguration();
+        HomeScreen.Apply(h);
         page.Libraries = string.Join(",", plugin.Configuration.LibraryIds.Select(Text));
         page.RowCheckUser = plugin.Configuration.RowCheckUserId;
         page.CreateLibraryIfMissing = plugin.Configuration.CreateLibraryIfMissing;
+        page.ShowAsSlideshow = plugin.Configuration.ShowAsSlideshow;
         ContentData = Fill(page, "Saved.");
         return Task.FromResult<IPluginUIView>(this);
     }

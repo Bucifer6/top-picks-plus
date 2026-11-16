@@ -16,8 +16,8 @@ Follows the build-software-safely method: talk and docs first, no code before th
 ## Docs
 - README.md – for people landing on the repo: what it does, install, the Top Picks library, schedule, settings
 - docs/spec.md – what it does (F1–F10, v7)
-- docs/checks.md – how the owner tests it (C1–C102)
-- docs/decisions.md – what's decided (D1–D151) and what's still open
+- docs/checks.md – how the owner tests it (C1–C103)
+- docs/decisions.md – what's decided (D1–D152) and what's still open
 - docs/data.md – settings, plugin flags (state.json), managed list, play log, run record
 - docs/backlog.md – findings set aside for the chunk that deals with them; each chunk's builder fixes or decides its items
 - docs/reviews/ – challenge round and scaffold review, with what's still owed
